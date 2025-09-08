@@ -1,5 +1,14 @@
 [
     {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
         "label": "QtWidgets",
         "importPath": "PySide6",
         "description": "PySide6",
@@ -112,6 +121,14 @@
         "documentation": {}
     },
     {
+        "label": "QCheckBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "QVBoxLayout",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -129,14 +146,6 @@
     },
     {
         "label": "QMessageBox",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QCheckBox",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
         "isExtraImport": true,
@@ -472,6 +481,22 @@
         "documentation": {}
     },
     {
+        "label": "Tabela",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Figura",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "Figura",
         "importPath": "documento",
         "description": "documento",
@@ -766,7 +791,7 @@
         "kind": 6,
         "importPath": "aba_conteudo",
         "description": "aba_conteudo",
-        "peekOfCode": "class ArvoreConteudo(QTreeWidget):\n    \"\"\"\n    Subclasse de QTreeWidget com controle total do Drag and Drop.\n    \"\"\"\n    estruturaAlterada = QtCore.Signal()\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)\n        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)\n        self.setDropIndicatorShown(True)",
+        "peekOfCode": "class ArvoreConteudo(QTreeWidget):\n    estruturaAlterada = QtCore.Signal()\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)\n        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)\n        self.setDropIndicatorShown(True)\n    def dropEvent(self, event: QtGui.QDropEvent):\n        if self.dragDropMode() == QAbstractItemView.DragDropMode.InternalMove:\n            super().dropEvent(event)",
         "detail": "aba_conteudo",
         "documentation": {}
     },
@@ -865,7 +890,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE: return False",
         "detail": "gerador_docx",
         "documentation": {}
     },
