@@ -1,6 +1,5 @@
 # gerador_docx.py
-# Descrição: O Construtor. Orquestra a criação do .docx, mas delega
-# toda a lógica de formatação para o Motor de Regras da ABNT.
+# Descrição: Adiciona uma melhoria para centralizar o cabeçalho da tabela.
 
 import os
 from docx import Document
@@ -8,6 +7,7 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.section import WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+from docx.shared import Pt
 
 from documento import DocumentoABNT, Capitulo
 from normas_abnt import MotorNormasABNT
@@ -19,6 +19,7 @@ except ImportError:
     WIN32_AVAILABLE = False
     print("AVISO: Biblioteca 'pywin32' não encontrada. A automação do sumário será desativada.")
 
+# ... (função adicionar_sumario sem alterações) ...
 def adicionar_sumario(doc, paragrafo_placeholder):
     sdt = OxmlElement('w:sdt')
     sdtContent = OxmlElement('w:sdtContent')
@@ -50,7 +51,9 @@ class GeradorDOCX:
         self.doc = Document()
         self.regras = MotorNormasABNT()
         self.regras.configurar_pagina_e_estilos(self.doc)
-
+        self.contador_tabelas = 0
+    
+    # ... (métodos _atualizar_sumario, gerar_documento sem alterações) ...
     def _atualizar_sumario_com_word(self, caminho_arquivo):
         if not WIN32_AVAILABLE:
             print("Não foi possível atualizar o sumário: pywin32 não está instalado.")
@@ -62,7 +65,6 @@ class GeradorDOCX:
             word.Visible = False
             doc_path = os.path.abspath(caminho_arquivo)
             doc = word.Documents.Open(doc_path)
-            # A forma mais robusta é forçar a atualização de todos os campos
             word.Selection.WholeStory()
             word.Selection.Fields.Update()
             doc.Save()
@@ -75,7 +77,6 @@ class GeradorDOCX:
         finally:
             if word is not None:
                 word.Quit()
-    
     def gerar_documento(self, caminho_arquivo: str):
         self._renderizar_capa()
         self._renderizar_folha_rosto()
@@ -97,8 +98,50 @@ class GeradorDOCX:
             if no_filho.conteudo:
                 p = self.doc.add_paragraph()
                 self.regras.aplicar_estilo_paragrafo_normal(p, no_filho.conteudo)
+            if no_filho.tabelas:
+                for tabela in no_filho.tabelas:
+                    self.contador_tabelas += 1
+                    tabela.numero = self.contador_tabelas
+                    self._renderizar_tabela(tabela)
             self._renderizar_secoes_recursivamente(no_filho, prefixo_numeracao=f"{numero_completo}.")
 
+    def _renderizar_tabela(self, tabela_obj):
+        p_titulo = self.doc.add_paragraph()
+        p_titulo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        run_titulo = p_titulo.add_run(f"Tabela {tabela_obj.numero} – {tabela_obj.titulo}")
+        run_titulo.font.size = self.regras.TAMANHO_FONTE_LEGENDA
+        p_titulo.paragraph_format.space_after = Pt(6)
+        
+        if not tabela_obj.dados: return
+        
+        num_rows = len(tabela_obj.dados)
+        num_cols = len(tabela_obj.dados[0]) if num_rows > 0 else 0
+        t = self.doc.add_table(rows=num_rows, cols=num_cols)
+        t.style = 'Table Grid'
+        
+        for i, row_data in enumerate(tabela_obj.dados):
+            for j, cell_data in enumerate(row_data):
+                cell = t.cell(i, j)
+                cell.text = cell_data
+                p = cell.paragraphs[0]
+                run = p.runs[0]
+                run.font.name = self.regras.FONTE_PADRAO
+                run.font.size = self.regras.TAMANHO_FONTE_LEGENDA
+                
+                # --- ## MELHORIA: Centraliza o texto do cabeçalho ## ---
+                if i == 0: # Se for a primeira linha (cabeçalho)
+                    p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        self.regras.aplicar_estilo_tabela_abnt(t)
+        
+        if tabela_obj.fonte:
+            fonte_texto = f"Fonte: {tabela_obj.fonte}"
+            p_fonte = self.doc.add_paragraph()
+            run_fonte = p_fonte.add_run(fonte_texto)
+            run_fonte.font.size = self.regras.TAMANHO_FONTE_LEGENDA
+            p_fonte.paragraph_format.space_before = Pt(6)
+
+    # (Restante do arquivo sem alterações)
     def _set_page_numbering(self, section):
         section.header.is_linked_to_previous = False
         header_p = section.header.paragraphs[0]

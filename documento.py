@@ -1,14 +1,23 @@
 # documento.py
-# Descrição: Modelo de Dados atualizado para suportar uma estrutura de árvore.
+# Descrição: Modelo de Dados atualizado para incluir a estrutura de Tabelas.
 
 from dataclasses import dataclass, field
 from typing import List, Optional
 from datetime import datetime
 from referencia import Referencia
 
+# --- ## NOVO: Classe para armazenar os dados de uma Tabela ## ---
+@dataclass
+class Tabela:
+    titulo: str = ""
+    fonte: str = ""
+    dados: List[List[str]] = field(default_factory=list) # Matriz de strings
+    # O número será atribuído dinamicamente durante a geração do documento
+    numero: int = 0
+
 @dataclass
 class Configuracoes:
-    """Armazena as configurações globais do documento."""
+    # (sem alterações)
     tipo_trabalho: str = "Trabalho de Conclusão de Curso (TCC)"
     instituicao: str = "Universidade Estadual do Piauí (UESPI)"
     curso: str = "Bacharelado em Ciência da Computação"
@@ -19,7 +28,7 @@ class Configuracoes:
 
 @dataclass
 class Autor:
-    """Representa um autor do trabalho."""
+    # (sem alterações)
     nome_completo: str
 
 @dataclass
@@ -29,15 +38,15 @@ class Capitulo:
     conteudo: str = ""
     filhos: List['Capitulo'] = field(default_factory=list)
     pai: Optional['Capitulo'] = None
+    # --- ## NOVO: Cada capítulo agora pode ter uma lista de tabelas ## ---
+    tabelas: List[Tabela] = field(default_factory=list)
 
     def adicionar_filho(self, filho: 'Capitulo'):
         filho.pai = self
         self.filhos.append(filho)
 
 class DocumentoABNT:
-    """
-    Classe principal que agrega todas as partes de um documento ABNT.
-    """
+    # (classe sem alterações, a mudança foi no Capitulo)
     def __init__(self):
         self.configuracoes: Configuracoes = Configuracoes()
         self.titulo: str = ""
@@ -45,17 +54,11 @@ class DocumentoABNT:
         self.orientador: str = ""
         self.resumo: str = ""
         self.palavras_chave: str = ""
-        
-        # Este nó raiz não aparece no documento, ele apenas contém os capítulos principais.
         self.estrutura_textual = Capitulo(titulo="Raiz do Documento")
-        
-        # Adiciona capítulos iniciais por padrão
         self.estrutura_textual.adicionar_filho(Capitulo(titulo="INTRODUÇÃO"))
         self.estrutura_textual.adicionar_filho(Capitulo(titulo="DESENVOLVIMENTO"))
         self.estrutura_textual.adicionar_filho(Capitulo(titulo="CONCLUSÃO"))
-        
         self.referencias: List[Referencia] = []
 
     def ordenar_referencias(self):
-        """Ordena a lista de referências em ordem alfabética."""
         self.referencias.sort(key=lambda ref: ref.get_chave_ordenacao())
