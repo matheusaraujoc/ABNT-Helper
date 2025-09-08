@@ -16,6 +16,14 @@
         "documentation": {}
     },
     {
+        "label": "QtGui",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
         "label": "QtWidgets",
         "importPath": "PySide6",
         "description": "PySide6",
@@ -136,6 +144,14 @@
         "documentation": {}
     },
     {
+        "label": "QAbstractItemView",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "QDialog",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -161,6 +177,14 @@
     },
     {
         "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QComboBox",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
         "isExtraImport": true,
@@ -602,11 +626,20 @@
         "documentation": {}
     },
     {
+        "label": "ArvoreConteudo",
+        "kind": 6,
+        "importPath": "aba_conteudo",
+        "description": "aba_conteudo",
+        "peekOfCode": "class ArvoreConteudo(QTreeWidget):\n    \"\"\"\n    Uma subclasse de QTreeWidget que emite um sinal personalizado após uma\n    operação de arrastar e soltar ser concluída. Isso garante que a\n    sincronização do modelo de dados ocorra de forma confiável.\n    \"\"\"\n    # Sinal personalizado que será emitido após a estrutura ser alterada\n    estruturaAlterada = QtCore.Signal()\n    def __init__(self, parent=None):\n        super().__init__(parent)",
+        "detail": "aba_conteudo",
+        "documentation": {}
+    },
+    {
         "label": "AbaConteudo",
         "kind": 6,
         "importPath": "aba_conteudo",
         "description": "aba_conteudo",
-        "peekOfCode": "class AbaConteudo(QWidget):\n    def __init__(self, documento, parent=None):\n        super().__init__(parent)\n        self.documento = documento\n        self._carregando_capitulo = False\n        self._build_ui()\n    def _build_ui(self):\n        layout = QHBoxLayout(self)\n        # Painel Esquerdo: Árvore\n        left_panel = QWidget()",
+        "peekOfCode": "class AbaConteudo(QWidget):\n    def __init__(self, documento, parent=None):\n        super().__init__(parent)\n        self.documento = documento\n        self._carregando_capitulo = False\n        self._build_ui()\n    def _build_ui(self):\n        layout = QHBoxLayout(self)\n        left_panel = QWidget()\n        left_layout = QVBoxLayout(left_panel)",
         "detail": "aba_conteudo",
         "documentation": {}
     },
@@ -615,7 +648,7 @@
         "kind": 6,
         "importPath": "dialogo_tabela",
         "description": "dialogo_tabela",
-        "peekOfCode": "class TabelaDialog(QDialog):\n    def __init__(self, tabela: Tabela = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Tabela ABNT\")\n        self.setMinimumSize(600, 400)\n        # Se nenhuma tabela for passada, cria uma nova\n        self.tabela = tabela if tabela else Tabela(dados=[[\"Cabeçalho 1\", \"Cabeçalho 2\"], [\"Dado 1\", \"Dado 2\"]])\n        self.layout = QVBoxLayout(self)\n        # Campos de Título e Fonte\n        self.titulo_input = QLineEdit(self.tabela.titulo)",
+        "peekOfCode": "class TabelaDialog(QDialog):\n    def __init__(self, tabela: Tabela = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Tabela ABNT\")\n        self.setMinimumSize(600, 400)\n        self.tabela = tabela if tabela else Tabela(dados=[[\"Cabeçalho 1\", \"Cabeçalho 2\"], [\"Dado 1\", \"Dado 2\"]])\n        self.layout = QVBoxLayout(self)\n        self.titulo_input = QLineEdit(self.tabela.titulo)\n        self.fonte_input = QLineEdit(self.tabela.fonte)\n        self.estilo_borda_combo = QComboBox()",
         "detail": "dialogo_tabela",
         "documentation": {}
     },
@@ -624,7 +657,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Tabela:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    dados: List[List[str]] = field(default_factory=list) # Matriz de strings\n    # O número será atribuído dinamicamente durante a geração do documento\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    # (sem alterações)\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"",
+        "peekOfCode": "class Tabela:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    dados: List[List[str]] = field(default_factory=list)\n    estilo_borda: str = 'abnt' # Opções: 'abnt' ou 'grade'\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"",
         "detail": "documento",
         "documentation": {}
     },
@@ -633,7 +666,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Configuracoes:\n    # (sem alterações)\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Bacharelado em Ciência da Computação\"\n    cidade: str = \"Araioses\"\n    estado: str = \"MA\"\n    ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass",
+        "peekOfCode": "class Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Bacharelado em Ciência da Computação\"\n    cidade: str = \"Araioses\"\n    estado: str = \"MA\"\n    ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass\nclass Autor:",
         "detail": "documento",
         "documentation": {}
     },
@@ -642,7 +675,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Autor:\n    # (sem alterações)\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    \"\"\"Representa um nó na árvore de conteúdo (tópico ou subtópico).\"\"\"\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None",
+        "peekOfCode": "class Autor:\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):",
         "detail": "documento",
         "documentation": {}
     },
@@ -651,7 +684,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Capitulo:\n    \"\"\"Representa um nó na árvore de conteúdo (tópico ou subtópico).\"\"\"\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    # --- ## NOVO: Cada capítulo agora pode ter uma lista de tabelas ## ---\n    tabelas: List[Tabela] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self",
+        "peekOfCode": "class Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self\n        self.filhos.append(filho)\nclass DocumentoABNT:",
         "detail": "documento",
         "documentation": {}
     },
@@ -660,7 +693,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class DocumentoABNT:\n    # (classe sem alterações, a mudança foi no Capitulo)\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"\n        self.autores: List[Autor] = []\n        self.orientador: str = \"\"\n        self.resumo: str = \"\"\n        self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")",
+        "peekOfCode": "class DocumentoABNT:\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"\n        self.autores: List[Autor] = []\n        self.orientador: str = \"\"\n        self.resumo: str = \"\"\n        self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"INTRODUÇÃO\"))",
         "detail": "documento",
         "documentation": {}
     },
@@ -669,7 +702,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n    # ... (métodos _atualizar_sumario, gerar_documento sem alterações) ...\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:\n            print(\"Não foi possível atualizar o sumário: pywin32 não está instalado.\")",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -687,7 +720,7 @@
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ReferenciaDialog(QDialog):\n    # (código sem alterações)\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self)\n        self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox()\n        self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit()",
+        "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self)\n        self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox()\n        self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit()\n        self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")",
         "detail": "main_app",
         "documentation": {}
     },
@@ -705,7 +738,7 @@
         "kind": 6,
         "importPath": "normas_abnt",
         "description": "normas_abnt",
-        "peekOfCode": "class MotorNormasABNT:\n    def __init__(self):\n        # (constantes sem alteração)\n        self.MARGEM_SUPERIOR = Cm(3)\n        self.MARGEM_INFERIOR = Cm(2)\n        self.MARGEM_ESQUERDA = Cm(3)\n        self.MARGEM_DIREITA = Cm(2)\n        self.FONTE_PADRAO = 'Times New Roman'\n        self.TAMANHO_FONTE_PADRAO = Pt(12)\n        self.TAMANHO_FONTE_CAPA = Pt(14)",
+        "peekOfCode": "class MotorNormasABNT:\n    def __init__(self):\n        self.MARGEM_SUPERIOR = Cm(3)\n        self.MARGEM_INFERIOR = Cm(2)\n        self.MARGEM_ESQUERDA = Cm(3)\n        self.MARGEM_DIREITA = Cm(2)\n        self.FONTE_PADRAO = 'Times New Roman'\n        self.TAMANHO_FONTE_PADRAO = Pt(12)\n        self.TAMANHO_FONTE_CAPA = Pt(14)\n        self.ESPAÇAMENTO_PADRAO = 1.5",
         "detail": "normas_abnt",
         "documentation": {}
     },
@@ -714,7 +747,7 @@
         "kind": 6,
         "importPath": "referencia",
         "description": "referencia",
-        "peekOfCode": "class Referencia:\n    \"\"\"Classe base para todos os tipos de referência.\"\"\"\n    def __init__(self, tipo: str, autores: str, titulo: str, ano: int):\n        self.tipo = tipo\n        self.autores = autores\n        self.titulo = titulo\n        self.ano = ano\n    def get_chave_ordenacao(self) -> str:\n        \"\"\"Retorna uma chave para ordenação alfabética.\"\"\"\n        primeiro_autor = self.autores.split(';')[0].strip()",
+        "peekOfCode": "class Referencia:\n    def __init__(self, tipo: str, autores: str, titulo: str, ano: int):\n        self.tipo = tipo\n        self.autores = autores\n        self.titulo = titulo\n        self.ano = ano\n    def get_chave_ordenacao(self) -> str:\n        primeiro_autor = self.autores.split(';')[0].strip()\n        if not primeiro_autor:\n            return self.titulo.upper()",
         "detail": "referencia",
         "documentation": {}
     },
@@ -750,7 +783,7 @@
         "kind": 2,
         "importPath": "referencia",
         "description": "referencia",
-        "peekOfCode": "def formatar_autores(autores_str: str) -> str:\n    \"\"\"Formata uma string de autores (separados por ';') para o padrão ABNT.\"\"\"\n    if not autores_str:\n        return \"\"\n    autores = [a.strip() for a in autores_str.split(';')]\n    autores_formatados = []\n    for autor in autores:\n        partes = autor.split()\n        if len(partes) > 1:\n            sobrenome = partes[-1].upper()",
+        "peekOfCode": "def formatar_autores(autores_str: str) -> str:\n    if not autores_str:\n        return \"\"\n    autores = [a.strip() for a in autores_str.split(';')]\n    autores_formatados = []\n    for autor in autores:\n        partes = autor.split()\n        if len(partes) > 1:\n            sobrenome = partes[-1].upper()\n            prenomes = \" \".join(partes[:-1])",
         "detail": "referencia",
         "documentation": {}
     }

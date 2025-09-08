@@ -4,7 +4,6 @@
 from dataclasses import dataclass
 
 def formatar_autores(autores_str: str) -> str:
-    """Formata uma string de autores (separados por ';') para o padrão ABNT."""
     if not autores_str:
         return ""
     autores = [a.strip() for a in autores_str.split(';')]
@@ -20,7 +19,6 @@ def formatar_autores(autores_str: str) -> str:
     return " ; ".join(autores_formatados)
 
 class Referencia:
-    """Classe base para todos os tipos de referência."""
     def __init__(self, tipo: str, autores: str, titulo: str, ano: int):
         self.tipo = tipo
         self.autores = autores
@@ -28,7 +26,6 @@ class Referencia:
         self.ano = ano
 
     def get_chave_ordenacao(self) -> str:
-        """Retorna uma chave para ordenação alfabética."""
         primeiro_autor = self.autores.split(';')[0].strip()
         if not primeiro_autor:
             return self.titulo.upper()
@@ -36,7 +33,6 @@ class Referencia:
         return partes[-1].upper() if partes else ""
 
     def formatar(self) -> str:
-        """Método placeholder para ser implementado pelas subclasses."""
         raise NotImplementedError
 
 @dataclass

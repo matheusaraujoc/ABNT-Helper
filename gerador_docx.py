@@ -1,5 +1,5 @@
 # gerador_docx.py
-# Descrição: Adiciona uma melhoria para centralizar o cabeçalho da tabela.
+# Descrição: O Construtor, agora sem alterações nesta rodada.
 
 import os
 from docx import Document
@@ -19,7 +19,6 @@ except ImportError:
     WIN32_AVAILABLE = False
     print("AVISO: Biblioteca 'pywin32' não encontrada. A automação do sumário será desativada.")
 
-# ... (função adicionar_sumario sem alterações) ...
 def adicionar_sumario(doc, paragrafo_placeholder):
     sdt = OxmlElement('w:sdt')
     sdtContent = OxmlElement('w:sdtContent')
@@ -52,8 +51,7 @@ class GeradorDOCX:
         self.regras = MotorNormasABNT()
         self.regras.configurar_pagina_e_estilos(self.doc)
         self.contador_tabelas = 0
-    
-    # ... (métodos _atualizar_sumario, gerar_documento sem alterações) ...
+
     def _atualizar_sumario_com_word(self, caminho_arquivo):
         if not WIN32_AVAILABLE:
             print("Não foi possível atualizar o sumário: pywin32 não está instalado.")
@@ -77,6 +75,7 @@ class GeradorDOCX:
         finally:
             if word is not None:
                 word.Quit()
+    
     def gerar_documento(self, caminho_arquivo: str):
         self._renderizar_capa()
         self._renderizar_folha_rosto()
@@ -111,14 +110,11 @@ class GeradorDOCX:
         run_titulo = p_titulo.add_run(f"Tabela {tabela_obj.numero} – {tabela_obj.titulo}")
         run_titulo.font.size = self.regras.TAMANHO_FONTE_LEGENDA
         p_titulo.paragraph_format.space_after = Pt(6)
-        
         if not tabela_obj.dados: return
-        
         num_rows = len(tabela_obj.dados)
         num_cols = len(tabela_obj.dados[0]) if num_rows > 0 else 0
         t = self.doc.add_table(rows=num_rows, cols=num_cols)
         t.style = 'Table Grid'
-        
         for i, row_data in enumerate(tabela_obj.dados):
             for j, cell_data in enumerate(row_data):
                 cell = t.cell(i, j)
@@ -127,13 +123,10 @@ class GeradorDOCX:
                 run = p.runs[0]
                 run.font.name = self.regras.FONTE_PADRAO
                 run.font.size = self.regras.TAMANHO_FONTE_LEGENDA
-                
-                # --- ## MELHORIA: Centraliza o texto do cabeçalho ## ---
-                if i == 0: # Se for a primeira linha (cabeçalho)
+                if i == 0:
                     p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        self.regras.aplicar_estilo_tabela_abnt(t)
-        
+        if tabela_obj.estilo_borda == 'abnt':
+            self.regras.aplicar_estilo_tabela_abnt(t)
         if tabela_obj.fonte:
             fonte_texto = f"Fonte: {tabela_obj.fonte}"
             p_fonte = self.doc.add_paragraph()
@@ -141,7 +134,6 @@ class GeradorDOCX:
             run_fonte.font.size = self.regras.TAMANHO_FONTE_LEGENDA
             p_fonte.paragraph_format.space_before = Pt(6)
 
-    # (Restante do arquivo sem alterações)
     def _set_page_numbering(self, section):
         section.header.is_linked_to_previous = False
         header_p = section.header.paragraphs[0]

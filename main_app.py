@@ -1,5 +1,5 @@
 # main_app.py
-# Descrição: Aplicação principal, agora atuando como um "montador" da interface.
+# Descrição: Aplicação principal, o "montador" da interface.
 
 import sys
 from PySide6 import QtWidgets, QtCore
@@ -11,12 +11,9 @@ from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QTextEd
 from documento import DocumentoABNT, Autor
 from gerador_docx import GeradorDOCX
 from referencia import Livro, Artigo, Site
-from aba_conteudo import AbaConteudo  # <-- Importa nosso novo componente
+from aba_conteudo import AbaConteudo
 
-# A classe ReferenciaDialog continua a mesma e pode ficar aqui ou ser movida
-# para seu próprio arquivo (ex: dialogs.py) no futuro.
 class ReferenciaDialog(QDialog):
-    # (código sem alterações)
     def __init__(self, ref=None, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Adicionar/Editar Referência")
@@ -104,11 +101,10 @@ class ABNTHelperApp(QWidget):
         self.tabs = QTabWidget()
         main_layout.addWidget(self.tabs)
         
-        # --- ## ALTERADO: A aba de conteúdo agora é um componente externo ## ---
-        self.aba_conteudo = AbaConteudo(self.documento) # Cria a instância do componente
+        self.aba_conteudo = AbaConteudo(self.documento)
         
         self.tabs.addTab(self._criar_aba_geral(), "Geral e Pré-Textual")
-        self.tabs.addTab(self.aba_conteudo, "Conteúdo Textual (Estrutura)") # Adiciona o componente
+        self.tabs.addTab(self.aba_conteudo, "Conteúdo Textual (Estrutura)")
         self.tabs.addTab(self._criar_aba_referencias(), "Referências")
         
         self.generate_btn = QPushButton("Gerar Documento .docx")
@@ -117,7 +113,6 @@ class ABNTHelperApp(QWidget):
         main_layout.addWidget(self.generate_btn)
 
     def _criar_aba_geral(self):
-        # (código sem alterações)
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.addWidget(QLabel("<h3>Configurações do Documento</h3>"))
@@ -150,7 +145,6 @@ class ABNTHelperApp(QWidget):
         return widget
         
     def _criar_aba_referencias(self):
-        # (código sem alterações)
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.addWidget(QLabel("<h3>Gerenciador de Referências</h3>"))
@@ -168,7 +162,6 @@ class ABNTHelperApp(QWidget):
 
     @QtCore.Slot()
     def _adicionar_referencia(self):
-        # (código sem alterações)
         dialog = ReferenciaDialog(self)
         if dialog.exec():
             nova_ref = dialog.get_data()
@@ -178,7 +171,6 @@ class ABNTHelperApp(QWidget):
 
     @QtCore.Slot()
     def _remover_referencia(self):
-        # (código sem alterações)
         linha = self.lista_referencias.currentRow()
         if linha == -1: return
         if QMessageBox.question(self, "Confirmar", "Remover esta referência?") == QMessageBox.Yes:
@@ -186,7 +178,6 @@ class ABNTHelperApp(QWidget):
             del self.documento.referencias[linha]
 
     def _sincronizar_modelo_com_ui(self):
-        # (código sem alterações)
         cfg = self.documento.configuracoes
         cfg.tipo_trabalho = self.cfg_tipo.currentText()
         cfg.instituicao = self.cfg_instituicao.text()
@@ -201,17 +192,13 @@ class ABNTHelperApp(QWidget):
 
     @QtCore.Slot()
     def _gerar_documento(self):
-        # --- ## ALTERADO: Garante que o último texto editado seja salvo ## ---
         self.aba_conteudo.sincronizar_conteudo_pendente()
         self._sincronizar_modelo_com_ui()
-
         if not self.documento.titulo or not self.documento.autores:
             QMessageBox.warning(self, "Erro", "Título e Autores são campos obrigatórios.")
             return
-
         filename, _ = QFileDialog.getSaveFileName(self, "Salvar Documento", "trabalho_abnt.docx", "Word Documents (*.docx)")
         if not filename: return
-
         try:
             gerador = GeradorDOCX(self.documento)
             gerador.gerar_documento(filename)

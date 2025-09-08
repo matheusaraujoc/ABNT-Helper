@@ -1,23 +1,21 @@
 # documento.py
-# Descrição: Modelo de Dados atualizado para incluir a estrutura de Tabelas.
+# Descrição: Modelo de Dados completo do documento ABNT.
 
 from dataclasses import dataclass, field
 from typing import List, Optional
 from datetime import datetime
 from referencia import Referencia
 
-# --- ## NOVO: Classe para armazenar os dados de uma Tabela ## ---
 @dataclass
 class Tabela:
     titulo: str = ""
     fonte: str = ""
-    dados: List[List[str]] = field(default_factory=list) # Matriz de strings
-    # O número será atribuído dinamicamente durante a geração do documento
+    dados: List[List[str]] = field(default_factory=list)
+    estilo_borda: str = 'abnt' # Opções: 'abnt' ou 'grade'
     numero: int = 0
 
 @dataclass
 class Configuracoes:
-    # (sem alterações)
     tipo_trabalho: str = "Trabalho de Conclusão de Curso (TCC)"
     instituicao: str = "Universidade Estadual do Piauí (UESPI)"
     curso: str = "Bacharelado em Ciência da Computação"
@@ -28,17 +26,14 @@ class Configuracoes:
 
 @dataclass
 class Autor:
-    # (sem alterações)
     nome_completo: str
 
 @dataclass
 class Capitulo:
-    """Representa um nó na árvore de conteúdo (tópico ou subtópico)."""
     titulo: str
     conteudo: str = ""
     filhos: List['Capitulo'] = field(default_factory=list)
     pai: Optional['Capitulo'] = None
-    # --- ## NOVO: Cada capítulo agora pode ter uma lista de tabelas ## ---
     tabelas: List[Tabela] = field(default_factory=list)
 
     def adicionar_filho(self, filho: 'Capitulo'):
@@ -46,7 +41,6 @@ class Capitulo:
         self.filhos.append(filho)
 
 class DocumentoABNT:
-    # (classe sem alterações, a mudança foi no Capitulo)
     def __init__(self):
         self.configuracoes: Configuracoes = Configuracoes()
         self.titulo: str = ""

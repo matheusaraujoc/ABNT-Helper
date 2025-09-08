@@ -1,5 +1,5 @@
 # normas_abnt.py
-# Descrição: O "Motor de Regras", com a lógica de estilo de tabela corrigida.
+# Descrição: O "Motor de Regras". Centraliza todas as especificações da ABNT.
 
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
@@ -8,7 +8,6 @@ from docx.oxml.ns import qn
 
 class MotorNormasABNT:
     def __init__(self):
-        # (constantes sem alteração)
         self.MARGEM_SUPERIOR = Cm(3)
         self.MARGEM_INFERIOR = Cm(2)
         self.MARGEM_ESQUERDA = Cm(3)
@@ -23,41 +22,26 @@ class MotorNormasABNT:
         self.TAMANHO_FONTE_CITACAO_LONGA = Pt(10)
         self.TAMANHO_FONTE_LEGENDA = Pt(10)
 
-    # --- ## CORREÇÃO: Lógica de aplicação de bordas refeita para ser mais robusta ## ---
     def aplicar_estilo_tabela_abnt(self, tabela):
-        """
-        Aplica o estilo de bordas abertas da ABNT na tabela, modificando
-        corretamente as propriedades existentes em vez de adicionar novas.
-        """
         tbl_pr = tabela._element.xpath('w:tblPr')[0]
-        
-        # Procura pelo elemento de bordas existente
         tbl_borders = tbl_pr.find(qn('w:tblBorders'))
         if tbl_borders is None:
-            # Se não existir, cria um novo
             tbl_borders = OxmlElement('w:tblBorders')
             tbl_pr.append(tbl_borders)
-
-        # Remove todas as definições de borda filhas para começar do zero
         for border in tbl_borders.findall(qn('w:*')):
             tbl_borders.remove(border)
-
-        # Define as bordas horizontais (superior, inferior e interna)
         for border_name in ['top', 'bottom', 'insideH']:
             border = OxmlElement(f'w:{border_name}')
             border.set(qn('w:val'), 'single')
-            border.set(qn('w:sz'), '4') # '4' é 0.5pt
+            border.set(qn('w:sz'), '4')
             border.set(qn('w:space'), '0')
             border.set(qn('w:color'), 'auto')
             tbl_borders.append(border)
-            
-        # Garante que as bordas verticais não existam
         for border_name in ['left', 'right', 'insideV']:
             border = OxmlElement(f'w:{border_name}')
-            border.set(qn('w:val'), 'nil') # 'nil' significa "sem borda"
+            border.set(qn('w:val'), 'nil')
             tbl_borders.append(border)
 
-    # (Restante dos métodos sem alterações)
     def configurar_pagina_e_estilos(self, doc):
         style = doc.styles['Normal']
         style.font.name = self.FONTE_PADRAO
