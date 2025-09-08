@@ -72,43 +72,20 @@
         "documentation": {}
     },
     {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
         "label": "Document",
         "importPath": "docx",
         "description": "docx",
         "isExtraImport": true,
         "detail": "docx",
-        "documentation": {}
-    },
-    {
-        "label": "Pt",
-        "importPath": "docx.shared",
-        "description": "docx.shared",
-        "isExtraImport": true,
-        "detail": "docx.shared",
-        "documentation": {}
-    },
-    {
-        "label": "Cm",
-        "importPath": "docx.shared",
-        "description": "docx.shared",
-        "isExtraImport": true,
-        "detail": "docx.shared",
-        "documentation": {}
-    },
-    {
-        "label": "Pt",
-        "importPath": "docx.shared",
-        "description": "docx.shared",
-        "isExtraImport": true,
-        "detail": "docx.shared",
-        "documentation": {}
-    },
-    {
-        "label": "Cm",
-        "importPath": "docx.shared",
-        "description": "docx.shared",
-        "isExtraImport": true,
-        "detail": "docx.shared",
         "documentation": {}
     },
     {
@@ -361,6 +338,22 @@
         "documentation": {}
     },
     {
+        "label": "Pt",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Cm",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
         "label": "Configuracoes",
         "kind": 6,
         "importPath": "documento",
@@ -401,7 +394,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n    def _set_page_numbering(self, section):\n        # (código sem alterações)\n        section.header.is_linked_to_previous = False\n        header_p = section.header.paragraphs[0]",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n    # --- ## NOVO CÓDIGO: Método para controlar o Word ## ---\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        \"\"\"\n        Abre o Word em segundo plano para forçar a atualização do sumário.",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -410,7 +403,7 @@
         "kind": 2,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "def adicionar_sumario(doc, paragrafo):\n    \"\"\"\n    Insere um campo de Tabela de Conteúdo (TOC) clicável em um parágrafo.\n    Esta função manipula o XML subjacente do documento.\n    \"\"\"\n    run = paragrafo.add_run()\n    fldChar = OxmlElement('w:fldChar')\n    fldChar.set(qn('w:fldCharType'), 'begin')\n    # Define as instruções do sumário:\n    # \\o \"1-3\" -> Usar níveis de título de 1 a 3",
+        "peekOfCode": "def adicionar_sumario(doc, paragrafo):\n    run = paragrafo.add_run()\n    fldChar = OxmlElement('w:fldChar')\n    fldChar.set(qn('w:fldCharType'), 'begin')\n    instrText = OxmlElement('w:instrText')\n    instrText.set(qn('xml:space'), 'preserve')\n    instrText.text = 'TOC \\\\o \"1-3\" \\\\h \\\\z \\\\u'\n    fldChar2 = OxmlElement('w:fldChar')\n    fldChar2.set(qn('w:fldCharType'), 'separate')\n    fldChar3 = OxmlElement('w:fldChar')",
         "detail": "gerador_docx",
         "documentation": {}
     },
