@@ -56,6 +56,22 @@
         "documentation": {}
     },
     {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
         "label": "QWidget",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -153,6 +169,86 @@
     },
     {
         "label": "QAbstractItemView",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QComboBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFileDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialogButtonBox",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
         "isExtraImport": true,
@@ -376,6 +472,14 @@
         "documentation": {}
     },
     {
+        "label": "Figura",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "Tabela",
         "importPath": "documento",
         "description": "documento",
@@ -421,6 +525,31 @@
         "description": "dialogo_tabela",
         "isExtraImport": true,
         "detail": "dialogo_tabela",
+        "documentation": {}
+    },
+    {
+        "label": "DialogoFigura",
+        "importPath": "dialogo_figura",
+        "description": "dialogo_figura",
+        "isExtraImport": true,
+        "detail": "dialogo_figura",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "Image",
+        "importPath": "PIL",
+        "description": "PIL",
+        "isExtraImport": true,
+        "detail": "PIL",
         "documentation": {}
     },
     {
@@ -504,20 +633,43 @@
         "documentation": {}
     },
     {
-        "label": "os",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "os",
-        "description": "os",
-        "detail": "os",
-        "documentation": {}
-    },
-    {
         "label": "Document",
         "importPath": "docx",
         "description": "docx",
         "isExtraImport": true,
         "detail": "docx",
+        "documentation": {}
+    },
+    {
+        "label": "Cm",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Pt",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Pt",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Cm",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
         "documentation": {}
     },
     {
@@ -577,30 +729,6 @@
         "documentation": {}
     },
     {
-        "label": "Pt",
-        "importPath": "docx.shared",
-        "description": "docx.shared",
-        "isExtraImport": true,
-        "detail": "docx.shared",
-        "documentation": {}
-    },
-    {
-        "label": "Pt",
-        "importPath": "docx.shared",
-        "description": "docx.shared",
-        "isExtraImport": true,
-        "detail": "docx.shared",
-        "documentation": {}
-    },
-    {
-        "label": "Cm",
-        "importPath": "docx.shared",
-        "description": "docx.shared",
-        "isExtraImport": true,
-        "detail": "docx.shared",
-        "documentation": {}
-    },
-    {
         "label": "MotorNormasABNT",
         "importPath": "normas_abnt",
         "description": "normas_abnt",
@@ -638,7 +766,7 @@
         "kind": 6,
         "importPath": "aba_conteudo",
         "description": "aba_conteudo",
-        "peekOfCode": "class ArvoreConteudo(QTreeWidget):\n    estruturaAlterada = QtCore.Signal()\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        # --- ## ALTERADO: Drag and Drop começa desativado por padrão ## ---\n        self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)\n        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)\n        self.setDropIndicatorShown(True)\n    def dropEvent(self, event: QtGui.QDropEvent):\n        if self.dragDropMode() == QAbstractItemView.DragDropMode.InternalMove:",
+        "peekOfCode": "class ArvoreConteudo(QTreeWidget):\n    \"\"\"\n    Subclasse de QTreeWidget com controle total do Drag and Drop.\n    \"\"\"\n    estruturaAlterada = QtCore.Signal()\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)\n        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)\n        self.setDropIndicatorShown(True)",
         "detail": "aba_conteudo",
         "documentation": {}
     },
@@ -649,6 +777,24 @@
         "description": "aba_conteudo",
         "peekOfCode": "class AbaConteudo(QWidget):\n    def __init__(self, documento, parent=None):\n        super().__init__(parent)\n        self.documento = documento\n        self._carregando_capitulo = False\n        self._build_ui()\n    def _build_ui(self):\n        layout = QHBoxLayout(self)\n        left_panel = QWidget()\n        left_layout = QVBoxLayout(left_panel)",
         "detail": "aba_conteudo",
+        "documentation": {}
+    },
+    {
+        "label": "DialogoFigura",
+        "kind": 6,
+        "importPath": "dialogo_figura",
+        "description": "dialogo_figura",
+        "peekOfCode": "class DialogoFigura(QDialog):\n    def __init__(self, figura: Figura = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Figura ABNT\")\n        self.setMinimumSize(500, 250)\n        self.figura = figura if figura else Figura()\n        self.layout = QVBoxLayout(self)\n        form_layout = QtWidgets.QFormLayout()\n        # Campos de Título, Fonte, Arquivo e Largura\n        self.titulo_input = QLineEdit(self.figura.titulo)",
+        "detail": "dialogo_figura",
+        "documentation": {}
+    },
+    {
+        "label": "LARGURA_MAXIMA_CM",
+        "kind": 5,
+        "importPath": "dialogo_figura",
+        "description": "dialogo_figura",
+        "peekOfCode": "LARGURA_MAXIMA_CM = 16.0 # Largura máxima para uma imagem em uma página A4 com margens\nclass DialogoFigura(QDialog):\n    def __init__(self, figura: Figura = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Figura ABNT\")\n        self.setMinimumSize(500, 250)\n        self.figura = figura if figura else Figura()\n        self.layout = QVBoxLayout(self)\n        form_layout = QtWidgets.QFormLayout()\n        # Campos de Título, Fonte, Arquivo e Largura",
+        "detail": "dialogo_figura",
         "documentation": {}
     },
     {
@@ -665,7 +811,16 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Tabela:\n    # (sem alterações)\n    titulo: str = \"\"\n    fonte: str = \"\"\n    dados: List[List[str]] = field(default_factory=list)\n    estilo_borda: str = 'abnt'\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"",
+        "peekOfCode": "class Tabela:\n    # (sem alterações)\n    titulo: str = \"\"; fonte: str = \"\"; dados: List[List[str]] = field(default_factory=list)\n    estilo_borda: str = 'abnt'; numero: int = 0\n# --- ## NOVO: Classe para armazenar os dados de uma Figura ## ---\n@dataclass\nclass Figura:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    caminho_original: str = \"\" # Caminho do arquivo que o usuário selecionou",
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Figura",
+        "kind": 6,
+        "importPath": "documento",
+        "description": "documento",
+        "peekOfCode": "class Figura:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    caminho_original: str = \"\" # Caminho do arquivo que o usuário selecionou\n    caminho_processado: str = \"\" # Caminho do arquivo convertido/redimensionado\n    largura_cm: float = 12.0 # Largura padrão em cm\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    # (sem alterações)",
         "detail": "documento",
         "documentation": {}
     },
@@ -674,7 +829,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Ciência da Computação\"\n    # --- ## NOVOS CAMPOS PARA FLEXIBILIDADE ## ---\n    modalidade_curso: str = \"Bacharelado\" # Ex: Bacharelado, Tecnologia, Licenciatura\n    titulo_pretendido: str = \"Bacharel\"    # Ex: Bacharel, Tecnólogo, Licenciado\n    # --- FIM DOS NOVOS CAMPOS ---\n    cidade: str = \"Araioses\"\n    estado: str = \"MA\"",
+        "peekOfCode": "class Configuracoes:\n    # (sem alterações)\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"; curso: str = \"Ciência da Computação\"\n    modalidade_curso: str = \"Bacharelado\"; titulo_pretendido: str = \"Bacharel\"\n    cidade: str = \"Araioses\"; estado: str = \"MA\"; ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass\nclass Autor:\n    # (sem alterações)",
         "detail": "documento",
         "documentation": {}
     },
@@ -683,7 +838,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Autor:\n    # (sem alterações)\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    # (sem alterações)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None",
+        "peekOfCode": "class Autor:\n    # (sem alterações)\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    # (sem alterações, apenas adiciona a lista de figuras)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None",
         "detail": "documento",
         "documentation": {}
     },
@@ -692,7 +847,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Capitulo:\n    # (sem alterações)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self\n        self.filhos.append(filho)",
+        "peekOfCode": "class Capitulo:\n    # (sem alterações, apenas adiciona a lista de figuras)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    # --- ## NOVO: Cada capítulo agora pode ter uma lista de figuras ## ---\n    figuras: List[Figura] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):",
         "detail": "documento",
         "documentation": {}
     },
@@ -701,7 +856,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class DocumentoABNT:\n    # (sem alterações)\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"\n        self.autores: List[Autor] = []\n        self.orientador: str = \"\"\n        self.resumo: str = \"\"\n        self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")",
+        "peekOfCode": "class DocumentoABNT:\n    # (sem alterações)\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"; self.autores: List[Autor] = []; self.orientador: str = \"\"\n        self.resumo: str = \"\"; self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"INTRODUÇÃO\"))\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"DESENVOLVIMENTO\"))\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"CONCLUSÃO\"))",
         "detail": "documento",
         "documentation": {}
     },
@@ -710,7 +865,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:\n            print(\"Não foi possível atualizar o sumário: pywin32 não está instalado.\")",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -719,7 +874,7 @@
         "kind": 2,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "def adicionar_sumario(doc, paragrafo_placeholder):\n    sdt = OxmlElement('w:sdt')\n    sdtContent = OxmlElement('w:sdtContent')\n    p = OxmlElement('w:p')\n    r = OxmlElement('w:r')\n    fldChar_begin = OxmlElement('w:fldChar')\n    fldChar_begin.set(qn('w:fldCharType'), 'begin')\n    instrText = OxmlElement('w:instrText')\n    instrText.set(qn('xml:space'), 'preserve')\n    instrText.text = 'TOC \\\\o \"1-3\" \\\\h \\\\z \\\\u'",
+        "peekOfCode": "def adicionar_sumario(doc, paragrafo_placeholder):\n    sdt = OxmlElement('w:sdt')\n    sdtContent = OxmlElement('w:sdtContent')\n    p = OxmlElement('w:p'); r = OxmlElement('w:r')\n    fldChar_begin = OxmlElement('w:fldChar'); fldChar_begin.set(qn('w:fldCharType'), 'begin')\n    instrText = OxmlElement('w:instrText'); instrText.set(qn('xml:space'), 'preserve')\n    instrText.text = 'TOC \\\\o \"1-3\" \\\\h \\\\z \\\\u'\n    fldChar_separate = OxmlElement('w:fldChar'); fldChar_separate.set(qn('w:fldCharType'), 'separate')\n    fldChar_end = OxmlElement('w:fldChar'); fldChar_end.set(qn('w:fldCharType'), 'end')\n    r.append(fldChar_begin); r.append(instrText); r.append(fldChar_separate); r.append(fldChar_end)",
         "detail": "gerador_docx",
         "documentation": {}
     },

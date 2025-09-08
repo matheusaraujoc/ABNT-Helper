@@ -1,5 +1,5 @@
 # normas_abnt.py
-# Descrição: O "Motor de Regras". Centraliza todas as especificações da ABNT.
+# Descrição: O "Motor de Regras" que centraliza todas as especificações da ABNT.
 
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
@@ -41,6 +41,15 @@ class MotorNormasABNT:
             border = OxmlElement(f'w:{border_name}')
             border.set(qn('w:val'), 'nil')
             tbl_borders.append(border)
+
+    def aplicar_estilo_legenda(self, paragrafo, is_titulo=True):
+        paragrafo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER if is_titulo else WD_PARAGRAPH_ALIGNMENT.LEFT
+        paragrafo.paragraph_format.space_before = Pt(0) if is_titulo else Pt(6)
+        paragrafo.paragraph_format.space_after = Pt(6) if is_titulo else Pt(12)
+        paragrafo.paragraph_format.line_spacing = 1.0
+        for run in paragrafo.runs:
+            run.font.name = self.FONTE_PADRAO
+            run.font.size = self.TAMANHO_FONTE_LEGENDA
 
     def configurar_pagina_e_estilos(self, doc):
         style = doc.styles['Normal']

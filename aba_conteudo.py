@@ -1,5 +1,5 @@
 # aba_conteudo.py
-# Descrição: Adiciona um interruptor para ativar/desativar a reorganização de tópicos.
+# Descrição: Componente de UI dedicado para a aba de conteúdo textual.
 
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, QListWidget,
@@ -8,14 +8,16 @@ from PySide6.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, QListWid
 
 from documento import Capitulo
 from dialogo_tabela import TabelaDialog
+from dialogo_figura import DialogoFigura
 
 class ArvoreConteudo(QTreeWidget):
+    """
+    Subclasse de QTreeWidget com controle total do Drag and Drop.
+    """
     estruturaAlterada = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        
-        # --- ## ALTERADO: Drag and Drop começa desativado por padrão ## ---
         self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setDropIndicatorShown(True)
@@ -41,13 +43,11 @@ class AbaConteudo(QWidget):
         left_panel.setMaximumWidth(350)
 
         left_layout.addWidget(QLabel("Estrutura do Documento"))
-        
-        # --- ## NOVO: Checkbox para controlar o modo de reorganização ## ---
         self.chk_reorganizar = QCheckBox("Habilitar Reorganização (Arrastar e Soltar)")
         self.chk_reorganizar.stateChanged.connect(self._alternar_modo_arrastar)
         left_layout.addWidget(self.chk_reorganizar)
 
-        self.arvore_capitulos = ArvoreConteudo() 
+        self.arvore_capitulos = ArvoreConteudo()
         self.arvore_capitulos.setHeaderLabel("Tópicos")
         self.arvore_capitulos.estruturaAlterada.connect(self._sincronizar_modelo_com_arvore)
         self.arvore_capitulos.currentItemChanged.connect(self._carregar_capitulo_no_editor)
@@ -55,38 +55,74 @@ class AbaConteudo(QWidget):
         self._popular_arvore()
         left_layout.addWidget(self.arvore_capitulos)
 
-        # ... (Restante do _build_ui sem alterações) ...
         btn_layout = QHBoxLayout()
-        btn_add_topico = QPushButton("Novo Tópico"); btn_add_sub = QPushButton("Novo Subtópico")
-        btn_del = QPushButton("Remover"); btn_layout.addWidget(btn_add_topico)
-        btn_layout.addWidget(btn_add_sub); btn_layout.addWidget(btn_del)
+        btn_add_topico = QPushButton("Novo Tópico")
+        btn_add_sub = QPushButton("Novo Subtópico")
+        btn_del = QPushButton("Remover")
+        btn_layout.addWidget(btn_add_topico)
+        btn_layout.addWidget(btn_add_sub)
+        btn_layout.addWidget(btn_del)
         btn_add_topico.clicked.connect(self._adicionar_topico_principal)
         btn_add_sub.clicked.connect(self._adicionar_subtopico)
         btn_del.clicked.connect(self._remover_topico)
-        left_layout.addLayout(btn_layout); layout.addWidget(left_panel)
-        right_panel = QWidget(); right_layout = QVBoxLayout(right_panel)
+        left_layout.addLayout(btn_layout)
+        layout.addWidget(left_panel)
+
+        right_panel = QWidget()
+        right_layout = QVBoxLayout(right_panel)
         self.label_capitulo_atual = QLabel("Selecione um tópico para editar")
         self.editor_capitulo = QTextEdit()
         self.editor_capitulo.textChanged.connect(self._salvar_conteudo_capitulo)
-        self.label_tabelas = QLabel("Tabelas neste Tópico:")
-        self.lista_tabelas = QListWidget(); self.lista_tabelas.setMaximumHeight(150)
+        
+        self.lista_tabelas = QListWidget()
+        self.lista_figuras = QListWidget()
+
+        elementos_layout = QHBoxLayout()
+        tabelas_widget = QWidget()
+        tabelas_v_layout = QVBoxLayout(tabelas_widget)
+        tabelas_v_layout.addWidget(QLabel("Tabelas neste Tópico:"))
+        tabelas_v_layout.addWidget(self.lista_tabelas)
         tabelas_btn_layout = QHBoxLayout()
-        btn_add_tabela = QPushButton("Adicionar Tabela"); btn_edit_tabela = QPushButton("Editar Tabela")
-        btn_del_tabela = QPushButton("Remover Tabela"); tabelas_btn_layout.addWidget(btn_add_tabela)
-        tabelas_btn_layout.addWidget(btn_edit_tabela); tabelas_btn_layout.addWidget(btn_del_tabela)
+        btn_add_tabela = QPushButton("Add Tabela")
+        btn_edit_tabela = QPushButton("Editar Tabela")
+        btn_del_tabela = QPushButton("Remover Tabela")
+        tabelas_btn_layout.addWidget(btn_add_tabela)
+        tabelas_btn_layout.addWidget(btn_edit_tabela)
+        tabelas_btn_layout.addWidget(btn_del_tabela)
         btn_add_tabela.clicked.connect(self._adicionar_tabela)
         btn_edit_tabela.clicked.connect(self._editar_tabela)
         btn_del_tabela.clicked.connect(self._remover_tabela)
-        right_layout.addWidget(self.label_capitulo_atual); right_layout.addWidget(self.editor_capitulo, 3)
-        right_layout.addWidget(self.label_tabelas); right_layout.addWidget(self.lista_tabelas, 1)
-        right_layout.addLayout(tabelas_btn_layout); layout.addWidget(right_panel)
+        tabelas_v_layout.addLayout(tabelas_btn_layout)
+        
+        figuras_widget = QWidget()
+        figuras_v_layout = QVBoxLayout(figuras_widget)
+        figuras_v_layout.addWidget(QLabel("Figuras neste Tópico:"))
+        figuras_v_layout.addWidget(self.lista_figuras)
+        figuras_btn_layout = QHBoxLayout()
+        btn_add_figura = QPushButton("Add Figura")
+        btn_edit_figura = QPushButton("Editar Figura")
+        btn_del_figura = QPushButton("Remover Figura")
+        figuras_btn_layout.addWidget(btn_add_figura)
+        figuras_btn_layout.addWidget(btn_edit_figura)
+        figuras_btn_layout.addWidget(btn_del_figura)
+        btn_add_figura.clicked.connect(self._adicionar_figura)
+        btn_edit_figura.clicked.connect(self._editar_figura)
+        btn_del_figura.clicked.connect(self._remover_figura)
+        figuras_v_layout.addLayout(figuras_btn_layout)
+        
+        elementos_layout.addWidget(tabelas_widget)
+        elementos_layout.addWidget(figuras_widget)
+
+        right_layout.addWidget(self.label_capitulo_atual)
+        right_layout.addWidget(self.editor_capitulo, 2)
+        right_layout.addLayout(elementos_layout, 1)
+        layout.addWidget(right_panel)
+        
         if self.arvore_capitulos.topLevelItemCount() > 0:
             self.arvore_capitulos.setCurrentItem(self.arvore_capitulos.topLevelItem(0))
 
-    # --- ## NOVO: Slot para ativar/desativar o Drag and Drop ## ---
     @QtCore.Slot(int)
     def _alternar_modo_arrastar(self, state):
-        """Ativa ou desativa o modo de arrastar e soltar na árvore."""
         if state == QtCore.Qt.CheckState.Checked.value:
             self.arvore_capitulos.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
             self.arvore_capitulos.setHeaderLabel("Tópicos (Modo Reorganizar)")
@@ -94,7 +130,6 @@ class AbaConteudo(QWidget):
             self.arvore_capitulos.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)
             self.arvore_capitulos.setHeaderLabel("Tópicos")
             
-    # --- O restante do arquivo permanece o mesmo da versão anterior ---
     @QtCore.Slot()
     def _sincronizar_modelo_com_arvore(self):
         self.documento.estrutura_textual.filhos.clear()
@@ -171,16 +206,15 @@ class AbaConteudo(QWidget):
 
     def _get_capitulo_selecionado(self) -> Capitulo | None:
         item = self.arvore_capitulos.currentItem()
-        if item:
-            return item.data(0, QtCore.Qt.ItemDataRole.UserRole)
-        return None
+        return item.data(0, QtCore.Qt.ItemDataRole.UserRole) if item else None
 
     @QtCore.Slot(QTreeWidgetItem)
     def _carregar_capitulo_no_editor(self, item_atual, item_anterior):
         capitulo = self._get_capitulo_selecionado()
         if not capitulo:
             self.editor_capitulo.clear(); self.editor_capitulo.setEnabled(False)
-            self.lista_tabelas.clear(); self.label_capitulo_atual.setText("Selecione um tópico")
+            self.lista_tabelas.clear(); self.lista_figuras.clear()
+            self.label_capitulo_atual.setText("Selecione um tópico")
             return
         self._carregando_capitulo = True
         self.label_capitulo_atual.setText(f"Editando: {capitulo.titulo}")
@@ -189,6 +223,9 @@ class AbaConteudo(QWidget):
         self.lista_tabelas.clear()
         for i, tabela in enumerate(capitulo.tabelas):
             self.lista_tabelas.addItem(f"Tabela {i+1}: {tabela.titulo}")
+        self.lista_figuras.clear()
+        for i, figura in enumerate(capitulo.figuras):
+            self.lista_figuras.addItem(f"Figura {i+1}: {figura.titulo}")
         self._carregando_capitulo = False
 
     @QtCore.Slot()
@@ -201,38 +238,72 @@ class AbaConteudo(QWidget):
     @QtCore.Slot()
     def _adicionar_tabela(self):
         capitulo = self._get_capitulo_selecionado()
-        if not capitulo:
-            QMessageBox.warning(self, "Atenção", "Selecione um tópico para adicionar uma tabela.")
-            return
+        if not capitulo: QMessageBox.warning(self, "Atenção", "Selecione um tópico para adicionar uma tabela."); return
         dialog = TabelaDialog(parent=self)
         if dialog.exec():
-            nova_tabela = dialog.get_dados_tabela()
-            capitulo.tabelas.append(nova_tabela)
+            nova_tabela = dialog.get_dados_tabela(); capitulo.tabelas.append(nova_tabela)
             self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
 
     @QtCore.Slot()
     def _editar_tabela(self):
-        capitulo = self._get_capitulo_selecionado()
-        linha_selecionada = self.lista_tabelas.currentRow()
-        if not capitulo or linha_selecionada == -1:
-            QMessageBox.warning(self, "Atenção", "Selecione uma tabela para editar.")
-            return
-        tabela_para_editar = capitulo.tabelas[linha_selecionada]
-        dialog = TabelaDialog(tabela=tabela_para_editar, parent=self)
+        capitulo = self._get_capitulo_selecionado(); linha_selecionada = self.lista_tabelas.currentRow()
+        if not capitulo or linha_selecionada == -1: QMessageBox.warning(self, "Atenção", "Selecione uma tabela para editar."); return
+        tabela_para_editar = capitulo.tabelas[linha_selecionada]; dialog = TabelaDialog(tabela=tabela_para_editar, parent=self)
         if dialog.exec():
-            tabela_atualizada = dialog.get_dados_tabela()
-            capitulo.tabelas[linha_selecionada] = tabela_atualizada
+            tabela_atualizada = dialog.get_dados_tabela(); capitulo.tabelas[linha_selecionada] = tabela_atualizada
             self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
 
     @QtCore.Slot()
     def _remover_tabela(self):
-        capitulo = self._get_capitulo_selecionado()
-        linha_selecionada = self.lista_tabelas.currentRow()
-        if not capitulo or linha_selecionada == -1:
-            QMessageBox.warning(self, "Atenção", "Selecione uma tabela para remover.")
-            return
+        capitulo = self._get_capitulo_selecionado(); linha_selecionada = self.lista_tabelas.currentRow()
+        if not capitulo or linha_selecionada == -1: QMessageBox.warning(self, "Atenção", "Selecione uma tabela para remover."); return
         if QMessageBox.question(self, "Confirmar", "Remover esta tabela?") == QMessageBox.StandardButton.Yes:
             del capitulo.tabelas[linha_selecionada]
+            self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+            
+    @QtCore.Slot()
+    def _adicionar_figura(self):
+        capitulo = self._get_capitulo_selecionado()
+        if not capitulo:
+            QMessageBox.warning(self, "Atenção", "Selecione um tópico para adicionar uma figura.")
+            return
+        dialog = DialogoFigura(parent=self)
+        if dialog.exec():
+            nova_figura = dialog.get_dados_figura()
+            if nova_figura and nova_figura.caminho_processado:
+                capitulo.figuras.append(nova_figura)
+                self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+            elif nova_figura and not nova_figura.caminho_original:
+                QMessageBox.warning(self, "Atenção", "Nenhum arquivo de imagem foi selecionado.")
+            else:
+                QMessageBox.critical(self, "Erro", "Não foi possível processar a imagem selecionada.")
+
+    @QtCore.Slot()
+    def _editar_figura(self):
+        capitulo = self._get_capitulo_selecionado()
+        linha_selecionada = self.lista_figuras.currentRow()
+        if not capitulo or linha_selecionada == -1:
+            QMessageBox.warning(self, "Atenção", "Selecione uma figura para editar.")
+            return
+        figura_para_editar = capitulo.figuras[linha_selecionada]
+        dialog = DialogoFigura(figura=figura_para_editar, parent=self)
+        if dialog.exec():
+            figura_atualizada = dialog.get_dados_figura()
+            if figura_atualizada and figura_atualizada.caminho_processado:
+                capitulo.figuras[linha_selecionada] = figura_atualizada
+                self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+            else:
+                QMessageBox.critical(self, "Erro", "Não foi possível processar a imagem selecionada na edição.")
+    
+    @QtCore.Slot()
+    def _remover_figura(self):
+        capitulo = self._get_capitulo_selecionado()
+        linha_selecionada = self.lista_figuras.currentRow()
+        if not capitulo or linha_selecionada == -1:
+            QMessageBox.warning(self, "Atenção", "Selecione uma figura para remover.")
+            return
+        if QMessageBox.question(self, "Confirmar", "Remover esta figura?") == QMessageBox.StandardButton.Yes:
+            del capitulo.figuras[linha_selecionada]
             self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
             
     @QtCore.Slot(QTreeWidgetItem, int)
