@@ -948,7 +948,7 @@
         "kind": 6,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "class GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _nova_pagina(self):\n        \"\"\"Finaliza a página atual e começa uma nova.\"\"\"",
+        "peekOfCode": "class GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n        self.entradas_sumario = []\n    def _nova_pagina(self):",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -993,7 +993,7 @@
         "kind": 5,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "ALTURA_LINHA_TABELA = 0.8\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _nova_pagina(self):",
+        "peekOfCode": "ALTURA_LINHA_TABELA = 0.8\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n        self.entradas_sumario = []",
         "detail": "gerador_preview",
         "documentation": {}
     },
