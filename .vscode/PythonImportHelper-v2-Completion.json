@@ -394,7 +394,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n    # --- ## NOVO CÓDIGO: Método para controlar o Word ## ---\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        \"\"\"\n        Abre o Word em segundo plano para forçar a atualização do sumário.",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n    # --- ## CÓDIGO CORRIGIDO E DEFINITIVO PARA A ATUALIZAÇÃO DO SUMÁRIO ## ---\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        \"\"\"\n        Abre o Word em segundo plano e força uma atualização COMPLETA de todos os",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -403,7 +403,7 @@
         "kind": 2,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "def adicionar_sumario(doc, paragrafo):\n    run = paragrafo.add_run()\n    fldChar = OxmlElement('w:fldChar')\n    fldChar.set(qn('w:fldCharType'), 'begin')\n    instrText = OxmlElement('w:instrText')\n    instrText.set(qn('xml:space'), 'preserve')\n    instrText.text = 'TOC \\\\o \"1-3\" \\\\h \\\\z \\\\u'\n    fldChar2 = OxmlElement('w:fldChar')\n    fldChar2.set(qn('w:fldCharType'), 'separate')\n    fldChar3 = OxmlElement('w:fldChar')",
+        "peekOfCode": "def adicionar_sumario(doc, paragrafo_placeholder):\n    # (código sem alterações, já está correto)\n    sdt = OxmlElement('w:sdt')\n    sdtContent = OxmlElement('w:sdtContent')\n    p = OxmlElement('w:p')\n    r = OxmlElement('w:r')\n    fldChar_begin = OxmlElement('w:fldChar')\n    fldChar_begin.set(qn('w:fldCharType'), 'begin')\n    instrText = OxmlElement('w:instrText')\n    instrText.set(qn('xml:space'), 'preserve')",
         "detail": "gerador_docx",
         "documentation": {}
     },

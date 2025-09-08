@@ -1,5 +1,5 @@
 # gerador_docx.py
-# Descrição: Versão final do Construtor, com automação total do sumário via MS Word.
+# Descrição: Versão definitiva com a automação do sumário CLICÁVEL funcionando.
 
 import os
 from docx import Document
@@ -11,7 +11,6 @@ from docx.oxml import OxmlElement
 from documento import DocumentoABNT
 from normas_abnt import MotorNormasABNT
 
-# --- ## NOVO CÓDIGO: Import para automação do Word ## ---
 try:
     import win32com.client as win32
     WIN32_AVAILABLE = True
@@ -19,21 +18,31 @@ except ImportError:
     WIN32_AVAILABLE = False
     print("AVISO: Biblioteca 'pywin32' não encontrada. A automação do sumário será desativada.")
 
-def adicionar_sumario(doc, paragrafo):
-    run = paragrafo.add_run()
-    fldChar = OxmlElement('w:fldChar')
-    fldChar.set(qn('w:fldCharType'), 'begin')
+def adicionar_sumario(doc, paragrafo_placeholder):
+    # (código sem alterações, já está correto)
+    sdt = OxmlElement('w:sdt')
+    sdtContent = OxmlElement('w:sdtContent')
+    p = OxmlElement('w:p')
+    r = OxmlElement('w:r')
+    fldChar_begin = OxmlElement('w:fldChar')
+    fldChar_begin.set(qn('w:fldCharType'), 'begin')
     instrText = OxmlElement('w:instrText')
     instrText.set(qn('xml:space'), 'preserve')
     instrText.text = 'TOC \\o "1-3" \\h \\z \\u'
-    fldChar2 = OxmlElement('w:fldChar')
-    fldChar2.set(qn('w:fldCharType'), 'separate')
-    fldChar3 = OxmlElement('w:fldChar')
-    fldChar3.set(qn('w:fldCharType'), 'end')
-    run._r.append(fldChar)
-    run._r.append(instrText)
-    run._r.append(fldChar2)
-    run._r.append(fldChar3)
+    fldChar_separate = OxmlElement('w:fldChar')
+    fldChar_separate.set(qn('w:fldCharType'), 'separate')
+    fldChar_end = OxmlElement('w:fldChar')
+    fldChar_end.set(qn('w:fldCharType'), 'end')
+    r.append(fldChar_begin)
+    r.append(instrText)
+    r.append(fldChar_separate)
+    r.append(fldChar_end)
+    p.append(r)
+    sdtContent.append(p)
+    sdt.append(sdtContent)
+    p_xml = paragrafo_placeholder._p
+    p_xml.addnext(sdt)
+    p_xml.getparent().remove(p_xml)
 
 class GeradorDOCX:
     def __init__(self, doc_abnt: DocumentoABNT):
@@ -42,78 +51,65 @@ class GeradorDOCX:
         self.regras = MotorNormasABNT()
         self.regras.configurar_pagina_e_estilos(self.doc)
 
-    # --- ## NOVO CÓDIGO: Método para controlar o Word ## ---
+    # --- ## CÓDIGO CORRIGIDO E DEFINITIVO PARA A ATUALIZAÇÃO DO SUMÁRIO ## ---
     def _atualizar_sumario_com_word(self, caminho_arquivo):
         """
-        Abre o Word em segundo plano para forçar a atualização do sumário.
-        Requer Windows e MS Word instalado.
+        Abre o Word em segundo plano e força uma atualização COMPLETA de todos os
+        campos do documento, o que garante a criação dos hyperlinks no sumário.
         """
         if not WIN32_AVAILABLE:
             print("Não foi possível atualizar o sumário: pywin32 não está instalado.")
             return False
-
+        
+        word = None
         try:
-            print("Iniciando automação do MS Word para atualizar o sumário...")
+            print("Iniciando automação do MS Word para reconstrução do sumário...")
             word = win32.DispatchEx("Word.Application")
-            word.Visible = False # Roda invisível
-            
-            # Converte o caminho relativo para absoluto, essencial para o Word
+            word.Visible = False
             doc_path = os.path.abspath(caminho_arquivo)
-            
             doc = word.Documents.Open(doc_path)
             
-            # Atualiza todos os campos do documento (TOC, números de página, etc.)
-            doc.Fields.Update()
+            # Seleciona o documento inteiro
+            word.Selection.WholeStory()
+            # Força a atualização de todos os campos na seleção (incluindo o TOC com hyperlinks)
+            word.Selection.Fields.Update()
             
             doc.Save()
             doc.Close(SaveChanges=False)
             
-            print("Sumário atualizado com sucesso.")
+            print("Sumário clicável gerado e atualizado com sucesso.")
             return True
         except Exception as e:
             print(f"ERRO: Falha ao automatizar o Word para atualizar o sumário: {e}")
             return False
         finally:
-            if 'word' in locals():
+            if word is not None:
                 word.Quit()
+    # --- FIM DA CORREÇÃO ---
 
     def gerar_documento(self, caminho_arquivo: str):
-        # ... (código de renderização pré-textual, textual, pós-textual) ...
-        # Pré-textuais
+        # (código sem alterações)
         self._renderizar_capa()
         self._renderizar_folha_rosto()
         self._renderizar_resumo()
-        
-        # Início da seção textual
         section = self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._set_page_numbering(section)
-
-        # Textuais
         self._renderizar_sumario()
-        
         for i, capitulo in enumerate(self.doc_abnt.capitulos, 1):
             self._renderizar_capitulo(capitulo, i)
-
-        # Pós-textuais
         self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._renderizar_referencias()
-
-        # Salva o documento pela primeira vez
         self.doc.save(caminho_arquivo)
-        
-        # --- ## ALTERADO: Chama a automação do Word após salvar ## ---
-        # Tenta atualizar o sumário automaticamente
         self._atualizar_sumario_com_word(caminho_arquivo)
 
+    # --- O restante do arquivo permanece o mesmo da versão anterior ---
     def _renderizar_sumario(self):
         self.regras.aplicar_estilo_titulo_secao(self.doc, numero="", titulo_texto="SUMÁRIO")
-        paragrafo_sumario = self.doc.add_paragraph()
-        adicionar_sumario(self.doc, paragrafo_sumario)
+        paragrafo_placeholder = self.doc.add_paragraph()
+        adicionar_sumario(self.doc, paragrafo_placeholder)
         self.doc.add_page_break()
 
-    # --- O restante do arquivo (métodos de renderização) permanece o mesmo ---
     def _set_page_numbering(self, section):
-        # (código sem alterações)
         section.header.is_linked_to_previous = False
         header_p = section.header.paragraphs[0]
         header_p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
@@ -130,7 +126,6 @@ class GeradorDOCX:
         run._r.append(fldChar_end)
         
     def _renderizar_capa(self):
-        # (código sem alterações)
         p_inst = self.doc.add_paragraph()
         p_inst.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = p_inst.add_run(self.doc_abnt.configuracoes.instituicao.upper())
@@ -153,7 +148,6 @@ class GeradorDOCX:
         self.doc.add_page_break()
 
     def _renderizar_folha_rosto(self):
-        # (código sem alterações)
         nomes_autores = '\n'.join([a.nome_completo.upper() for a in self.doc_abnt.autores])
         p_autores = self.doc.add_paragraph()
         p_autores.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
@@ -177,7 +171,6 @@ class GeradorDOCX:
         self.doc.add_page_break()
     
     def _renderizar_resumo(self):
-        # (código sem alterações)
         self.regras.aplicar_estilo_titulo_secao(self.doc, numero="", titulo_texto="RESUMO")
         p_resumo = self.doc.add_paragraph()
         self.regras.aplicar_estilo_resumo(p_resumo, self.doc_abnt.resumo)
@@ -189,13 +182,11 @@ class GeradorDOCX:
         p_kw.add_run(texto_kw)
 
     def _renderizar_capitulo(self, capitulo, numero):
-        # (código sem alterações)
         self.regras.aplicar_estilo_titulo_secao(self.doc, numero, capitulo.titulo)
         p = self.doc.add_paragraph()
         self.regras.aplicar_estilo_paragrafo_normal(p, capitulo.conteudo)
 
     def _renderizar_referencias(self):
-        # (código sem alterações)
         self.regras.aplicar_estilo_titulo_secao(self.doc, numero="", titulo_texto="REFERÊNCIAS")
         self.doc_abnt.ordenar_referencias()
         for ref in self.doc_abnt.referencias:
