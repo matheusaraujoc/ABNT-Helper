@@ -1,5 +1,5 @@
 # gerador_docx.py
-# Descrição: Versão corrigida com o nome do método de geração de documento restaurado.
+# Descrição: Versão com a correção da renderização de múltiplos parágrafos.
 
 import os
 from docx import Document
@@ -67,7 +67,6 @@ class GeradorDOCX:
             if word is not None:
                 word.Quit()
 
-    # --- ## CORREÇÃO: O nome do método foi restaurado para a versão estável ## ---
     def gerar_documento(self, caminho_arquivo: str):
         self._renderizar_capa()
         self._renderizar_folha_rosto()
@@ -79,40 +78,57 @@ class GeradorDOCX:
         self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._renderizar_referencias()
         
-        # Salva o .docx e depois tenta atualizar o sumário
         self.doc.save(caminho_arquivo)
         self._atualizar_sumario_com_word(caminho_arquivo)
     
+    # =============================================================================
+    # FUNÇÃO ALTERADA PARA CORRIGIR A RENDERIZAÇÃO DE PARÁGRAFOS
+    # =============================================================================
     def _renderizar_secoes_recursivamente(self, no_pai: Capitulo, prefixo_numeracao=""):
         for i, no_filho in enumerate(no_pai.filhos, 1):
             numero_completo = f"{prefixo_numeracao}{i}"
             nivel_titulo = len(numero_completo.split('.'))
             self.regras.aplicar_estilo_titulo_secao(self.doc, numero_completo, no_filho.titulo, nivel=nivel_titulo)
+            
             if no_filho.conteudo:
                 padrao = r"\{\{(Tabela|Figura):([^}]+)\}\}"
                 partes = re.split(padrao, no_filho.conteudo)
-                texto_atual = partes.pop(0).strip()
-                if texto_atual:
-                    p = self.doc.add_paragraph()
-                    self.regras.aplicar_estilo_paragrafo_normal(p, texto_atual)
-                for j in range(0, len(partes), 3):
-                    tipo, titulo, texto_seguinte = partes[j:j+3]
-                    if tipo == "Tabela":
-                        tabela_obj = next((t for t in no_filho.tabelas if t.titulo == titulo), None)
-                        if tabela_obj:
-                            self.contador_tabelas += 1
-                            tabela_obj.numero = self.contador_tabelas
-                            self._renderizar_tabela(tabela_obj)
-                    elif tipo == "Figura":
-                        figura_obj = next((f for f in no_filho.figuras if f.titulo == titulo), None)
-                        if figura_obj:
-                            self.contador_figuras += 1
-                            figura_obj.numero = self.contador_figuras
-                            self._renderizar_figura(figura_obj)
-                    if texto_seguinte:
-                        p = self.doc.add_paragraph()
-                        self.regras.aplicar_estilo_paragrafo_normal(p, texto_seguinte)
+                
+                # Loop simplificado para processar texto e marcadores em ordem
+                for k, parte in enumerate(partes):
+                    if k % 3 == 0:  # Esta é uma parte de texto
+                        bloco_de_texto = parte
+                        if bloco_de_texto.strip():
+                            # Divide o bloco de texto em parágrafos individuais
+                            paragrafos = bloco_de_texto.strip().split('\n')
+                            for texto_paragrafo in paragrafos:
+                                if texto_paragrafo.strip():
+                                    # Adiciona cada parágrafo individualmente com o estilo correto
+                                    p = self.doc.add_paragraph()
+                                    self.regras.aplicar_estilo_paragrafo_normal(p, texto_paragrafo)
+                                    
+                    elif k % 3 == 1:  # Esta é a parte do marcador (Tabela ou Figura)
+                        tipo = parte
+                        titulo = partes[k+1] # O título é o próximo item na lista
+                        
+                        if tipo == "Tabela":
+                            tabela_obj = next((t for t in no_filho.tabelas if t.titulo == titulo), None)
+                            if tabela_obj:
+                                self.contador_tabelas += 1
+                                tabela_obj.numero = self.contador_tabelas
+                                self._renderizar_tabela(tabela_obj)
+                        elif tipo == "Figura":
+                            figura_obj = next((f for f in no_filho.figuras if f.titulo == titulo), None)
+                            if figura_obj:
+                                self.contador_figuras += 1
+                                figura_obj.numero = self.contador_figuras
+                                self._renderizar_figura(figura_obj)
+            
+            # Chamada recursiva para os subtópicos
             self._renderizar_secoes_recursivamente(no_filho, prefixo_numeracao=f"{numero_completo}.")
+    # =============================================================================
+    # FIM DA FUNÇÃO ALTERADA
+    # =============================================================================
 
     def _renderizar_tabela(self, tabela_obj):
         p_titulo = self.doc.add_paragraph()
@@ -207,7 +223,7 @@ class GeradorDOCX:
         run.font.size = self.regras.TAMANHO_FONTE_CAPA
         self.doc.add_paragraph('\n' * 2)
         texto_natureza = (f"{cfg.tipo_trabalho} apresentado ao curso de {cfg.modalidade_curso} em {cfg.curso} da {cfg.instituicao}, "
-                         f"como requisito parcial para a obtenção do título de {cfg.titulo_pretendido}.")
+                          f"como requisito parcial para a obtenção do título de {cfg.titulo_pretendido}.")
         p_natureza = self.doc.add_paragraph()
         self.regras.aplicar_estilo_natureza_trabalho(p_natureza, texto_natureza)
         self.doc.add_paragraph()

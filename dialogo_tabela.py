@@ -4,7 +4,8 @@
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import (QDialog, QWidget, QLabel, QLineEdit, QComboBox,
                                QPushButton, QVBoxLayout, QHBoxLayout, 
-                               QTableWidget, QTableWidgetItem, QDialogButtonBox)
+                               QTableWidget, QTableWidgetItem, QDialogButtonBox,
+                               QMessageBox) # ADICIONADO: QMessageBox para o alerta
 
 from documento import Tabela
 
@@ -46,9 +47,28 @@ class TabelaDialog(QDialog):
         self.layout.addLayout(btn_layout)
 
         self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        self.buttons.accepted.connect(self.accept)
+        self.buttons.accepted.connect(self.accept) # Esta conexão agora chama nosso método personalizado
         self.buttons.rejected.connect(self.reject)
         self.layout.addWidget(self.buttons)
+
+    # =============================================================================
+    # NOVO MÉTODO: Sobrescreve o comportamento padrão do botão "OK"
+    # =============================================================================
+    def accept(self):
+        """
+        Executa a validação ANTES de fechar a janela.
+        """
+        # 1. Verifica se o título está vazio
+        if not self.titulo_input.text().strip():
+            # 2. Se estiver vazio, exibe o alerta
+            QMessageBox.warning(self, "Título Obrigatório", 
+                                      "O título da tabela não pode estar vazio. Por favor, preencha o campo para salvar.")
+            # 3. Impede o fechamento da janela ao não chamar super().accept()
+            return
+        
+        # 4. Se o título for válido, chama o comportamento padrão para fechar a janela
+        super().accept()
+    # =============================================================================
 
     def popular_tabela_widget(self):
         dados = self.tabela.dados
@@ -58,11 +78,15 @@ class TabelaDialog(QDialog):
         for i, row_data in enumerate(dados):
             for j, cell_data in enumerate(row_data):
                 self.table_widget.setItem(i, j, QTableWidgetItem(cell_data))
+
     def adicionar_linha(self): self.table_widget.insertRow(self.table_widget.rowCount())
+    
     def remover_linha(self):
         row = self.table_widget.currentRow()
         if row != -1: self.table_widget.removeRow(row)
+
     def adicionar_coluna(self): self.table_widget.insertColumn(self.table_widget.columnCount())
+    
     def remover_coluna(self):
         col = self.table_widget.currentColumn()
         if col != -1: self.table_widget.removeColumn(col)
@@ -71,6 +95,7 @@ class TabelaDialog(QDialog):
         self.tabela.titulo = self.titulo_input.text()
         self.tabela.fonte = self.fonte_input.text()
         self.tabela.estilo_borda = 'abnt' if self.estilo_borda_combo.currentIndex() == 0 else 'grade'
+        
         num_rows = self.table_widget.rowCount()
         num_cols = self.table_widget.columnCount()
         novos_dados = []
