@@ -1,0 +1,489 @@
+[
+    {
+        "label": "dataclass",
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "isExtraImport": true,
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
+        "label": "field",
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "isExtraImport": true,
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
+        "label": "dataclass",
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "isExtraImport": true,
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "Referencia",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Livro",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Artigo",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Site",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Document",
+        "importPath": "docx",
+        "description": "docx",
+        "isExtraImport": true,
+        "detail": "docx",
+        "documentation": {}
+    },
+    {
+        "label": "Pt",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Cm",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Pt",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Cm",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "WD_PARAGRAPH_ALIGNMENT",
+        "importPath": "docx.enum.text",
+        "description": "docx.enum.text",
+        "isExtraImport": true,
+        "detail": "docx.enum.text",
+        "documentation": {}
+    },
+    {
+        "label": "WD_PARAGRAPH_ALIGNMENT",
+        "importPath": "docx.enum.text",
+        "description": "docx.enum.text",
+        "isExtraImport": true,
+        "detail": "docx.enum.text",
+        "documentation": {}
+    },
+    {
+        "label": "WD_SECTION",
+        "importPath": "docx.enum.section",
+        "description": "docx.enum.section",
+        "isExtraImport": true,
+        "detail": "docx.enum.section",
+        "documentation": {}
+    },
+    {
+        "label": "qn",
+        "importPath": "docx.oxml.ns",
+        "description": "docx.oxml.ns",
+        "isExtraImport": true,
+        "detail": "docx.oxml.ns",
+        "documentation": {}
+    },
+    {
+        "label": "OxmlElement",
+        "importPath": "docx.oxml",
+        "description": "docx.oxml",
+        "isExtraImport": true,
+        "detail": "docx.oxml",
+        "documentation": {}
+    },
+    {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Autor",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "MotorNormasABNT",
+        "importPath": "normas_abnt",
+        "description": "normas_abnt",
+        "isExtraImport": true,
+        "detail": "normas_abnt",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QApplication",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTextEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFileDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTabWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QComboBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QListWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QInputDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFormLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialogButtonBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "GeradorDOCX",
+        "importPath": "gerador_docx",
+        "description": "gerador_docx",
+        "isExtraImport": true,
+        "detail": "gerador_docx",
+        "documentation": {}
+    },
+    {
+        "label": "Configuracoes",
+        "kind": 6,
+        "importPath": "documento",
+        "description": "documento",
+        "peekOfCode": "class Configuracoes:\n    \"\"\"Armazena as configurações globais do documento.\"\"\"\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Bacharelado em Ciência da Computação\"\n    cidade: str = \"Parnaíba\"\n    estado: str = \"PI\"\n    ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass",
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Autor",
+        "kind": 6,
+        "importPath": "documento",
+        "description": "documento",
+        "peekOfCode": "class Autor:\n    \"\"\"Representa um autor do trabalho.\"\"\"\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    \"\"\"Representa uma seção/capítulo do conteúdo textual.\"\"\"\n    titulo: str\n    conteudo: str = \"\"\nclass DocumentoABNT:\n    \"\"\"",
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Capitulo",
+        "kind": 6,
+        "importPath": "documento",
+        "description": "documento",
+        "peekOfCode": "class Capitulo:\n    \"\"\"Representa uma seção/capítulo do conteúdo textual.\"\"\"\n    titulo: str\n    conteudo: str = \"\"\nclass DocumentoABNT:\n    \"\"\"\n    Classe principal que agrega todas as partes de um documento ABNT.\n    \"\"\"\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()",
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "DocumentoABNT",
+        "kind": 6,
+        "importPath": "documento",
+        "description": "documento",
+        "peekOfCode": "class DocumentoABNT:\n    \"\"\"\n    Classe principal que agrega todas as partes de um documento ABNT.\n    \"\"\"\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"\n        self.autores: List[Autor] = []\n        self.orientador: str = \"\"\n        self.resumo: str = \"\"",
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "GeradorDOCX",
+        "kind": 6,
+        "importPath": "gerador_docx",
+        "description": "gerador_docx",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n    def _set_page_numbering(self, section):\n        # (código sem alterações)\n        section.header.is_linked_to_previous = False\n        header_p = section.header.paragraphs[0]",
+        "detail": "gerador_docx",
+        "documentation": {}
+    },
+    {
+        "label": "adicionar_sumario",
+        "kind": 2,
+        "importPath": "gerador_docx",
+        "description": "gerador_docx",
+        "peekOfCode": "def adicionar_sumario(doc, paragrafo):\n    \"\"\"\n    Insere um campo de Tabela de Conteúdo (TOC) clicável em um parágrafo.\n    Esta função manipula o XML subjacente do documento.\n    \"\"\"\n    run = paragrafo.add_run()\n    fldChar = OxmlElement('w:fldChar')\n    fldChar.set(qn('w:fldCharType'), 'begin')\n    # Define as instruções do sumário:\n    # \\o \"1-3\" -> Usar níveis de título de 1 a 3",
+        "detail": "gerador_docx",
+        "documentation": {}
+    },
+    {
+        "label": "ReferenciaDialog",
+        "kind": 6,
+        "importPath": "main_app",
+        "description": "main_app",
+        "peekOfCode": "class ReferenciaDialog(QDialog):\n    \"\"\"Dialog para adicionar ou editar uma referência.\"\"\"\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self)\n        self.form_layout = QFormLayout()\n        # --- ## CORREÇÃO 1: LÓGICA DO FORMULÁRIO DINÂMICO ## ---\n        # A lógica foi refeita para OCULTAR/EXIBIR campos em vez de DELETÁ-LOS.\n        # 1. Criar TODOS os widgets de uma vez.",
+        "detail": "main_app",
+        "documentation": {}
+    },
+    {
+        "label": "ABNTHelperApp",
+        "kind": 6,
+        "importPath": "main_app",
+        "description": "main_app",
+        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final - Editor de Alta Fidelidade')\n        self.setGeometry(100, 100, 950, 750)\n        self.documento = DocumentoABNT()\n        self._build_ui()\n        self._carregando_capitulo = False\n    def _build_ui(self):\n        main_layout = QVBoxLayout(self)",
+        "detail": "main_app",
+        "documentation": {}
+    },
+    {
+        "label": "MotorNormasABNT",
+        "kind": 6,
+        "importPath": "normas_abnt",
+        "description": "normas_abnt",
+        "peekOfCode": "class MotorNormasABNT:\n    \"\"\"\n    Esta classe é a fonte única de verdade para todas as especificações ABNT.\n    Ela não sabe como criar um documento, apenas como formatar seus elementos.\n    \"\"\"\n    def __init__(self):\n        # --- Constantes de Página e Fonte (NBR 14724) ---\n        self.MARGEM_SUPERIOR = Cm(3)\n        self.MARGEM_INFERIOR = Cm(2)\n        self.MARGEM_ESQUERDA = Cm(3)",
+        "detail": "normas_abnt",
+        "documentation": {}
+    },
+    {
+        "label": "Referencia",
+        "kind": 6,
+        "importPath": "referencia",
+        "description": "referencia",
+        "peekOfCode": "class Referencia:\n    \"\"\"Classe base para todos os tipos de referência.\"\"\"\n    def __init__(self, tipo: str, autores: str, titulo: str, ano: int):\n        self.tipo = tipo\n        self.autores = autores\n        self.titulo = titulo\n        self.ano = ano\n    def get_chave_ordenacao(self) -> str:\n        \"\"\"Retorna uma chave para ordenação alfabética.\"\"\"\n        primeiro_autor = self.autores.split(';')[0].strip()",
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Livro",
+        "kind": 6,
+        "importPath": "referencia",
+        "description": "referencia",
+        "peekOfCode": "class Livro(Referencia):\n    local: str\n    editora: str\n    def __init__(self, autores, titulo, ano, local, editora):\n        super().__init__(\"Livro\", autores, titulo, ano)\n        self.local = local\n        self.editora = editora\n    def formatar(self) -> str:\n        autores_fmt = formatar_autores(self.autores)\n        return f\"{autores_fmt}. **{self.titulo}**. {self.local}: {self.editora}, {self.ano}.\"",
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Artigo",
+        "kind": 6,
+        "importPath": "referencia",
+        "description": "referencia",
+        "peekOfCode": "class Artigo(Referencia):\n    revista: str\n    volume: str\n    pagina_inicial: int\n    pagina_final: int\n    def __init__(self, autores, titulo, ano, revista, volume, pagina_inicial, pagina_final):\n        super().__init__(\"Artigo\", autores, titulo, ano)\n        self.revista = revista\n        self.volume = volume\n        self.pagina_inicial = pagina_inicial",
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Site",
+        "kind": 6,
+        "importPath": "referencia",
+        "description": "referencia",
+        "peekOfCode": "class Site(Referencia):\n    url: str\n    data_acesso: str\n    def __init__(self, autores, titulo, ano, url, data_acesso):\n        super().__init__(\"Site\", autores, titulo, ano)\n        self.url = url\n        self.data_acesso = data_acesso\n    def formatar(self) -> str:\n        autores_fmt = formatar_autores(self.autores)\n        return (f\"{autores_fmt}. {self.titulo}. {self.ano}. \"",
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "formatar_autores",
+        "kind": 2,
+        "importPath": "referencia",
+        "description": "referencia",
+        "peekOfCode": "def formatar_autores(autores_str: str) -> str:\n    \"\"\"Formata uma string de autores (separados por ';') para o padrão ABNT.\"\"\"\n    if not autores_str:\n        return \"\"\n    autores = [a.strip() for a in autores_str.split(';')]\n    autores_formatados = []\n    for autor in autores:\n        partes = autor.split()\n        if len(partes) > 1:\n            sobrenome = partes[-1].upper()",
+        "detail": "referencia",
+        "documentation": {}
+    }
+]
