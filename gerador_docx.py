@@ -1,24 +1,25 @@
 # gerador_docx.py
-# Descrição: Implementa a lógica de processamento de marcadores para inserir tabelas e figuras.
+# Descrição: Versão corrigida com o nome do método de geração de documento restaurado.
 
 import os
-import re
 from docx import Document
 from docx.shared import Cm, Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.section import WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+import re
 
-from documento import DocumentoABNT, Capitulo
-from normas_abnt import MotorNormasABNT
-
+# Importa o win32com de forma segura
 try:
     import win32com.client as win32
     WIN32_AVAILABLE = True
 except ImportError:
     WIN32_AVAILABLE = False
     print("AVISO: Biblioteca 'pywin32' não encontrada. A automação do sumário será desativada.")
+
+from documento import DocumentoABNT, Capitulo
+from normas_abnt import MotorNormasABNT
 
 def adicionar_sumario(doc, paragrafo_placeholder):
     sdt = OxmlElement('w:sdt')
@@ -43,10 +44,12 @@ class GeradorDOCX:
         self.contador_figuras = 0
 
     def _atualizar_sumario_com_word(self, caminho_arquivo):
-        if not WIN32_AVAILABLE: return False
+        if not WIN32_AVAILABLE:
+            print("Não foi possível atualizar o sumário: pywin32 não está instalado.")
+            return False
         word = None
         try:
-            print("Iniciando automação do MS Word...")
+            print("Iniciando automação do MS Word para reconstrução do sumário...")
             word = win32.DispatchEx("Word.Application")
             word.Visible = False
             doc_path = os.path.abspath(caminho_arquivo)
@@ -55,14 +58,16 @@ class GeradorDOCX:
             word.Selection.Fields.Update()
             doc.Save()
             doc.Close(SaveChanges=False)
-            print("Sumário clicável gerado e atualizado.")
+            print("Sumário clicável gerado e atualizado com sucesso.")
             return True
         except Exception as e:
-            print(f"ERRO: {e}")
+            print(f"ERRO: Falha ao automatizar o Word para atualizar o sumário: {e}")
             return False
         finally:
-            if word is not None: word.Quit()
-    
+            if word is not None:
+                word.Quit()
+
+    # --- ## CORREÇÃO: O nome do método foi restaurado para a versão estável ## ---
     def gerar_documento(self, caminho_arquivo: str):
         self._renderizar_capa()
         self._renderizar_folha_rosto()
@@ -73,6 +78,8 @@ class GeradorDOCX:
         self._renderizar_secoes_recursivamente(self.doc_abnt.estrutura_textual)
         self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._renderizar_referencias()
+        
+        # Salva o .docx e depois tenta atualizar o sumário
         self.doc.save(caminho_arquivo)
         self._atualizar_sumario_com_word(caminho_arquivo)
     
@@ -81,21 +88,15 @@ class GeradorDOCX:
             numero_completo = f"{prefixo_numeracao}{i}"
             nivel_titulo = len(numero_completo.split('.'))
             self.regras.aplicar_estilo_titulo_secao(self.doc, numero_completo, no_filho.titulo, nivel=nivel_titulo)
-            
             if no_filho.conteudo:
                 padrao = r"\{\{(Tabela|Figura):([^}]+)\}\}"
                 partes = re.split(padrao, no_filho.conteudo)
-                
                 texto_atual = partes.pop(0).strip()
                 if texto_atual:
                     p = self.doc.add_paragraph()
                     self.regras.aplicar_estilo_paragrafo_normal(p, texto_atual)
-
                 for j in range(0, len(partes), 3):
-                    tipo = partes[j]
-                    titulo = partes[j+1]
-                    texto_seguinte = partes[j+2].strip()
-
+                    tipo, titulo, texto_seguinte = partes[j:j+3]
                     if tipo == "Tabela":
                         tabela_obj = next((t for t in no_filho.tabelas if t.titulo == titulo), None)
                         if tabela_obj:
@@ -108,11 +109,9 @@ class GeradorDOCX:
                             self.contador_figuras += 1
                             figura_obj.numero = self.contador_figuras
                             self._renderizar_figura(figura_obj)
-                    
                     if texto_seguinte:
                         p = self.doc.add_paragraph()
                         self.regras.aplicar_estilo_paragrafo_normal(p, texto_seguinte)
-
             self._renderizar_secoes_recursivamente(no_filho, prefixo_numeracao=f"{numero_completo}.")
 
     def _renderizar_tabela(self, tabela_obj):
@@ -216,7 +215,7 @@ class GeradorDOCX:
         self.regras.aplicar_estilo_natureza_trabalho(p_orientador, f"Orientador(a): {self.doc_abnt.orientador}")
         p_final = self.doc.add_paragraph('\n' * 5)
         p_final.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-        p_final.add_run(f"{self.doc_abnt.configuracoes.cidade.upper()}\n{self.doc_abnt.configuracoes.ano}")
+        p_final.add_run(f"{cfg.cidade.upper()}\n{cfg.ano}")
         self.doc.add_page_break()
     
     def _renderizar_resumo(self):

@@ -537,6 +537,22 @@
         "documentation": {}
     },
     {
+        "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "Autor",
         "importPath": "documento",
         "description": "documento",
@@ -627,6 +643,14 @@
     },
     {
         "label": "Referencia",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "formatar_autores",
         "importPath": "referencia",
         "description": "referencia",
         "isExtraImport": true,
@@ -771,6 +795,14 @@
         "documentation": {}
     },
     {
+        "label": "QWebEngineView",
+        "importPath": "PySide6.QtWebEngineWidgets",
+        "description": "PySide6.QtWebEngineWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWebEngineWidgets",
+        "documentation": {}
+    },
+    {
         "label": "GeradorDOCX",
         "importPath": "gerador_docx",
         "description": "gerador_docx",
@@ -784,6 +816,14 @@
         "description": "aba_conteudo",
         "isExtraImport": true,
         "detail": "aba_conteudo",
+        "documentation": {}
+    },
+    {
+        "label": "GeradorHTMLPreview",
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "isExtraImport": true,
+        "detail": "gerador_preview",
         "documentation": {}
     },
     {
@@ -890,7 +930,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE: return False",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -904,11 +944,65 @@
         "documentation": {}
     },
     {
+        "label": "GeradorHTMLPreview",
+        "kind": 6,
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "peekOfCode": "class GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _nova_pagina(self):\n        \"\"\"Finaliza a página atual e começa uma nova.\"\"\"",
+        "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
+        "label": "ALTURA_CONTEUDO_PAGINA",
+        "kind": 5,
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "peekOfCode": "ALTURA_CONTEUDO_PAGINA = 24.7  # (29.7cm - 3cm margem sup - 2cm margem inf)\nALTURA_LINHA_TEXTO = 0.6\nALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []",
+        "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
+        "label": "ALTURA_LINHA_TEXTO",
+        "kind": 5,
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "peekOfCode": "ALTURA_LINHA_TEXTO = 0.6\nALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA",
+        "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
+        "label": "ALTURA_TITULO_SECAO",
+        "kind": 5,
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "peekOfCode": "ALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0",
+        "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
+        "label": "ALTURA_LEGENDA",
+        "kind": 5,
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "peekOfCode": "ALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0",
+        "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
+        "label": "ALTURA_LINHA_TABELA",
+        "kind": 5,
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "peekOfCode": "ALTURA_LINHA_TABELA = 0.8\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _nova_pagina(self):",
+        "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
         "label": "ReferenciaDialog",
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self)\n        self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox()\n        self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit()\n        self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")",
+        "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent); self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox(); self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")\n        self.titulo_input = QLineEdit(); self.ano_input = QLineEdit()\n        self.campos_livro = { \"Local\": QLineEdit(), \"Editora\": QLineEdit() }\n        self.campos_artigo = { \"Revista\": QLineEdit(), \"Volume\": QLineEdit(), \"Pág. Inicial\": QLineEdit(), \"Pág. Final\": QLineEdit() }\n        self.campos_site = { \"URL\": QLineEdit(), \"Data de Acesso\": QLineEdit(\"dd/mm/aaaa\") }",
         "detail": "main_app",
         "documentation": {}
     },
@@ -917,7 +1011,7 @@
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper - Editor de Estrutura')\n        self.setGeometry(100, 100, 950, 750)\n        self.documento = DocumentoABNT()\n        self._build_ui()\n    def _build_ui(self):\n        main_layout = QVBoxLayout(self)\n        self.tabs = QTabWidget()",
+        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1200, 800)\n        self.documento = DocumentoABNT()\n        self._build_ui()\n    def _build_ui(self):\n        main_layout = QVBoxLayout(self)\n        self.tabs = QTabWidget()",
         "detail": "main_app",
         "documentation": {}
     },
