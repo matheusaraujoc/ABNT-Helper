@@ -1,5 +1,6 @@
 # gerador_docx.py
-# Descrição: O Construtor, agora sem alterações nesta rodada.
+# Descrição: O Construtor. Orquestra a criação do .docx, mas delega
+# toda a lógica de formatação para o Motor de Regras da ABNT.
 
 import os
 from docx import Document
@@ -75,7 +76,7 @@ class GeradorDOCX:
         finally:
             if word is not None:
                 word.Quit()
-    
+
     def gerar_documento(self, caminho_arquivo: str):
         self._renderizar_capa()
         self._renderizar_folha_rosto()
@@ -88,7 +89,7 @@ class GeradorDOCX:
         self._renderizar_referencias()
         self.doc.save(caminho_arquivo)
         self._atualizar_sumario_com_word(caminho_arquivo)
-    
+
     def _renderizar_secoes_recursivamente(self, no_pai: Capitulo, prefixo_numeracao=""):
         for i, no_filho in enumerate(no_pai.filhos, 1):
             numero_completo = f"{prefixo_numeracao}{i}"
@@ -173,26 +174,40 @@ class GeradorDOCX:
         self.doc.add_page_break()
 
     def _renderizar_folha_rosto(self):
+        cfg = self.doc_abnt.configuracoes
+        
         nomes_autores = '\n'.join([a.nome_completo.upper() for a in self.doc_abnt.autores])
         p_autores = self.doc.add_paragraph()
         p_autores.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         p_autores.add_run(nomes_autores).bold = True
+        
         self.doc.add_paragraph('\n' * 2)
+
         p_titulo = self.doc.add_paragraph()
         p_titulo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = p_titulo.add_run(self.doc_abnt.titulo.upper())
         run.bold = True
         run.font.size = self.regras.TAMANHO_FONTE_CAPA
+        
         self.doc.add_paragraph('\n' * 2)
-        texto_natureza = f"{self.doc_abnt.configuracoes.tipo_trabalho} apresentado ao curso de {self.doc_abnt.configuracoes.curso} da {self.doc_abnt.configuracoes.instituicao}, como requisito parcial para a obtenção do título de Bacharel."
+
+        texto_natureza = (
+            f"{cfg.tipo_trabalho} apresentado ao curso de "
+            f"{cfg.modalidade_curso} em {cfg.curso} da {cfg.instituicao}, "
+            f"como requisito parcial para a obtenção do título de {cfg.titulo_pretendido}."
+        )
         p_natureza = self.doc.add_paragraph()
         self.regras.aplicar_estilo_natureza_trabalho(p_natureza, texto_natureza)
+        
         self.doc.add_paragraph()
+        
         p_orientador = self.doc.add_paragraph()
         self.regras.aplicar_estilo_natureza_trabalho(p_orientador, f"Orientador(a): {self.doc_abnt.orientador}")
+        
         p_final = self.doc.add_paragraph('\n' * 5)
         p_final.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-        p_final.add_run(f"{self.doc_abnt.configuracoes.cidade.upper()}\n{self.doc_abnt.configuracoes.ano}")
+        p_final.add_run(f"{cfg.cidade.upper()}\n{cfg.ano}")
+        
         self.doc.add_page_break()
     
     def _renderizar_resumo(self):

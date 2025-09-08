@@ -1,5 +1,5 @@
 # main_app.py
-# Descrição: Aplicação principal, o "montador" da interface.
+# Descrição: Implementa a funcionalidade de editar referências existentes.
 
 import sys
 from PySide6 import QtWidgets, QtCore
@@ -51,7 +51,33 @@ class ReferenciaDialog(QDialog):
         self.buttons.accepted.connect(self.accept)
         self.buttons.rejected.connect(self.reject)
         self.layout.addWidget(self.buttons)
-        self.update_form_visibility(self.tipo_combo.currentText())
+        
+        # --- ## ALTERADO: Se uma referência for passada, preenche os campos ## ---
+        if ref:
+            self._popular_campos(ref)
+        else:
+            self.update_form_visibility(self.tipo_combo.currentText())
+
+    # --- ## NOVO: Método para preencher o formulário com dados existentes ## ---
+    def _popular_campos(self, ref):
+        self.tipo_combo.setCurrentText(ref.tipo)
+        self.autores_input.setText(ref.autores)
+        self.titulo_input.setText(ref.titulo)
+        self.ano_input.setText(str(ref.ano))
+
+        if isinstance(ref, Livro):
+            self.campos_livro["Local"].setText(ref.local)
+            self.campos_livro["Editora"].setText(ref.editora)
+        elif isinstance(ref, Artigo):
+            self.campos_artigo["Revista"].setText(ref.revista)
+            self.campos_artigo["Volume"].setText(ref.volume)
+            self.campos_artigo["Pág. Inicial"].setText(str(ref.pagina_inicial))
+            self.campos_artigo["Pág. Final"].setText(str(ref.pagina_final))
+        elif isinstance(ref, Site):
+            self.campos_site["URL"].setText(ref.url)
+            self.campos_site["Data de Acesso"].setText(ref.data_acesso)
+
+        self.update_form_visibility(ref.tipo)
 
     def update_form_visibility(self, tipo):
         all_specific_fields = {**self.campos_livro, **self.campos_artigo, **self.campos_site}
@@ -100,32 +126,34 @@ class ABNTHelperApp(QWidget):
         main_layout = QVBoxLayout(self)
         self.tabs = QTabWidget()
         main_layout.addWidget(self.tabs)
-        
         self.aba_conteudo = AbaConteudo(self.documento)
-        
         self.tabs.addTab(self._criar_aba_geral(), "Geral e Pré-Textual")
         self.tabs.addTab(self.aba_conteudo, "Conteúdo Textual (Estrutura)")
         self.tabs.addTab(self._criar_aba_referencias(), "Referências")
-        
         self.generate_btn = QPushButton("Gerar Documento .docx")
         self.generate_btn.setStyleSheet("font-size: 16px; padding: 10px;")
         self.generate_btn.clicked.connect(self._gerar_documento)
         main_layout.addWidget(self.generate_btn)
 
     def _criar_aba_geral(self):
+        # (código sem alterações)
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.addWidget(QLabel("<h3>Configurações do Documento</h3>"))
         form_layout1 = QFormLayout()
         self.cfg_tipo = QComboBox()
         self.cfg_tipo.addItems(["Trabalho de Conclusão de Curso (TCC)", "Artigo Científico", "Dissertação de Mestrado", "Tese de Doutorado"])
-        form_layout1.addRow("Tipo de Trabalho:", self.cfg_tipo)
         self.cfg_instituicao = QLineEdit(self.documento.configuracoes.instituicao)
         self.cfg_curso = QLineEdit(self.documento.configuracoes.curso)
+        self.cfg_modalidade_curso = QLineEdit(self.documento.configuracoes.modalidade_curso)
+        self.cfg_titulo_pretendido = QLineEdit(self.documento.configuracoes.titulo_pretendido)
         self.cfg_cidade = QLineEdit(self.documento.configuracoes.cidade)
         self.cfg_ano = QLineEdit(str(self.documento.configuracoes.ano))
+        form_layout1.addRow("Tipo de Trabalho:", self.cfg_tipo)
         form_layout1.addRow("Instituição:", self.cfg_instituicao)
-        form_layout1.addRow("Curso:", self.cfg_curso)
+        form_layout1.addRow("Nome do Curso (Ex: Ciência da Computação):", self.cfg_curso)
+        form_layout1.addRow("Modalidade do Curso (Ex: Bacharelado):", self.cfg_modalidade_curso)
+        form_layout1.addRow("Título Pretendido (Ex: Bacharel):", self.cfg_titulo_pretendido)
         form_layout1.addRow("Cidade:", self.cfg_cidade)
         form_layout1.addRow("Ano:", self.cfg_ano)
         layout.addLayout(form_layout1)
@@ -147,27 +175,60 @@ class ABNTHelperApp(QWidget):
     def _criar_aba_referencias(self):
         widget = QWidget()
         layout = QVBoxLayout(widget)
+        
         layout.addWidget(QLabel("<h3>Gerenciador de Referências</h3>"))
         self.lista_referencias = QtWidgets.QListWidget()
+        # --- ## NOVO: Conecta o duplo clique para editar ## ---
+        self.lista_referencias.itemDoubleClicked.connect(self._editar_referencia)
         layout.addWidget(self.lista_referencias)
+        
         btn_layout = QHBoxLayout()
-        btn_add = QPushButton("Adicionar Referência")
+        btn_add = QPushButton("Adicionar")
         btn_add.clicked.connect(self._adicionar_referencia)
+
+        # --- ## NOVO: Botão de Edição ## ---
+        btn_edit = QPushButton("Editar Selecionada")
+        btn_edit.clicked.connect(self._editar_referencia)
+        
         btn_del = QPushButton("Remover Selecionada")
         btn_del.clicked.connect(self._remover_referencia)
+        
         btn_layout.addWidget(btn_add)
+        btn_layout.addWidget(btn_edit)
         btn_layout.addWidget(btn_del)
         layout.addLayout(btn_layout)
+        
         return widget
 
     @QtCore.Slot()
     def _adicionar_referencia(self):
-        dialog = ReferenciaDialog(self)
+        dialog = ReferenciaDialog(parent=self)
         if dialog.exec():
             nova_ref = dialog.get_data()
             if nova_ref:
                 self.documento.referencias.append(nova_ref)
                 self.lista_referencias.addItem(nova_ref.formatar().replace('**', ''))
+
+    # --- ## NOVO: Slot para editar a referência ## ---
+    @QtCore.Slot()
+    def _editar_referencia(self):
+        linha = self.lista_referencias.currentRow()
+        if linha == -1:
+            QMessageBox.warning(self, "Atenção", "Nenhuma referência selecionada para editar.")
+            return
+            
+        ref_para_editar = self.documento.referencias[linha]
+        
+        dialog = ReferenciaDialog(ref=ref_para_editar, parent=self)
+        if dialog.exec():
+            ref_atualizada = dialog.get_data()
+            if ref_atualizada:
+                # Atualiza o modelo de dados
+                self.documento.referencias[linha] = ref_atualizada
+                
+                # Atualiza a lista na interface
+                item_lista = self.lista_referencias.item(linha)
+                item_lista.setText(ref_atualizada.formatar().replace('**', ''))
 
     @QtCore.Slot()
     def _remover_referencia(self):
@@ -182,6 +243,8 @@ class ABNTHelperApp(QWidget):
         cfg.tipo_trabalho = self.cfg_tipo.currentText()
         cfg.instituicao = self.cfg_instituicao.text()
         cfg.curso = self.cfg_curso.text()
+        cfg.modalidade_curso = self.cfg_modalidade_curso.text()
+        cfg.titulo_pretendido = self.cfg_titulo_pretendido.text()
         cfg.cidade = self.cfg_cidade.text()
         cfg.ano = int(self.cfg_ano.text())
         self.documento.titulo = self.titulo_input.text()

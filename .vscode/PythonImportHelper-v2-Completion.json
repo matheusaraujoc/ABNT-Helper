@@ -665,7 +665,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Tabela:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    dados: List[List[str]] = field(default_factory=list)\n    estilo_borda: str = 'abnt' # Opções: 'abnt' ou 'grade'\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"",
+        "peekOfCode": "class Tabela:\n    # (sem alterações)\n    titulo: str = \"\"\n    fonte: str = \"\"\n    dados: List[List[str]] = field(default_factory=list)\n    estilo_borda: str = 'abnt'\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"",
         "detail": "documento",
         "documentation": {}
     },
@@ -674,7 +674,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Bacharelado em Ciência da Computação\"\n    cidade: str = \"Araioses\"\n    estado: str = \"MA\"\n    ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass\nclass Autor:",
+        "peekOfCode": "class Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Ciência da Computação\"\n    # --- ## NOVOS CAMPOS PARA FLEXIBILIDADE ## ---\n    modalidade_curso: str = \"Bacharelado\" # Ex: Bacharelado, Tecnologia, Licenciatura\n    titulo_pretendido: str = \"Bacharel\"    # Ex: Bacharel, Tecnólogo, Licenciado\n    # --- FIM DOS NOVOS CAMPOS ---\n    cidade: str = \"Araioses\"\n    estado: str = \"MA\"",
         "detail": "documento",
         "documentation": {}
     },
@@ -683,7 +683,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Autor:\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):",
+        "peekOfCode": "class Autor:\n    # (sem alterações)\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    # (sem alterações)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None",
         "detail": "documento",
         "documentation": {}
     },
@@ -692,7 +692,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self\n        self.filhos.append(filho)\nclass DocumentoABNT:",
+        "peekOfCode": "class Capitulo:\n    # (sem alterações)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self\n        self.filhos.append(filho)",
         "detail": "documento",
         "documentation": {}
     },
@@ -701,7 +701,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class DocumentoABNT:\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"\n        self.autores: List[Autor] = []\n        self.orientador: str = \"\"\n        self.resumo: str = \"\"\n        self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"INTRODUÇÃO\"))",
+        "peekOfCode": "class DocumentoABNT:\n    # (sem alterações)\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"\n        self.autores: List[Autor] = []\n        self.orientador: str = \"\"\n        self.resumo: str = \"\"\n        self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")",
         "detail": "documento",
         "documentation": {}
     },
