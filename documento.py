@@ -1,10 +1,10 @@
 # documento.py
-# Descrição: Define o Modelo de Dados para o documento ABNT.
+# Descrição: Modelo de Dados atualizado para suportar uma estrutura de árvore.
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 from datetime import datetime
-from referencia import Referencia  # Importa a classe base de referência
+from referencia import Referencia
 
 @dataclass
 class Configuracoes:
@@ -12,8 +12,8 @@ class Configuracoes:
     tipo_trabalho: str = "Trabalho de Conclusão de Curso (TCC)"
     instituicao: str = "Universidade Estadual do Piauí (UESPI)"
     curso: str = "Bacharelado em Ciência da Computação"
-    cidade: str = "Parnaíba"
-    estado: str = "PI"
+    cidade: str = "Araioses"
+    estado: str = "MA"
     ano: int = datetime.now().year
     mes: str = datetime.now().strftime("%B").capitalize()
 
@@ -24,9 +24,15 @@ class Autor:
 
 @dataclass
 class Capitulo:
-    """Representa uma seção/capítulo do conteúdo textual."""
+    """Representa um nó na árvore de conteúdo (tópico ou subtópico)."""
     titulo: str
     conteudo: str = ""
+    filhos: List['Capitulo'] = field(default_factory=list)
+    pai: Optional['Capitulo'] = None
+
+    def adicionar_filho(self, filho: 'Capitulo'):
+        filho.pai = self
+        self.filhos.append(filho)
 
 class DocumentoABNT:
     """
@@ -40,11 +46,13 @@ class DocumentoABNT:
         self.resumo: str = ""
         self.palavras_chave: str = ""
         
-        self.capitulos: List[Capitulo] = [
-            Capitulo(titulo="INTRODUÇÃO"),
-            Capitulo(titulo="DESENVOLVIMENTO"),
-            Capitulo(titulo="CONCLUSÃO")
-        ]
+        # Este nó raiz não aparece no documento, ele apenas contém os capítulos principais.
+        self.estrutura_textual = Capitulo(titulo="Raiz do Documento")
+        
+        # Adiciona capítulos iniciais por padrão
+        self.estrutura_textual.adicionar_filho(Capitulo(titulo="INTRODUÇÃO"))
+        self.estrutura_textual.adicionar_filho(Capitulo(titulo="DESENVOLVIMENTO"))
+        self.estrutura_textual.adicionar_filho(Capitulo(titulo="CONCLUSÃO"))
         
         self.referencias: List[Referencia] = []
 

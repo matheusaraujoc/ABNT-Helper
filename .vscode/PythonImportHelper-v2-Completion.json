@@ -1,5 +1,277 @@
 [
     {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTextEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTreeWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTreeWidgetItem",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QInputDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QApplication",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTextEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFileDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTabWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QComboBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFormLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialogButtonBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Autor",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "dataclass",
         "importPath": "dataclasses",
         "description": "dataclasses",
@@ -25,6 +297,14 @@
     },
     {
         "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -129,38 +409,6 @@
         "documentation": {}
     },
     {
-        "label": "DocumentoABNT",
-        "importPath": "documento",
-        "description": "documento",
-        "isExtraImport": true,
-        "detail": "documento",
-        "documentation": {}
-    },
-    {
-        "label": "DocumentoABNT",
-        "importPath": "documento",
-        "description": "documento",
-        "isExtraImport": true,
-        "detail": "documento",
-        "documentation": {}
-    },
-    {
-        "label": "Autor",
-        "importPath": "documento",
-        "description": "documento",
-        "isExtraImport": true,
-        "detail": "documento",
-        "documentation": {}
-    },
-    {
-        "label": "Capitulo",
-        "importPath": "documento",
-        "description": "documento",
-        "isExtraImport": true,
-        "detail": "documento",
-        "documentation": {}
-    },
-    {
         "label": "MotorNormasABNT",
         "importPath": "normas_abnt",
         "description": "normas_abnt",
@@ -178,163 +426,19 @@
         "documentation": {}
     },
     {
-        "label": "QtWidgets",
-        "importPath": "PySide6",
-        "description": "PySide6",
-        "isExtraImport": true,
-        "detail": "PySide6",
-        "documentation": {}
-    },
-    {
-        "label": "QtCore",
-        "importPath": "PySide6",
-        "description": "PySide6",
-        "isExtraImport": true,
-        "detail": "PySide6",
-        "documentation": {}
-    },
-    {
-        "label": "QApplication",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QWidget",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QLabel",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QLineEdit",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QTextEdit",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QPushButton",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QVBoxLayout",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QHBoxLayout",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QFileDialog",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QMessageBox",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QTabWidget",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QComboBox",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QListWidget",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QInputDialog",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QDialog",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QFormLayout",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
-        "label": "QDialogButtonBox",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
         "label": "GeradorDOCX",
         "importPath": "gerador_docx",
         "description": "gerador_docx",
         "isExtraImport": true,
         "detail": "gerador_docx",
+        "documentation": {}
+    },
+    {
+        "label": "AbaConteudo",
+        "importPath": "aba_conteudo",
+        "description": "aba_conteudo",
+        "isExtraImport": true,
+        "detail": "aba_conteudo",
         "documentation": {}
     },
     {
@@ -354,11 +458,20 @@
         "documentation": {}
     },
     {
+        "label": "AbaConteudo",
+        "kind": 6,
+        "importPath": "aba_conteudo",
+        "description": "aba_conteudo",
+        "peekOfCode": "class AbaConteudo(QWidget):\n    \"\"\"\n    Este widget encapsula toda a funcionalidade da aba de conteúdo,\n    incluindo a árvore de tópicos, os botões e o editor de texto.\n    \"\"\"\n    def __init__(self, documento, parent=None):\n        super().__init__(parent)\n        self.documento = documento\n        self._carregando_capitulo = False\n        self._build_ui()",
+        "detail": "aba_conteudo",
+        "documentation": {}
+    },
+    {
         "label": "Configuracoes",
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Configuracoes:\n    \"\"\"Armazena as configurações globais do documento.\"\"\"\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Bacharelado em Ciência da Computação\"\n    cidade: str = \"Parnaíba\"\n    estado: str = \"PI\"\n    ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass",
+        "peekOfCode": "class Configuracoes:\n    \"\"\"Armazena as configurações globais do documento.\"\"\"\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Bacharelado em Ciência da Computação\"\n    cidade: str = \"Araioses\"\n    estado: str = \"MA\"\n    ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass",
         "detail": "documento",
         "documentation": {}
     },
@@ -367,7 +480,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Autor:\n    \"\"\"Representa um autor do trabalho.\"\"\"\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    \"\"\"Representa uma seção/capítulo do conteúdo textual.\"\"\"\n    titulo: str\n    conteudo: str = \"\"\nclass DocumentoABNT:\n    \"\"\"",
+        "peekOfCode": "class Autor:\n    \"\"\"Representa um autor do trabalho.\"\"\"\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    \"\"\"Representa um nó na árvore de conteúdo (tópico ou subtópico).\"\"\"\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None",
         "detail": "documento",
         "documentation": {}
     },
@@ -376,7 +489,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Capitulo:\n    \"\"\"Representa uma seção/capítulo do conteúdo textual.\"\"\"\n    titulo: str\n    conteudo: str = \"\"\nclass DocumentoABNT:\n    \"\"\"\n    Classe principal que agrega todas as partes de um documento ABNT.\n    \"\"\"\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()",
+        "peekOfCode": "class Capitulo:\n    \"\"\"Representa um nó na árvore de conteúdo (tópico ou subtópico).\"\"\"\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self\n        self.filhos.append(filho)\nclass DocumentoABNT:",
         "detail": "documento",
         "documentation": {}
     },
@@ -394,7 +507,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n    # --- ## CÓDIGO CORRIGIDO E DEFINITIVO PARA A ATUALIZAÇÃO DO SUMÁRIO ## ---\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        \"\"\"\n        Abre o Word em segundo plano e força uma atualização COMPLETA de todos os",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:\n            print(\"Não foi possível atualizar o sumário: pywin32 não está instalado.\")\n            return False",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -403,7 +516,7 @@
         "kind": 2,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "def adicionar_sumario(doc, paragrafo_placeholder):\n    # (código sem alterações, já está correto)\n    sdt = OxmlElement('w:sdt')\n    sdtContent = OxmlElement('w:sdtContent')\n    p = OxmlElement('w:p')\n    r = OxmlElement('w:r')\n    fldChar_begin = OxmlElement('w:fldChar')\n    fldChar_begin.set(qn('w:fldCharType'), 'begin')\n    instrText = OxmlElement('w:instrText')\n    instrText.set(qn('xml:space'), 'preserve')",
+        "peekOfCode": "def adicionar_sumario(doc, paragrafo_placeholder):\n    sdt = OxmlElement('w:sdt')\n    sdtContent = OxmlElement('w:sdtContent')\n    p = OxmlElement('w:p')\n    r = OxmlElement('w:r')\n    fldChar_begin = OxmlElement('w:fldChar')\n    fldChar_begin.set(qn('w:fldCharType'), 'begin')\n    instrText = OxmlElement('w:instrText')\n    instrText.set(qn('xml:space'), 'preserve')\n    instrText.text = 'TOC \\\\o \"1-3\" \\\\h \\\\z \\\\u'",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -412,7 +525,7 @@
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ReferenciaDialog(QDialog):\n    \"\"\"Dialog para adicionar ou editar uma referência.\"\"\"\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self)\n        self.form_layout = QFormLayout()\n        # --- ## CORREÇÃO 1: LÓGICA DO FORMULÁRIO DINÂMICO ## ---\n        # A lógica foi refeita para OCULTAR/EXIBIR campos em vez de DELETÁ-LOS.\n        # 1. Criar TODOS os widgets de uma vez.",
+        "peekOfCode": "class ReferenciaDialog(QDialog):\n    # (código sem alterações)\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self)\n        self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox()\n        self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit()",
         "detail": "main_app",
         "documentation": {}
     },
@@ -421,7 +534,7 @@
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final - Editor de Alta Fidelidade')\n        self.setGeometry(100, 100, 950, 750)\n        self.documento = DocumentoABNT()\n        self._build_ui()\n        self._carregando_capitulo = False\n    def _build_ui(self):\n        main_layout = QVBoxLayout(self)",
+        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper - Editor de Estrutura')\n        self.setGeometry(100, 100, 950, 750)\n        self.documento = DocumentoABNT()\n        self._build_ui()\n    def _build_ui(self):\n        main_layout = QVBoxLayout(self)\n        self.tabs = QTabWidget()",
         "detail": "main_app",
         "documentation": {}
     },

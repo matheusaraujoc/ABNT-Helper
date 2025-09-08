@@ -1,5 +1,6 @@
 # gerador_docx.py
-# Descrição: Versão definitiva com a automação do sumário CLICÁVEL funcionando.
+# Descrição: O Construtor. Orquestra a criação do .docx, mas delega
+# toda a lógica de formatação para o Motor de Regras da ABNT.
 
 import os
 from docx import Document
@@ -8,7 +9,7 @@ from docx.enum.section import WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-from documento import DocumentoABNT
+from documento import DocumentoABNT, Capitulo
 from normas_abnt import MotorNormasABNT
 
 try:
@@ -19,7 +20,6 @@ except ImportError:
     print("AVISO: Biblioteca 'pywin32' não encontrada. A automação do sumário será desativada.")
 
 def adicionar_sumario(doc, paragrafo_placeholder):
-    # (código sem alterações, já está correto)
     sdt = OxmlElement('w:sdt')
     sdtContent = OxmlElement('w:sdtContent')
     p = OxmlElement('w:p')
@@ -51,16 +51,10 @@ class GeradorDOCX:
         self.regras = MotorNormasABNT()
         self.regras.configurar_pagina_e_estilos(self.doc)
 
-    # --- ## CÓDIGO CORRIGIDO E DEFINITIVO PARA A ATUALIZAÇÃO DO SUMÁRIO ## ---
     def _atualizar_sumario_com_word(self, caminho_arquivo):
-        """
-        Abre o Word em segundo plano e força uma atualização COMPLETA de todos os
-        campos do documento, o que garante a criação dos hyperlinks no sumário.
-        """
         if not WIN32_AVAILABLE:
             print("Não foi possível atualizar o sumário: pywin32 não está instalado.")
             return False
-        
         word = None
         try:
             print("Iniciando automação do MS Word para reconstrução do sumário...")
@@ -68,15 +62,11 @@ class GeradorDOCX:
             word.Visible = False
             doc_path = os.path.abspath(caminho_arquivo)
             doc = word.Documents.Open(doc_path)
-            
-            # Seleciona o documento inteiro
+            # A forma mais robusta é forçar a atualização de todos os campos
             word.Selection.WholeStory()
-            # Força a atualização de todos os campos na seleção (incluindo o TOC com hyperlinks)
             word.Selection.Fields.Update()
-            
             doc.Save()
             doc.Close(SaveChanges=False)
-            
             print("Sumário clicável gerado e atualizado com sucesso.")
             return True
         except Exception as e:
@@ -85,29 +75,29 @@ class GeradorDOCX:
         finally:
             if word is not None:
                 word.Quit()
-    # --- FIM DA CORREÇÃO ---
-
+    
     def gerar_documento(self, caminho_arquivo: str):
-        # (código sem alterações)
         self._renderizar_capa()
         self._renderizar_folha_rosto()
         self._renderizar_resumo()
         section = self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._set_page_numbering(section)
         self._renderizar_sumario()
-        for i, capitulo in enumerate(self.doc_abnt.capitulos, 1):
-            self._renderizar_capitulo(capitulo, i)
+        self._renderizar_secoes_recursivamente(self.doc_abnt.estrutura_textual)
         self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._renderizar_referencias()
         self.doc.save(caminho_arquivo)
         self._atualizar_sumario_com_word(caminho_arquivo)
-
-    # --- O restante do arquivo permanece o mesmo da versão anterior ---
-    def _renderizar_sumario(self):
-        self.regras.aplicar_estilo_titulo_secao(self.doc, numero="", titulo_texto="SUMÁRIO")
-        paragrafo_placeholder = self.doc.add_paragraph()
-        adicionar_sumario(self.doc, paragrafo_placeholder)
-        self.doc.add_page_break()
+    
+    def _renderizar_secoes_recursivamente(self, no_pai: Capitulo, prefixo_numeracao=""):
+        for i, no_filho in enumerate(no_pai.filhos, 1):
+            numero_completo = f"{prefixo_numeracao}{i}"
+            nivel_titulo = len(numero_completo.split('.'))
+            self.regras.aplicar_estilo_titulo_secao(self.doc, numero_completo, no_filho.titulo, nivel=nivel_titulo)
+            if no_filho.conteudo:
+                p = self.doc.add_paragraph()
+                self.regras.aplicar_estilo_paragrafo_normal(p, no_filho.conteudo)
+            self._renderizar_secoes_recursivamente(no_filho, prefixo_numeracao=f"{numero_completo}.")
 
     def _set_page_numbering(self, section):
         section.header.is_linked_to_previous = False
@@ -181,10 +171,11 @@ class GeradorDOCX:
         texto_kw = self.doc_abnt.palavras_chave.replace(';', '.') + "."
         p_kw.add_run(texto_kw)
 
-    def _renderizar_capitulo(self, capitulo, numero):
-        self.regras.aplicar_estilo_titulo_secao(self.doc, numero, capitulo.titulo)
-        p = self.doc.add_paragraph()
-        self.regras.aplicar_estilo_paragrafo_normal(p, capitulo.conteudo)
+    def _renderizar_sumario(self):
+        self.regras.aplicar_estilo_titulo_secao(self.doc, numero="", titulo_texto="SUMÁRIO")
+        paragrafo_placeholder = self.doc.add_paragraph()
+        adicionar_sumario(self.doc, paragrafo_placeholder)
+        self.doc.add_page_break()
 
     def _renderizar_referencias(self):
         self.regras.aplicar_estilo_titulo_secao(self.doc, numero="", titulo_texto="REFERÊNCIAS")
