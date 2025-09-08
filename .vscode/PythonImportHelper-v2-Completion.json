@@ -120,6 +120,14 @@
         "documentation": {}
     },
     {
+        "label": "QCheckBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "QTreeWidget",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -630,7 +638,7 @@
         "kind": 6,
         "importPath": "aba_conteudo",
         "description": "aba_conteudo",
-        "peekOfCode": "class ArvoreConteudo(QTreeWidget):\n    \"\"\"\n    Uma subclasse de QTreeWidget que emite um sinal personalizado após uma\n    operação de arrastar e soltar ser concluída. Isso garante que a\n    sincronização do modelo de dados ocorra de forma confiável.\n    \"\"\"\n    # Sinal personalizado que será emitido após a estrutura ser alterada\n    estruturaAlterada = QtCore.Signal()\n    def __init__(self, parent=None):\n        super().__init__(parent)",
+        "peekOfCode": "class ArvoreConteudo(QTreeWidget):\n    estruturaAlterada = QtCore.Signal()\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        # --- ## ALTERADO: Drag and Drop começa desativado por padrão ## ---\n        self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)\n        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)\n        self.setDropIndicatorShown(True)\n    def dropEvent(self, event: QtGui.QDropEvent):\n        if self.dragDropMode() == QAbstractItemView.DragDropMode.InternalMove:",
         "detail": "aba_conteudo",
         "documentation": {}
     },

@@ -1,45 +1,31 @@
 # aba_conteudo.py
-# Descrição: Versão definitiva com a lógica de "arrastar e soltar" corrigida
-# e a sincronização com o modelo de dados garantida.
+# Descrição: Adiciona um interruptor para ativar/desativar a reorganização de tópicos.
 
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, QListWidget,
-                               QVBoxLayout, QHBoxLayout, QMessageBox, 
+                               QVBoxLayout, QHBoxLayout, QMessageBox, QCheckBox,
                                QTreeWidget, QTreeWidgetItem, QInputDialog, QAbstractItemView)
 
 from documento import Capitulo
 from dialogo_tabela import TabelaDialog
 
-# --- ## NOVO: Subclasse de QTreeWidget para controle total do Drag and Drop ## ---
 class ArvoreConteudo(QTreeWidget):
-    """
-    Uma subclasse de QTreeWidget que emite um sinal personalizado após uma
-    operação de arrastar e soltar ser concluída. Isso garante que a
-    sincronização do modelo de dados ocorra de forma confiável.
-    """
-    # Sinal personalizado que será emitido após a estrutura ser alterada
     estruturaAlterada = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         
-        # Configurações do Drag and Drop
-        self.setDragEnabled(True)
-        self.setAcceptDrops(True)
+        # --- ## ALTERADO: Drag and Drop começa desativado por padrão ## ---
+        self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setDropIndicatorShown(True)
-        self.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
 
     def dropEvent(self, event: QtGui.QDropEvent):
-        """
-        Sobrescreve o evento 'drop' padrão.
-        """
-        # 1. Deixa a implementação padrão do Qt fazer a movimentação visual do item.
-        super().dropEvent(event)
-        
-        # 2. Emite nosso sinal personalizado para notificar a aplicação que a
-        #    estrutura mudou e precisa ser sincronizada com o modelo de dados.
-        self.estruturaAlterada.emit()
-# --- FIM DA NOVA CLASSE ---
+        if self.dragDropMode() == QAbstractItemView.DragDropMode.InternalMove:
+            super().dropEvent(event)
+            self.estruturaAlterada.emit()
+        else:
+            event.ignore()
 
 class AbaConteudo(QWidget):
     def __init__(self, documento, parent=None):
@@ -54,21 +40,22 @@ class AbaConteudo(QWidget):
         left_layout = QVBoxLayout(left_panel)
         left_panel.setMaximumWidth(350)
 
-        left_layout.addWidget(QLabel("Estrutura do Documento (clique e arraste para reordenar)"))
+        left_layout.addWidget(QLabel("Estrutura do Documento"))
         
-        # --- ## ALTERADO: Usa nossa nova classe ArvoreConteudo ## ---
+        # --- ## NOVO: Checkbox para controlar o modo de reorganização ## ---
+        self.chk_reorganizar = QCheckBox("Habilitar Reorganização (Arrastar e Soltar)")
+        self.chk_reorganizar.stateChanged.connect(self._alternar_modo_arrastar)
+        left_layout.addWidget(self.chk_reorganizar)
+
         self.arvore_capitulos = ArvoreConteudo() 
         self.arvore_capitulos.setHeaderLabel("Tópicos")
-        
-        # Conecta o novo sinal personalizado ao nosso método de sincronização
         self.arvore_capitulos.estruturaAlterada.connect(self._sincronizar_modelo_com_arvore)
-        
         self.arvore_capitulos.currentItemChanged.connect(self._carregar_capitulo_no_editor)
         self.arvore_capitulos.itemChanged.connect(self._renomear_capitulo)
         self._popular_arvore()
         left_layout.addWidget(self.arvore_capitulos)
 
-        # O restante do _build_ui permanece o mesmo
+        # ... (Restante do _build_ui sem alterações) ...
         btn_layout = QHBoxLayout()
         btn_add_topico = QPushButton("Novo Tópico"); btn_add_sub = QPushButton("Novo Subtópico")
         btn_del = QPushButton("Remover"); btn_layout.addWidget(btn_add_topico)
@@ -96,7 +83,18 @@ class AbaConteudo(QWidget):
         if self.arvore_capitulos.topLevelItemCount() > 0:
             self.arvore_capitulos.setCurrentItem(self.arvore_capitulos.topLevelItem(0))
 
-    # --- O método de sincronização está correto e agora será chamado de forma confiável ---
+    # --- ## NOVO: Slot para ativar/desativar o Drag and Drop ## ---
+    @QtCore.Slot(int)
+    def _alternar_modo_arrastar(self, state):
+        """Ativa ou desativa o modo de arrastar e soltar na árvore."""
+        if state == QtCore.Qt.CheckState.Checked.value:
+            self.arvore_capitulos.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
+            self.arvore_capitulos.setHeaderLabel("Tópicos (Modo Reorganizar)")
+        else:
+            self.arvore_capitulos.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)
+            self.arvore_capitulos.setHeaderLabel("Tópicos")
+            
+    # --- O restante do arquivo permanece o mesmo da versão anterior ---
     @QtCore.Slot()
     def _sincronizar_modelo_com_arvore(self):
         self.documento.estrutura_textual.filhos.clear()
@@ -110,8 +108,7 @@ class AbaConteudo(QWidget):
         root_widget = self.arvore_capitulos.invisibleRootItem()
         percorrer_arvore_ui(root_widget, self.documento.estrutura_textual)
         print("Modelo de dados sincronizado com a nova ordem da árvore.")
-
-    # O restante do arquivo não precisa de alterações
+    
     @QtCore.Slot()
     def _adicionar_topico_principal(self):
         novo_capitulo = Capitulo(titulo="Novo Tópico")
@@ -137,7 +134,7 @@ class AbaConteudo(QWidget):
         item_pai_widget.addChild(item_filho_widget)
         self.arvore_capitulos.expandItem(item_pai_widget)
         self.arvore_capitulos.setCurrentItem(item_filho_widget)
-
+        
     @QtCore.Slot()
     def _remover_topico(self):
         item_selecionado = self.arvore_capitulos.currentItem()
