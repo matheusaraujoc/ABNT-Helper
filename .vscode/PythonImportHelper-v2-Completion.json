@@ -201,6 +201,14 @@
         "documentation": {}
     },
     {
+        "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "QDialog",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -625,6 +633,14 @@
         "documentation": {}
     },
     {
+        "label": "QCheckBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "Capitulo",
         "importPath": "documento",
         "description": "documento",
@@ -809,6 +825,14 @@
         "documentation": {}
     },
     {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "TabelaDialog",
         "importPath": "dialogs",
         "description": "dialogs",
@@ -826,6 +850,14 @@
     },
     {
         "label": "ReferenciaDialog",
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "isExtraImport": true,
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
+        "label": "DialogoFigura",
         "importPath": "dialogs",
         "description": "dialogs",
         "isExtraImport": true,
@@ -1169,6 +1201,22 @@
         "documentation": {}
     },
     {
+        "label": "QKeySequence",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QWebEnginePage",
+        "importPath": "PySide6.QtWebEngineCore",
+        "description": "PySide6.QtWebEngineCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWebEngineCore",
+        "documentation": {}
+    },
+    {
         "label": "QWebEngineView",
         "importPath": "PySide6.QtWebEngineWidgets",
         "description": "PySide6.QtWebEngineWidgets",
@@ -1355,7 +1403,7 @@
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT()\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT(self.doc_abnt)\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -1373,7 +1421,7 @@
         "kind": 6,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "class GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _parsear_paragrafos_por_indentacao(self, texto_bloco):",
+        "peekOfCode": "class GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n        self.classe_pagina_atual = 'pagina'",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1481,7 +1529,7 @@
         "kind": 6,
         "importPath": "normas_abnt",
         "description": "normas_abnt",
-        "peekOfCode": "class MotorNormasABNT:\n    def __init__(self):\n        self.MARGEM_SUPERIOR = Cm(3)\n        self.MARGEM_INFERIOR = Cm(2)\n        self.MARGEM_ESQUERDA = Cm(3)\n        self.MARGEM_DIREITA = Cm(2)\n        self.FONTE_PADRAO = 'Times New Roman'\n        self.TAMANHO_FONTE_PADRAO = Pt(12)\n        self.TAMANHO_FONTE_CAPA = Pt(14)\n        self.ESPAÇAMENTO_PADRAO = 1.5",
+        "peekOfCode": "class MotorNormasABNT:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.MARGEM_SUPERIOR = Cm(3)\n        self.MARGEM_INFERIOR = Cm(2)\n        self.MARGEM_ESQUERDA = Cm(3)\n        self.MARGEM_DIREITA = Cm(2)\n        self.FONTE_PADRAO = 'Times New Roman'\n        self.TAMANHO_FONTE_PADRAO = Pt(12)\n        self.TAMANHO_FONTE_CAPA = Pt(14)",
         "detail": "normas_abnt",
         "documentation": {}
     },

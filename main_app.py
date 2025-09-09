@@ -1,5 +1,5 @@
 # main_app.py
-# Descrição: Versão final que descarta capítulos órfãos vazios.
+# Descrição: Versão definitiva com todas as funcionalidades e importações corrigidas.
 
 import sys
 import os
@@ -9,8 +9,9 @@ from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QTextEdit,
                                QPushButton, QVBoxLayout, QHBoxLayout, QFileDialog, 
                                QMessageBox, QTabWidget, QComboBox, 
-                               QFormLayout, QMenuBar)
-from PySide6.QtGui import QAction
+                               QFormLayout, QMenuBar, QCheckBox)
+from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtWebEngineCore import QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
 from documento import DocumentoABNT, Autor, Capitulo
@@ -19,7 +20,8 @@ from referencia import Livro, Artigo, Site
 from aba_conteudo import AbaConteudo
 from gerador_preview import GeradorHTMLPreview
 from gerenciador_projeto import GerenciadorProjetos
-from dialogs import ReferenciaDialog
+from dialogs import ReferenciaDialog, DialogoFigura
+# A LINHA ABAIXO ESTAVA FALTANDO E CAUSAVA O ERRO. FOI RE-ADICIONADA.
 from modelos_trabalho import get_estrutura_por_nome, get_nomes_modelos
 
 class ABNTHelperApp(QWidget):
@@ -44,25 +46,27 @@ class ABNTHelperApp(QWidget):
         
         menu_bar = QMenuBar(self)
         main_layout.setMenuBar(menu_bar)
-        menu_arquivo = menu_bar.addMenu("&Arquivo")
         
+        menu_arquivo = menu_bar.addMenu("&Arquivo")
         acao_novo = QAction("&Novo Projeto", self)
         acao_novo.triggered.connect(self._novo_projeto)
         menu_arquivo.addAction(acao_novo)
-        
         acao_carregar = QAction("&Carregar Projeto...", self); acao_carregar.triggered.connect(self._carregar_projeto)
         menu_arquivo.addAction(acao_carregar)
         menu_arquivo.addSeparator()
-
         acao_salvar = QAction("&Salvar", self); acao_salvar.setShortcut("Ctrl+S"); acao_salvar.triggered.connect(self._salvar_projeto)
         menu_arquivo.addAction(acao_salvar)
-
         acao_salvar_como = QAction("Salvar &Como...", self); acao_salvar_como.triggered.connect(self._salvar_projeto_como)
         menu_arquivo.addAction(acao_salvar_como)
         menu_arquivo.addSeparator()
-
         acao_sair = QAction("Sai&r", self); acao_sair.triggered.connect(self.close)
         menu_arquivo.addAction(acao_sair)
+
+        menu_editar = menu_bar.addMenu("&Editar")
+        acao_localizar = QAction("&Localizar...", self)
+        acao_localizar.setShortcut(QKeySequence.StandardKey.Find) # Atalho Ctrl+F
+        acao_localizar.triggered.connect(self._alternar_barra_busca)
+        menu_editar.addAction(acao_localizar)
 
         self.tabs = QTabWidget()
         main_layout.addWidget(self.tabs)
@@ -111,57 +115,93 @@ class ABNTHelperApp(QWidget):
         return widget
 
     def _criar_aba_preview(self):
-        widget = QWidget(); layout = QVBoxLayout(widget)
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        self.busca_toolbar = QWidget()
+        busca_layout = QHBoxLayout(self.busca_toolbar)
+        busca_layout.setContentsMargins(0, 5, 0, 5)
+        self.busca_input = QLineEdit()
+        self.busca_input.setPlaceholderText("Buscar no documento...")
+        btn_buscar_anterior = QPushButton("Anterior")
+        btn_buscar_proximo = QPushButton("Próximo")
+        self.busca_case_sensitive = QCheckBox("Diferenciar M/m")
+        btn_fechar_busca = QPushButton("Fechar")
         btn_atualizar = QPushButton("Atualizar Pré-Visualização")
-        btn_atualizar.clicked.connect(self._atualizar_preview)
+        busca_layout.addWidget(QLabel("Localizar:"))
+        busca_layout.addWidget(self.busca_input)
+        busca_layout.addWidget(btn_buscar_anterior)
+        busca_layout.addWidget(btn_buscar_proximo)
+        busca_layout.addWidget(self.busca_case_sensitive)
+        busca_layout.addStretch()
+        busca_layout.addWidget(btn_fechar_busca)
+        layout.addWidget(self.busca_toolbar)
+        self.busca_toolbar.setVisible(False)
         self.preview_display = QWebEngineView()
         self.preview_display.setHtml("<html><body><h1>Pré-Visualização</h1><p>Clique em 'Atualizar' para ver o seu documento.</p></body></html>")
-        layout.addWidget(btn_atualizar); layout.addWidget(self.preview_display)
+        layout.addWidget(self.preview_display, 1)
+        layout.addWidget(btn_atualizar)
+        btn_atualizar.clicked.connect(self._atualizar_preview)
+        btn_buscar_proximo.clicked.connect(self._buscar_proximo_preview)
+        btn_buscar_anterior.clicked.connect(self._buscar_anterior_preview)
+        self.busca_input.returnPressed.connect(self._buscar_proximo_preview)
+        btn_fechar_busca.clicked.connect(self._alternar_barra_busca)
         return widget
 
+    @QtCore.Slot()
+    def _alternar_barra_busca(self):
+        is_visible = self.busca_toolbar.isVisible()
+        self.busca_toolbar.setVisible(not is_visible)
+        if not is_visible:
+            self.busca_input.setFocus()
+
+    def _buscar_preview(self, direcao_reversa=False):
+        texto_busca = self.busca_input.text()
+        if not texto_busca: return
+        flags = QWebEnginePage.FindFlag(0)
+        if direcao_reversa: flags |= QWebEnginePage.FindFlag.FindBackward
+        if self.busca_case_sensitive.isChecked(): flags |= QWebEnginePage.FindFlag.FindCaseSensitively
+        self.preview_display.findText(texto_busca, flags)
+
+    @QtCore.Slot()
+    def _buscar_proximo_preview(self):
+        self._buscar_preview(direcao_reversa=False)
+
+    @QtCore.Slot()
+    def _buscar_anterior_preview(self):
+        self._buscar_preview(direcao_reversa=True)
+        
     @QtCore.Slot(bool)
     def _novo_projeto(self, primeira_execucao=False):
         if not primeira_execucao and not self._verificar_alteracoes_nao_salvas():
             return
-        
         self.documento = DocumentoABNT()
         estrutura_padrao = get_estrutura_por_nome("Trabalho de Conclusão de Curso (TCC)")
         for titulo in estrutura_padrao:
             self.documento.estrutura_textual.adicionar_filho(Capitulo(titulo=titulo, is_template_item=True))
-            
         self.caminho_projeto_atual = None
         self.gerenciador_projeto.fechar_projeto()
-        
         if hasattr(self, 'cfg_tipo'):
              self._popular_ui_com_documento()
-
         self.modificado = False
         self.setWindowTitle('ABNT Helper Final - Novo Projeto (TCC)')
     
-    # ALTERADO: Lógica de "Mesclagem Inteligente" agora descarta órfãos vazios.
     @QtCore.Slot(str)
     def _on_template_selecionado(self, nome_modelo):
-        if self._populando_ui or not nome_modelo:
-            return
-        if nome_modelo == self.documento.configuracoes.tipo_trabalho:
-            return
-
+        if self._populando_ui or not nome_modelo: return
+        if nome_modelo == self.documento.configuracoes.tipo_trabalho: return
         resposta = QMessageBox.question(self, "Mudar Modelo de Trabalho",
                                           f"Mudar o modelo para '{nome_modelo}' irá reorganizar sua estrutura de capítulos.\n"
                                           "Capítulos existentes serão preservados. Capítulos que não pertencem ao novo modelo e que contêm conteúdo serão movidos para o final.\n\n"
                                           "Deseja continuar?",
                                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
         if resposta == QMessageBox.StandardButton.No:
             self._populando_ui = True
             self.cfg_tipo.setCurrentText(self.documento.configuracoes.tipo_trabalho)
             self._populando_ui = False
             return
-        
         mapa_capitulos_atuais = {c.titulo.upper().strip(): c for c in self.documento.estrutura_textual.filhos}
         titulos_novos = get_estrutura_por_nome(nome_modelo)
         nova_lista_de_capitulos = []
-
         for titulo_novo in titulos_novos:
             titulo_normalizado = titulo_novo.upper().strip()
             if titulo_normalizado in mapa_capitulos_atuais:
@@ -170,25 +210,20 @@ class ABNTHelperApp(QWidget):
                 nova_lista_de_capitulos.append(capitulo_existente)
             else:
                 nova_lista_de_capitulos.append(Capitulo(titulo=titulo_novo, is_template_item=True))
-
-        # NOVO: Filtra os órfãos para manter apenas os que têm conteúdo
         capitulos_orfaos_com_conteudo = []
         for orfao in mapa_capitulos_atuais.values():
             if orfao.conteudo.strip() or orfao.filhos:
                 orfao.is_template_item = False
                 capitulos_orfaos_com_conteudo.append(orfao)
-        
         if capitulos_orfaos_com_conteudo:
             nova_lista_de_capitulos.extend(capitulos_orfaos_com_conteudo)
             QMessageBox.information(self, "Capítulos Preservados",
                                     "Alguns capítulos da estrutura anterior que continham conteúdo "
                                     "não fazem parte do novo modelo e foram movidos para o final.\n"
                                     "Capítulos órfãos que estavam vazios foram descartados.")
-
         self.documento.estrutura_textual.filhos = nova_lista_de_capitulos
         for filho in self.documento.estrutura_textual.filhos:
             filho.pai = self.documento.estrutura_textual
-
         self.aba_conteudo._popular_arvore()
         self.documento.configuracoes.tipo_trabalho = nome_modelo
         self._marcar_modificado()
@@ -315,9 +350,7 @@ class ABNTHelperApp(QWidget):
             self._marcar_modificado()
             
     def _sincronizar_modelo_com_ui(self):
-        # A sincronização do tipo de trabalho é feita dinamicamente agora
-        # self.documento.configuracoes.tipo_trabalho = self.cfg_tipo.currentText()
-        cfg = self.documento.configuracoes
+        cfg = self.documento.configuracoes; cfg.tipo_trabalho = self.cfg_tipo.currentText()
         cfg.instituicao = self.cfg_instituicao.text(); cfg.curso = self.cfg_curso.text()
         cfg.modalidade_curso = self.cfg_modalidade_curso.text(); cfg.titulo_pretendido = self.cfg_titulo_pretendido.text()
         cfg.cidade = self.cfg_cidade.text(); cfg.ano = int(self.cfg_ano.text() or datetime.now().year)
@@ -330,6 +363,7 @@ class ABNTHelperApp(QWidget):
     def _atualizar_preview(self):
         self.aba_conteudo.sincronizar_conteudo_pendente()
         self._sincronizar_modelo_com_ui()
+        self.preview_display.findText("") 
         gerador = GeradorHTMLPreview(self.documento)
         html_content = gerador.gerar_html()
         base_url = QtCore.QUrl.fromLocalFile(os.path.abspath(os.path.dirname(__file__)))

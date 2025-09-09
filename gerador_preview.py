@@ -1,5 +1,5 @@
 # gerador_preview.py
-# Descrição: Versão final com correção de tamanho da capa.
+# Descrição: Versão estável com a adição da lógica para formatar Artigos Científicos.
 
 import os
 import re
@@ -24,23 +24,12 @@ class GeradorHTMLPreview:
         self.altura_restante = ALTURA_CONTEUDO_PAGINA
         self.contador_tabelas = 0
         self.contador_figuras = 0
+        self.classe_pagina_atual = 'pagina'
+        # NOVO: Flag para verificar o tipo de trabalho
+        self.is_artigo = self.doc_abnt.configuracoes.tipo_trabalho == "Artigo Científico"
 
-    def _parsear_paragrafos_por_indentacao(self, texto_bloco):
-        paragrafos_finais = []
-        paragrafo_atual_linhas = []
-        linhas = texto_bloco.strip().split('\n')
-        for linha in linhas:
-            if not linha.strip():
-                continue
-            if linha.startswith((' ', '\t')):
-                paragrafo_atual_linhas.append(linha.strip())
-            else:
-                if paragrafo_atual_linhas:
-                    paragrafos_finais.append(' '.join(paragrafo_atual_linhas))
-                paragrafo_atual_linhas = [linha.strip()]
-        if paragrafo_atual_linhas:
-            paragrafos_finais.append(' '.join(paragrafo_atual_linhas))
-        return paragrafos_finais
+    # Este método não precisa mais do _parsear_paragrafos_por_indentacao
+    # pois a lógica de split('\n') já está no loop de renderização.
 
     def _estimar_paginacao_e_coletar_sumario(self):
         self.entradas_sumario = []
@@ -117,18 +106,18 @@ class GeradorHTMLPreview:
         self.conteudo_pagina_atual = [self.classe_pagina_atual]
         self.altura_restante = ALTURA_CONTEUDO_PAGINA
 
-    def _adicionar_elemento_bloco(self, html, altura, classe_pagina):
-        self.classe_pagina_atual = classe_pagina
-        if not self.conteudo_pagina_atual: self.conteudo_pagina_atual.append(classe_pagina)
+    def _adicionar_elemento_bloco(self, html, altura):
+        self.classe_pagina_atual = 'pagina'
+        if not self.conteudo_pagina_atual: self.conteudo_pagina_atual.append(self.classe_pagina_atual)
         altura_necessaria = altura
         if html.startswith("<h1"): altura_necessaria += ALTURA_LINHA_TEXTO * 2
         if self.altura_restante < altura_necessaria: self._nova_pagina()
         self.conteudo_pagina_atual.append(html)
         self.altura_restante -= altura
 
-    def _adicionar_paragrafo_quebravel(self, texto_paragrafo, classe_pagina):
-        self.classe_pagina_atual = classe_pagina
-        if not self.conteudo_pagina_atual: self.conteudo_pagina_atual.append(classe_pagina)
+    def _adicionar_paragrafo_quebravel(self, texto_paragrafo):
+        self.classe_pagina_atual = 'pagina'
+        if not self.conteudo_pagina_atual: self.conteudo_pagina_atual.append(self.classe_pagina_atual)
         texto_restante = texto_paragrafo.strip()
         is_continuacao = False
         while texto_restante:
@@ -154,11 +143,21 @@ class GeradorHTMLPreview:
                 self._nova_pagina()
                 is_continuacao = True
     
+    # NOVO: Método para renderizar o cabeçalho de um artigo
+    def _renderizar_cabecalho_artigo_html(self):
+        autores_html = ", ".join([a.nome_completo for a in self.doc_abnt.autores])
+        # Adiciona o conteúdo do cabeçalho à página atual, um elemento de cada vez
+        self._adicionar_elemento_bloco(f'<p style="text-align: center;"><strong>{self.doc_abnt.titulo.upper()}</strong></p><br>', ALTURA_LINHA_TEXTO * 2)
+        self._adicionar_elemento_bloco(f'<p style="text-align: center;">{autores_html}</p><br>', ALTURA_LINHA_TEXTO * 2)
+        self._adicionar_elemento_bloco(f'<p><strong>Resumo</strong></p>', ALTURA_LINHA_TEXTO)
+        self._adicionar_paragrafo_quebravel(self.doc_abnt.resumo)
+        self._adicionar_elemento_bloco(f'<br><p><strong>Palavras-chave:</strong> {self.doc_abnt.palavras_chave.replace(";", ".")}.</p>', ALTURA_LINHA_TEXTO * 2)
+
     def gerar_html(self) -> str:
-        self._estimar_paginacao_e_coletar_sumario()
-        
+        # Limpa o estado anterior
         self.paginas_html = []; self.conteudo_pagina_atual = []
-        self.altura_restante = ALTURA_CONTEUDO_PAGINA; self.classe_pagina_atual = 'pagina'
+        self.altura_restante = ALTURA_CONTEUDO_PAGINA
+        
         cfg = self.doc_abnt.configuracoes
         
         html_style = """
@@ -181,10 +180,7 @@ class GeradorHTMLPreview:
             p.corpo-texto { text-align: justify; text-indent: 1.25cm; }
             p.paragrafo-continuado { text-align: justify; text-indent: 0; }
             .paragrafo-quebrado { text-align-last: justify; }
-
-            /* ALTERADO: Removida a propriedade 'height: 100%' que causava o erro de tamanho */
             .capa, .folha-rosto { text-align: center; }
-
             .capa p, .folha-rosto p { text-indent: 0; }
             .natureza { text-indent: 0; margin-left: 8cm; font-size: 11pt; text-align: justify; }
             .resumo-paragrafo { text-indent: 1.25cm; text-align: justify; }
@@ -209,23 +205,36 @@ class GeradorHTMLPreview:
         </style>
         """
         
-        autores_capa_html = "<br>".join([a.nome_completo.upper() for a in self.doc_abnt.autores])
-        self.paginas_html.append(f'<div class="pagina capa pre-textual">{self._renderizar_capa_html(cfg, autores_capa_html)}</div>')
-        self.paginas_html.append(f'<div class="pagina pre-textual">{self._renderizar_folha_rosto_html(cfg, autores_capa_html)}</div>')
-        self.paginas_html.append(f'<div class="pagina pre-textual">{self._renderizar_resumo_html()}</div>')
-        self.paginas_html.append(f'<div class="pagina pre-textual">{self._renderizar_sumario_html()}</div>')
+        # --- ALTERADO: Lógica condicional para renderização ---
+        if self.is_artigo:
+            # Fluxo de renderização para Artigo Científico
+            self.classe_pagina_atual = 'pagina'
+            self.conteudo_pagina_atual = [self.classe_pagina_atual]
+            self._renderizar_cabecalho_artigo_html()
+        else:
+            # Fluxo de renderização para Trabalho Acadêmico (TCC, Tese, etc.)
+            self._estimar_paginacao_e_coletar_sumario()
+            autores_capa_html = "<br>".join([a.nome_completo.upper() for a in self.doc_abnt.autores])
+            self.paginas_html.append(f'<div class="pagina capa pre-textual">{self._renderizar_capa_html(cfg, autores_capa_html)}</div>')
+            self.paginas_html.append(f'<div class="pagina folha-rosto pre-textual">{self._renderizar_folha_rosto_html(cfg, autores_capa_html)}</div>')
+            self.paginas_html.append(f'<div class="pagina resumo-page pre-textual">{self._renderizar_resumo_html()}</div>')
+            if self.entradas_sumario:
+                self.paginas_html.append(f'<div class="pagina sumario-page pre-textual">{self._renderizar_sumario_html()}</div>')
+            self.classe_pagina_atual = 'pagina'
+            self.conteudo_pagina_atual = [self.classe_pagina_atual]
+            self.altura_restante = ALTURA_CONTEUDO_PAGINA
+
+        # --- FIM DA LÓGICA CONDICIONAL ---
         
-        self.classe_pagina_atual = 'pagina'; self.conteudo_pagina_atual = [self.classe_pagina_atual]
-        self.altura_restante = ALTURA_CONTEUDO_PAGINA
         self._renderizar_secoes_recursivamente_html(self.doc_abnt.estrutura_textual)
         self._nova_pagina()
         
-        self._adicionar_elemento_bloco("<h1>REFERÊNCIAS</h1>", ALTURA_TITULO_SECAO, 'pagina')
+        self._adicionar_elemento_bloco("<h1>REFERÊNCIAS</h1>", ALTURA_TITULO_SECAO)
         self.doc_abnt.ordenar_referencias()
         for ref in self.doc_abnt.referencias:
             ref_html = f'<p class="referencia">{ref.formatar().replace("**", "<strong>").replace("</strong>", "")}</p>'
             altura_ref = (len(ref.formatar()) / 100 + 1) * (ALTURA_LINHA_TEXTO * 0.8)
-            self._adicionar_elemento_bloco(ref_html, altura_ref, 'pagina')
+            self._adicionar_elemento_bloco(ref_html, altura_ref)
         self._nova_pagina()
 
         return f"<!DOCTYPE html><html><head><meta charset='UTF-8'>{html_style}</head><body>{''.join(self.paginas_html)}</body></html>"
@@ -233,8 +242,15 @@ class GeradorHTMLPreview:
     def _renderizar_secoes_recursivamente_html(self, no_pai: Capitulo, prefixo_numeracao=""):
         for i, no_filho in enumerate(no_pai.filhos, 1):
             numero_completo = f"{prefixo_numeracao}{i}"
-            titulo_texto = f"{numero_completo} {no_filho.titulo.upper() if len(numero_completo.split('.')) == 1 else no_filho.titulo}"
-            self._adicionar_elemento_bloco(f"<h1 id='secao-{numero_completo.replace('.', '-')}'>{titulo_texto}</h1>", ALTURA_TITULO_SECAO, 'pagina')
+            nivel = len(numero_completo.split('.'))
+            
+            # Formatação do título da seção/capítulo
+            if self.is_artigo:
+                titulo_texto = f"{numero_completo} {no_filho.titulo}" # Para artigos, sem maiúsculas
+            else:
+                titulo_texto = f"{numero_completo} {no_filho.titulo.upper() if nivel == 1 else no_filho.titulo}"
+            
+            self._adicionar_elemento_bloco(f"<h1 id='secao-{numero_completo.replace('.', '-')}'>{titulo_texto}</h1>", ALTURA_TITULO_SECAO)
 
             if no_filho.conteudo:
                 padrao = r"\{\{(Tabela|Figura):([^}]+)\}\}"
@@ -245,7 +261,7 @@ class GeradorHTMLPreview:
                             paragrafos = parte.strip().split('\n')
                             for paragrafo_texto in paragrafos:
                                 if paragrafo_texto.strip():
-                                    self._adicionar_paragrafo_quebravel(paragrafo_texto, 'pagina')
+                                    self._adicionar_paragrafo_quebravel(paragrafo_texto)
                     elif k % 3 == 1:
                         tipo, titulo = parte, partes[k+1]
                         if tipo == "Tabela":
@@ -253,28 +269,32 @@ class GeradorHTMLPreview:
                             if tabela_obj:
                                 self.contador_tabelas += 1; tabela_obj.numero = self.contador_tabelas
                                 altura = (len(tabela_obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2)
-                                self._adicionar_elemento_bloco(self._renderizar_tabela_html(tabela_obj), altura, 'pagina')
+                                self._adicionar_elemento_bloco(self._renderizar_tabela_html(tabela_obj), altura)
                         elif tipo == "Figura":
                             figura_obj = next((f for f in no_filho.figuras if f.titulo == titulo), None)
                             if figura_obj:
                                 self.contador_figuras += 1; figura_obj.numero = self.contador_figuras
                                 altura = (figura_obj.largura_cm / 16 * 9) + (ALTURA_LEGENDA * 2)
-                                self._adicionar_elemento_bloco(self._renderizar_figura_html(figura_obj), altura, 'pagina')
+                                self._adicionar_elemento_bloco(self._renderizar_figura_html(figura_obj), altura)
             
             self._renderizar_secoes_recursivamente_html(no_filho, f"{numero_completo}.")
     
     def _renderizar_capa_html(self, cfg, autores_html):
         return f"""<div class="capa"><p><strong>{cfg.instituicao.upper()}</strong></p><br><br><br><p><strong>{autores_html}</strong></p><br><br><br><br><p><strong>{self.doc_abnt.titulo.upper()}</strong></p><div class="posicao-final-pagina"><p>{cfg.cidade.upper()}</p><p>{cfg.ano}</p></div></div>"""
+
     def _renderizar_folha_rosto_html(self, cfg, autores_html):
         return f"""<div class="folha-rosto"><p><strong>{autores_html}</strong></p><br><br><br><br><p><strong>{self.doc_abnt.titulo.upper()}</strong></p><br><br><br><p class="natureza">{cfg.tipo_trabalho} apresentado ao curso de {cfg.modalidade_curso} em {cfg.curso} da {cfg.instituicao}, como requisito parcial para a obtenção do título de {cfg.titulo_pretendido}.</p><br><p class="natureza">Orientador(a): {self.doc_abnt.orientador}</p><div class="posicao-final-pagina"><p>{cfg.cidade.upper()}</p><p>{cfg.ano}</p></div></div>"""
+
     def _renderizar_resumo_html(self):
         return f"""<h1>RESUMO</h1><p class="resumo-paragrafo">{self.doc_abnt.resumo}</p><p><br></p><p class="resumo-titulo-palavras-chave">Palavras-chave: <span style="font-weight: normal;">{self.doc_abnt.palavras_chave.replace(';', '.')}.</span></p>"""
+
     def _renderizar_sumario_html(self):
         html = "<h1>SUMÁRIO</h1>"
         for entrada in self.entradas_sumario:
             titulo = entrada["titulo"].upper() if entrada["nivel"] == 1 else entrada["titulo"]
             html += f"""<p class="sumario-item sumario-nivel-{entrada['nivel']}"><a href="#{entrada['id_ancora']}"><span class="sumario-titulo">{entrada['numero']} {titulo}</span><span class="sumario-dots"></span><span class="sumario-pagina">{entrada['pagina']}</span></a></p>"""
         return html
+
     def _renderizar_tabela_html(self, tabela):
         classe_css = 'abnt' if tabela.estilo_borda == 'abnt' else ''
         html = f'<div><p class="legenda">Tabela {tabela.numero} – {tabela.titulo}</p><table class="{classe_css}" align="center">'
@@ -291,11 +311,12 @@ class GeradorHTMLPreview:
         if tabela.fonte: html += f'<p class="fonte">Fonte: {tabela.fonte}</p>'
         html += '</div>'
         return html
+
     def _renderizar_figura_html(self, figura):
         caminho_abs = os.path.abspath(figura.caminho_processado)
         url_local = f"file:///{caminho_abs.replace(os.path.sep, '/')}"
-        html = f'<div><img src="{url_local}" style="width: {figura.largura_cm}cm;">'
-        html += f'<p class="legenda">Figura {figura.numero} – {figura.titulo}</p>'
+        html = f'<div><p class="legenda">Figura {figura.numero} – {figura.titulo}</p>'
+        html += f'<img src="{url_local}" style="width: {figura.largura_cm}cm;">'
         if figura.fonte: html += f'<p class="fonte">Fonte: {figura.fonte}</p>'
         html += '</div>'
         return html

@@ -1,11 +1,11 @@
 # aba_conteudo.py
-# Descrição: Versão que aplica o destaque visual apenas nos tópicos de nível 1.
+# Descrição: Versão com a busca aprimorada para filtrar por títulos e conteúdo dos capítulos.
 
 import re
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, QListWidget, QCheckBox,
                                QVBoxLayout, QHBoxLayout, QMessageBox, QTreeWidget,
-                               QTreeWidgetItem, QInputDialog, QAbstractItemView)
+                               QTreeWidgetItem, QInputDialog, QAbstractItemView, QLineEdit)
 
 from documento import Capitulo, Tabela, Figura
 from dialogs import TabelaDialog, DialogoFigura
@@ -39,6 +39,13 @@ class AbaConteudo(QWidget):
         left_panel.setMaximumWidth(350)
 
         left_layout.addWidget(QLabel("Estrutura do Documento"))
+
+        self.busca_arvore_input = QLineEdit()
+        # ALTERADO: Placeholder reflete a nova capacidade de busca
+        self.busca_arvore_input.setPlaceholderText("Filtrar tópicos e conteúdos...")
+        self.busca_arvore_input.textChanged.connect(self._filtrar_arvore)
+        left_layout.addWidget(self.busca_arvore_input)
+        
         self.chk_reorganizar = QCheckBox("Habilitar Reorganização (Arrastar e Soltar)")
         self.chk_reorganizar.stateChanged.connect(self._alternar_modo_arrastar)
         left_layout.addWidget(self.chk_reorganizar)
@@ -82,16 +89,12 @@ class AbaConteudo(QWidget):
         btn_add_tabela = QPushButton("Criar Tabela")
         btn_edit_tabela = QPushButton("Editar Tabela")
         btn_del_tabela = QPushButton("Remover Tabela")
-        tabelas_btn_layout.addWidget(btn_add_tabela)
-        tabelas_btn_layout.addWidget(btn_edit_tabela)
-        tabelas_btn_layout.addWidget(btn_del_tabela)
+        tabelas_btn_layout.addWidget(btn_add_tabela); tabelas_btn_layout.addWidget(btn_edit_tabela); tabelas_btn_layout.addWidget(btn_del_tabela)
         tabelas_v_layout.addLayout(tabelas_btn_layout)
         btn_ins_tabela = QPushButton("Inserir no Texto")
         tabelas_v_layout.addWidget(btn_ins_tabela)
         
-        btn_add_tabela.clicked.connect(self._adicionar_tabela)
-        btn_edit_tabela.clicked.connect(self._editar_tabela)
-        btn_del_tabela.clicked.connect(self._remover_tabela)
+        btn_add_tabela.clicked.connect(self._adicionar_tabela); btn_edit_tabela.clicked.connect(self._editar_tabela); btn_del_tabela.clicked.connect(self._remover_tabela)
         btn_ins_tabela.clicked.connect(self._inserir_marcador_tabela)
         
         figuras_widget = QWidget()
@@ -99,33 +102,61 @@ class AbaConteudo(QWidget):
         figuras_v_layout.addWidget(QLabel("Banco de Figuras do Tópico:"))
         figuras_v_layout.addWidget(self.lista_figuras)
         figuras_btn_layout = QHBoxLayout()
-        btn_add_figura = QPushButton("Criar Figura")
-        btn_edit_figura = QPushButton("Editar Figura")
-        btn_del_figura = QPushButton("Remover Figura")
-        figuras_btn_layout.addWidget(btn_add_figura)
-        figuras_btn_layout.addWidget(btn_edit_figura)
-        figuras_btn_layout.addWidget(btn_del_figura)
+        btn_add_figura = QPushButton("Criar Figura"); btn_edit_figura = QPushButton("Editar Figura"); btn_del_figura = QPushButton("Remover Figura")
+        figuras_btn_layout.addWidget(btn_add_figura); figuras_btn_layout.addWidget(btn_edit_figura); figuras_btn_layout.addWidget(btn_del_figura)
         figuras_v_layout.addLayout(figuras_btn_layout)
         btn_ins_figura = QPushButton("Inserir no Texto")
         figuras_v_layout.addWidget(btn_ins_figura)
         
-        btn_add_figura.clicked.connect(self._adicionar_figura)
-        btn_edit_figura.clicked.connect(self._editar_figura)
-        btn_del_figura.clicked.connect(self._remover_figura)
+        btn_add_figura.clicked.connect(self._adicionar_figura); btn_edit_figura.clicked.connect(self._editar_figura); btn_del_figura.clicked.connect(self._remover_figura)
         btn_ins_figura.clicked.connect(self._inserir_marcador_figura)
         
-        elementos_layout.addWidget(tabelas_widget)
-        elementos_layout.addWidget(figuras_widget)
+        elementos_layout.addWidget(tabelas_widget); elementos_layout.addWidget(figuras_widget)
 
         right_layout.addWidget(self.label_capitulo_atual)
         right_layout.addWidget(self.editor_capitulo, 2)
         right_layout.addLayout(elementos_layout, 1)
         layout.addWidget(right_panel)
         
-        # Chamada inicial para popular a árvore
         self._popular_arvore()
         if self.arvore_capitulos.topLevelItemCount() > 0:
             self.arvore_capitulos.setCurrentItem(self.arvore_capitulos.topLevelItem(0))
+
+    @QtCore.Slot(str)
+    def _filtrar_arvore(self, texto_busca):
+        texto_busca = texto_busca.lower()
+        
+        def visitar_item(item):
+            capitulo_modelo = item.data(0, QtCore.Qt.ItemDataRole.UserRole)
+            
+            # --- LÓGICA DE BUSCA APRIMORADA ---
+            # 1. Verifica se o título corresponde
+            titulo_corresponde = texto_busca in item.text(0).lower()
+            
+            # 2. Verifica se o conteúdo do capítulo corresponde
+            conteudo_corresponde = False
+            if capitulo_modelo and capitulo_modelo.conteudo:
+                conteudo_corresponde = texto_busca in capitulo_modelo.conteudo.lower()
+            
+            item_corresponde = titulo_corresponde or conteudo_corresponde
+            # --- FIM DA LÓGICA DE BUSCA ---
+
+            algum_filho_corresponde = False
+            for i in range(item.childCount()):
+                if visitar_item(item.child(i)):
+                    algum_filho_corresponde = True
+            
+            deve_ficar_visivel = item_corresponde or algum_filho_corresponde
+            item.setHidden(not deve_ficar_visivel)
+            
+            if algum_filho_corresponde:
+                item.setExpanded(True)
+                
+            return deve_ficar_visivel
+
+        root = self.arvore_capitulos.invisibleRootItem()
+        for i in range(root.childCount()):
+            visitar_item(root.child(i))
 
     @QtCore.Slot(int)
     def _alternar_modo_arrastar(self, state):
@@ -165,7 +196,6 @@ class AbaConteudo(QWidget):
         if not capitulo:
             QMessageBox.warning(self, "Atenção", "Selecione um tópico para criar uma tabela.")
             return
-
         dialog = TabelaDialog(parent=self)
         if dialog.exec():
             nova_tabela = dialog.get_dados_tabela()
@@ -178,7 +208,6 @@ class AbaConteudo(QWidget):
         if not capitulo:
             QMessageBox.warning(self, "Atenção", "Selecione um tópico para criar uma figura.")
             return
-
         dialog = DialogoFigura(parent=self)
         if dialog.exec():
             nova_figura = dialog.get_dados_figura()
@@ -194,7 +223,6 @@ class AbaConteudo(QWidget):
         if not item_selecionado:
             QMessageBox.warning(self, "Atenção", "Selecione uma tabela do banco para inserir.")
             return
-        
         titulo_tabela = item_selecionado.text()
         marcador = f"\n{{{{Tabela:{titulo_tabela}}}}}\n"
         self.editor_capitulo.insertPlainText(marcador)
@@ -205,7 +233,6 @@ class AbaConteudo(QWidget):
         if not item_selecionado:
             QMessageBox.warning(self, "Atenção", "Selecione uma figura do banco para inserir.")
             return
-        
         titulo_figura = item_selecionado.text()
         marcador = f"\n{{{{Figura:{titulo_figura}}}}}\n"
         self.editor_capitulo.insertPlainText(marcador)
@@ -267,37 +294,28 @@ class AbaConteudo(QWidget):
     def _popular_arvore(self):
         self.arvore_capitulos.blockSignals(True)
         self.arvore_capitulos.clear()
-        
         def adicionar_filhos_recursivo(no_pai_modelo, no_pai_widget):
             for filho_modelo in no_pai_modelo.filhos:
                 item_widget = QTreeWidgetItem([filho_modelo.titulo])
                 item_widget.setData(0, QtCore.Qt.ItemDataRole.UserRole, filho_modelo)
                 item_widget.setFlags(item_widget.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
-
-                # --- LÓGICA DE FORMATAÇÃO VISUAL ALTERADA ---
-                # Aplica o destaque apenas se for um item não-padrão E um tópico principal (filho da raiz)
                 if not filho_modelo.is_template_item and filho_modelo.pai == self.documento.estrutura_textual:
-                    font = item_widget.font(0)
-                    font.setItalic(True)
+                    font = item_widget.font(0); font.setItalic(True)
                     item_widget.setFont(0, font)
                     item_widget.setForeground(0, QtGui.QColor('dimgray'))
                     item_widget.setToolTip(0, "Este é um capítulo personalizado (não pertence ao modelo padrão).")
-                # --- FIM DA ALTERAÇÃO ---
-
                 if no_pai_widget is self.arvore_capitulos:
                     no_pai_widget.addTopLevelItem(item_widget)
                 else:
                     no_pai_widget.addChild(item_widget)
-                
                 adicionar_filhos_recursivo(filho_modelo, item_widget)
-                
         adicionar_filhos_recursivo(self.documento.estrutura_textual, self.arvore_capitulos)
         self.arvore_capitulos.expandAll()
         self.arvore_capitulos.blockSignals(False)
 
     @QtCore.Slot()
     def _adicionar_topico_principal(self):
-        novo_capitulo = Capitulo(titulo="Novo Tópico") # is_template_item=False por padrão
+        novo_capitulo = Capitulo(titulo="Novo Tópico")
         self.documento.estrutura_textual.adicionar_filho(novo_capitulo)
         self._popular_arvore()
 
@@ -308,7 +326,7 @@ class AbaConteudo(QWidget):
             QMessageBox.warning(self, "Atenção", "Selecione um tópico para adicionar um subtópico.")
             return
         no_pai_modelo = item_pai_widget.data(0, QtCore.Qt.ItemDataRole.UserRole)
-        novo_subtopico = Capitulo(titulo="Novo Subtópico") # is_template_item=False por padrão
+        novo_subtopico = Capitulo(titulo="Novo Subtópico")
         no_pai_modelo.adicionar_filho(novo_subtopico)
         self._popular_arvore()
         item_pai_widget.setExpanded(True)
@@ -317,13 +335,10 @@ class AbaConteudo(QWidget):
     def _remover_topico(self):
         item_selecionado = self.arvore_capitulos.currentItem()
         if not item_selecionado: return
-        
         no_modelo = item_selecionado.data(0, QtCore.Qt.ItemDataRole.UserRole)
-        
         mensagem = f"Remover o tópico '{no_modelo.titulo}'?"
         if no_modelo.filhos:
             mensagem = f"Remover o tópico '{no_modelo.titulo}' e todos os seus subtópicos?"
-
         resposta = QMessageBox.question(self, "Confirmar Remoção", mensagem,
                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if resposta == QMessageBox.StandardButton.Yes:
@@ -346,7 +361,6 @@ class AbaConteudo(QWidget):
     @QtCore.Slot()
     def _sincronizar_modelo_com_arvore(self):
         nova_raiz = Capitulo(titulo="Raiz do Documento")
-        
         def percorrer_arvore_ui(parent_item_widget, parent_node_modelo):
             for i in range(parent_item_widget.childCount()):
                 child_item_widget = parent_item_widget.child(i)
@@ -354,8 +368,6 @@ class AbaConteudo(QWidget):
                 child_node_modelo.filhos.clear() 
                 parent_node_modelo.adicionar_filho(child_node_modelo)
                 percorrer_arvore_ui(child_item_widget, child_node_modelo)
-
         root_widget = self.arvore_capitulos.invisibleRootItem()
         percorrer_arvore_ui(root_widget, nova_raiz)
-        
         self.documento.estrutura_textual.filhos = nova_raiz.filhos
