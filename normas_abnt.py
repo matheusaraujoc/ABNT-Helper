@@ -1,7 +1,7 @@
 # normas_abnt.py
-# Descrição: Motor de Regras atualizado para diferenciar a formatação de Artigos.
+# Descrição: Versão corrigida para garantir cor preta nos títulos e melhor controle de espaçamento.
 
-from docx.shared import Pt, Cm
+from docx.shared import Pt, Cm, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -17,6 +17,7 @@ class MotorNormasABNT:
         self.FONTE_PADRAO = 'Times New Roman'
         self.TAMANHO_FONTE_PADRAO = Pt(12)
         self.TAMANHO_FONTE_CAPA = Pt(14)
+        self.COR_FONTE_PADRAO = RGBColor(0, 0, 0) # NOVO: Cor preta
         self.ESPAÇAMENTO_PADRAO = 1.5
         self.ESPAÇAMENTO_SIMPLES = 1.0
         self.RECUO_PRIMEIRA_LINHA = Cm(1.25)
@@ -85,15 +86,23 @@ class MotorNormasABNT:
         for run in paragrafo.runs:
             run.font.name = self.FONTE_PADRAO
             run.font.size = self.TAMANHO_FONTE_LEGENDA
+            run.font.color.rgb = self.COR_FONTE_PADRAO # CORRIGIDO
 
     def configurar_pagina_e_estilos(self, doc):
         style = doc.styles['Normal']
         style.font.name = self.FONTE_PADRAO
         style.font.size = self.TAMANHO_FONTE_PADRAO
+        style.font.color.rgb = self.COR_FONTE_PADRAO # CORRIGIDO
         style.paragraph_format.line_spacing = self.ESPAÇAMENTO_PADRAO
         style.paragraph_format.space_before = Pt(0)
         style.paragraph_format.space_after = Pt(0)
         
+        # Garante que os estilos de Título também sejam pretos
+        for i in range(1, 10):
+            style_name = f'Heading {i}'
+            if style_name in doc.styles:
+                doc.styles[style_name].font.color.rgb = self.COR_FONTE_PADRAO
+
         citacao_style = doc.styles.add_style('CitacaoLonga', 1)
         citacao_style.base_style = style
         citacao_style.font.size = self.TAMANHO_FONTE_CITACAO_LONGA
@@ -116,7 +125,9 @@ class MotorNormasABNT:
         paragrafo.style = 'Normal'
         paragrafo.paragraph_format.first_line_indent = self.RECUO_PRIMEIRA_LINHA
         paragrafo.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
-        paragrafo.add_run(texto)
+        run = paragrafo.add_run(texto)
+        run.font.name = self.FONTE_PADRAO
+        run.font.color.rgb = self.COR_FONTE_PADRAO
         
     def aplicar_estilo_titulo_secao(self, doc, numero, titulo_texto, nivel=1):
         if self.is_artigo:
@@ -128,6 +139,7 @@ class MotorNormasABNT:
         heading.style.font.name = self.FONTE_PADRAO
         heading.style.font.bold = True
         heading.style.font.size = self.TAMANHO_FONTE_PADRAO
+        heading.style.font.color.rgb = self.COR_FONTE_PADRAO # CORRIGIDO
         heading.paragraph_format.space_before = Pt(18) if nivel == 1 and not self.is_artigo else Pt(12)
         heading.paragraph_format.space_after = Pt(6)
         heading.paragraph_format.first_line_indent = 0
@@ -152,5 +164,6 @@ class MotorNormasABNT:
         partes = texto_formatado.split('**')
         for i, parte in enumerate(partes):
             run = paragrafo.add_run(parte)
-            if i % 2 == 1: # Aplica negrito a cada segunda parte
+            run.font.color.rgb = self.COR_FONTE_PADRAO # CORRIGIDO
+            if i % 2 == 1:
                 run.bold = True

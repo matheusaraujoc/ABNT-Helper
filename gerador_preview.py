@@ -1,11 +1,11 @@
 # gerador_preview.py
-# Descrição: Versão final que busca tabelas/figuras no banco de dados global do projeto.
+# Descrição: Versão corrigida que restaura a contagem de página correta e
+# adiciona a seção de Referências ao sumário.
 
 import os
 import re
 import math
 from documento import DocumentoABNT, Capitulo
-from referencia import formatar_autores
 
 # --- CONSTANTES DE ESTIMATIVA DE ALTURA (EM CM) ---
 ALTURA_CONTEUDO_PAGINA = 24.7
@@ -30,6 +30,8 @@ class GeradorHTMLPreview:
     def _estimar_paginacao_e_coletar_sumario(self):
         self.entradas_sumario = []
         altura_restante = ALTURA_CONTEUDO_PAGINA
+        # CORREÇÃO: Voltamos ao valor inicial 4, que representa o início do
+        # conteúdo textual após Capa(não conta), Folha de Rosto(1), Resumo(2), Sumário(3).
         pagina_atual = 4
         
         def simular_nova_pagina():
@@ -88,12 +90,22 @@ class GeradorHTMLPreview:
                             tipo, titulo = parte, partes[k+1]
                             if tipo == "Tabela":
                                 obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
-                                if obj: simular_adicao_bloco((len(obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2))
+                                if obj and obj.dados: simular_adicao_bloco((len(obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2))
                             elif tipo == "Figura":
                                 obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
                                 if obj: simular_adicao_bloco((obj.largura_cm / 16 * 9) + (ALTURA_LEGENDA * 2))
                 coletar_recursivo(no_filho, f"{numero_completo}.")
+        
+        # 1. Simula o conteúdo textual
         coletar_recursivo(self.doc_abnt.estrutura_textual)
+
+        # 2. CORREÇÃO: Simula a quebra de página para as referências
+        # e adiciona ao sumário com o número de página correto.
+        simular_nova_pagina()
+        self.entradas_sumario.append({
+            "numero": "", "titulo": "REFERÊNCIAS", "nivel": 1,
+            "id_ancora": "secao-referencias", "pagina": pagina_atual
+        })
 
     def _nova_pagina(self):
         if self.conteudo_pagina_atual:
@@ -218,10 +230,10 @@ class GeradorHTMLPreview:
         self._renderizar_secoes_recursivamente_html(self.doc_abnt.estrutura_textual)
         self._nova_pagina()
         
-        self._adicionar_elemento_bloco("<h1>REFERÊNCIAS</h1>", ALTURA_TITULO_SECAO)
+        self._adicionar_elemento_bloco("<h1 id='secao-referencias'>REFERÊNCIAS</h1>", ALTURA_TITULO_SECAO)
         self.doc_abnt.ordenar_referencias()
         for ref in self.doc_abnt.referencias:
-            ref_html = f'<p class="referencia">{ref.formatar().replace("**", "<strong>").replace("</strong>", "")}</p>'
+            ref_html = f'<p class="referencia">{ref.formatar().replace("**", "<strong>").replace("</strong>", "</strong>")}</p>'
             altura_ref = (len(ref.formatar()) / 100 + 1) * (ALTURA_LINHA_TEXTO * 0.8)
             self._adicionar_elemento_bloco(ref_html, altura_ref)
         self._nova_pagina()
@@ -238,7 +250,8 @@ class GeradorHTMLPreview:
             else:
                 titulo_texto = f"{numero_completo} {no_filho.titulo.upper() if nivel == 1 else no_filho.titulo}"
             
-            self._adicionar_elemento_bloco(f"<h1 id='secao-{numero_completo.replace('.', '-')}'>{titulo_texto}</h1>", ALTURA_TITULO_SECAO)
+            id_ancora = f"secao-{numero_completo.replace('.', '-')}"
+            self._adicionar_elemento_bloco(f"<h1 id='{id_ancora}'>{titulo_texto}</h1>", ALTURA_TITULO_SECAO)
 
             if no_filho.conteudo:
                 padrao = r"\{\{(Tabela|Figura):([^}]+)\}\}"
@@ -256,7 +269,7 @@ class GeradorHTMLPreview:
                             tabela_obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
                             if tabela_obj:
                                 self.contador_tabelas += 1; tabela_obj.numero = self.contador_tabelas
-                                altura = (len(tabela_obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2)
+                                altura = (len(tabela_obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2) if tabela_obj.dados else (ALTURA_LEGENDA * 2)
                                 self._adicionar_elemento_bloco(self._renderizar_tabela_html(tabela_obj), altura)
                         elif tipo == "Figura":
                             figura_obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
@@ -279,8 +292,14 @@ class GeradorHTMLPreview:
     def _renderizar_sumario_html(self):
         html = "<h1>SUMÁRIO</h1>"
         for entrada in self.entradas_sumario:
-            titulo = entrada["titulo"].upper() if entrada["nivel"] == 1 else entrada["titulo"]
-            html += f"""<p class="sumario-item sumario-nivel-{entrada['nivel']}"><a href="#{entrada['id_ancora']}"><span class="sumario-titulo">{entrada['numero']} {titulo}</span><span class="sumario-dots"></span><span class="sumario-pagina">{entrada['pagina']}</span></a></p>"""
+            is_referencias = not entrada["numero"]
+            titulo_sumario = entrada["titulo"].upper()
+            
+            if is_referencias:
+                html += f"""<p class="sumario-item sumario-nivel-1"><a href="#{entrada['id_ancora']}"><span class="sumario-titulo">{titulo_sumario}</span><span class="sumario-dots"></span><span class="sumario-pagina">{entrada['pagina']}</span></a></p>"""
+            else:
+                titulo = entrada["titulo"].upper() if entrada["nivel"] == 1 else entrada["titulo"]
+                html += f"""<p class="sumario-item sumario-nivel-{entrada['nivel']}"><a href="#{entrada['id_ancora']}"><span class="sumario-titulo">{entrada['numero']} {titulo}</span><span class="sumario-dots"></span><span class="sumario-pagina">{entrada['pagina']}</span></a></p>"""
         return html
 
     def _renderizar_tabela_html(self, tabela):
@@ -288,15 +307,18 @@ class GeradorHTMLPreview:
         html = f'<div><p class="legenda">Tabela {tabela.numero} – {tabela.titulo}</p><table class="{classe_css}" align="center">'
         if tabela.dados:
             html += '<thead><tr>'
-            for header in tabela.dados[0]: html += f'<th>{header}</th>'
+            for header in tabela.dados[0]:
+                html += f'<th>{header}</th>'
             html += '</tr></thead><tbody>'
             for row in tabela.dados[1:]:
-                html += '<tr>';
-                for cell in row: html += f'<td>{cell}</td>'
+                html += '<tr>'
+                for cell in row:
+                    html += f'<td>{cell}</td>'
                 html += '</tr>'
             html += '</tbody>'
         html += '</table>'
-        if tabela.fonte: html += f'<p class="fonte">Fonte: {tabela.fonte}</p>'
+        if tabela.fonte:
+            html += f'<p class="fonte">Fonte: {tabela.fonte}</p>'
         html += '</div>'
         return html
 
@@ -305,6 +327,7 @@ class GeradorHTMLPreview:
         url_local = f"file:///{caminho_abs.replace(os.path.sep, '/')}"
         html = f'<div><p class="legenda">Figura {figura.numero} – {figura.titulo}</p>'
         html += f'<img src="{url_local}" style="width: {figura.largura_cm}cm;">'
-        if figura.fonte: html += f'<p class="fonte">Fonte: {figura.fonte}</p>'
+        if figura.fonte:
+            html += f'<p class="fonte">Fonte: {figura.fonte}</p>'
         html += '</div>'
         return html

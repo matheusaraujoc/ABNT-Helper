@@ -1,54 +1,14 @@
 {
     "recent_projects": [
         {
-            "path": "C:\\Users\\Matheus\\AppData\\Local\\ABNTHelper\\recovery\\novo_projeto_1757419300.abnf.recovery",
-            "name": "novo_projeto_1757419300.abnf.recovery",
-            "timestamp": 1757419300.580432
-        },
-        {
-            "path": "C:\\Users\\Matheus\\AppData\\Local\\ABNTHelper\\recovery\\novo_projeto_1757419039.abnf.recovery",
-            "name": "novo_projeto_1757419039.abnf.recovery",
-            "timestamp": 1757419039.87614
-        },
-        {
-            "path": "C:\\Users\\Matheus\\AppData\\Local\\ABNTHelper\\recovery\\novo_projeto_1757417622.abnf.recovery",
-            "name": "novo_projeto_1757417622.abnf.recovery",
-            "timestamp": 1757417622.866395
-        },
-        {
-            "path": "C:\\Users\\Matheus\\AppData\\Local\\ABNTHelper\\recovery\\novo_projeto_1757417562.abnf.recovery",
-            "name": "novo_projeto_1757417562.abnf.recovery",
-            "timestamp": 1757417562.849996
-        },
-        {
-            "path": "C:\\Users\\Matheus\\AppData\\Local\\ABNTHelper\\recovery\\novo_projeto_1757416994.abnf.recovery",
-            "name": "novo_projeto_1757416994.abnf.recovery",
-            "timestamp": 1757416994.116329
-        },
-        {
-            "path": "C:\\Users\\Matheus\\AppData\\Local\\ABNTHelper\\recovery\\novo_projeto_1757416587.abnf.recovery",
-            "name": "novo_projeto_1757416587.abnf.recovery",
-            "timestamp": 1757416587.587861
-        },
-        {
-            "path": "C:\\Users\\Matheus\\Desktop\\Projetos do ABNT Helper\\Teste de Projeto.abnf",
-            "name": "Teste de Projeto.abnf",
-            "timestamp": 1757392930.532133
-        },
-        {
-            "path": "C:\\Users\\Matheus\\Desktop\\Projetos do ABNT Helper\\Testedesave.abnf",
-            "name": "Testedesave.abnf",
-            "timestamp": 1757392915.799213
-        },
-        {
-            "path": "C:\\Users\\Matheus\\Desktop\\Projetos do ABNT Helper\\testedesave2.abnf",
-            "name": "testedesave2.abnf",
-            "timestamp": 1757392243.835318
+            "path": "C:\\Users\\Matheus\\Desktop\\Projetos do ABNT Helper\\Projeto de Testes Final.abnf",
+            "name": "Projeto de Testes Final.abnf",
+            "timestamp": 1757431443.784012
         }
     ],
     "recovery": {
         "autosave_enabled": true,
-        "autosave_periodic_interval_min": 1
+        "autosave_periodic_interval_min": 10
     },
     "backup": {
         "backup_on_save_enabled": true,

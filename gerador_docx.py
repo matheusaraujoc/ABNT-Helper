@@ -1,14 +1,14 @@
 # gerador_docx.py
-# Descrição: Versão com a regra "Manter com o próximo" para títulos de figuras e tabelas.
+# Descrição: Versão corrigida com melhor distribuição de capa/folha de rosto e formatação de fonte.
 
 import os
+import re
 from docx import Document
 from docx.shared import Cm, Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.section import WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
-import re
 
 try:
     import win32com.client as win32
@@ -23,14 +23,24 @@ from normas_abnt import MotorNormasABNT
 def adicionar_sumario(doc, paragrafo_placeholder):
     sdt = OxmlElement('w:sdt')
     sdtContent = OxmlElement('w:sdtContent')
-    p = OxmlElement('w:p'); r = OxmlElement('w:r')
-    fldChar_begin = OxmlElement('w:fldChar'); fldChar_begin.set(qn('w:fldCharType'), 'begin')
-    instrText = OxmlElement('w:instrText'); instrText.set(qn('xml:space'), 'preserve')
+    p = OxmlElement('w:p')
+    r = OxmlElement('w:r')
+    fldChar_begin = OxmlElement('w:fldChar')
+    fldChar_begin.set(qn('w:fldCharType'), 'begin')
+    instrText = OxmlElement('w:instrText')
+    instrText.set(qn('xml:space'), 'preserve')
     instrText.text = 'TOC \\o "1-3" \\h \\z \\u'
-    fldChar_separate = OxmlElement('w:fldChar'); fldChar_separate.set(qn('w:fldCharType'), 'separate')
-    fldChar_end = OxmlElement('w:fldChar'); fldChar_end.set(qn('w:fldCharType'), 'end')
-    r.append(fldChar_begin); r.append(instrText); r.append(fldChar_separate); r.append(fldChar_end)
-    p.append(r); sdtContent.append(p); sdt.append(sdtContent)
+    fldChar_separate = OxmlElement('w:fldChar')
+    fldChar_separate.set(qn('w:fldCharType'), 'separate')
+    fldChar_end = OxmlElement('w:fldChar')
+    fldChar_end.set(qn('w:fldCharType'), 'end')
+    r.append(fldChar_begin)
+    r.append(instrText)
+    r.append(fldChar_separate)
+    r.append(fldChar_end)
+    p.append(r)
+    sdtContent.append(p)
+    sdt.append(sdtContent)
     p_xml = paragrafo_placeholder._p
     p_xml.addnext(sdt)
     p_xml.getparent().remove(p_xml)
@@ -138,9 +148,8 @@ class GeradorDOCX:
 
     def _renderizar_tabela(self, tabela_obj):
         p_titulo = self.doc.add_paragraph()
-        run_titulo = p_titulo.add_run(f"Tabela {tabela_obj.numero} – {tabela_obj.titulo}")
+        p_titulo.add_run(f"Tabela {tabela_obj.numero} – {tabela_obj.titulo}")
         self.regras.aplicar_estilo_legenda(p_titulo, is_titulo=True)
-        # NOVO: Impede que o Word quebre a página entre o título e a tabela
         p_titulo.paragraph_format.keep_with_next = True
         
         if not tabela_obj.dados: return
@@ -152,9 +161,13 @@ class GeradorDOCX:
         
         for i, row_data in enumerate(tabela_obj.dados):
             for j, cell_data in enumerate(row_data):
-                cell = t.cell(i, j); cell.text = cell_data
-                p = cell.paragraphs[0]; run = p.runs[0]
-                run.font.name = self.regras.FONTE_PADRAO; run.font.size = self.regras.TAMANHO_FONTE_LEGENDA
+                cell = t.cell(i, j)
+                cell.text = cell_data
+                p = cell.paragraphs[0]
+                run = p.runs[0]
+                run.font.name = self.regras.FONTE_PADRAO
+                run.font.size = self.regras.TAMANHO_FONTE_LEGENDA
+                run.font.color.rgb = self.regras.COR_FONTE_PADRAO
                 if i == 0:
                     p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
                     
@@ -162,7 +175,6 @@ class GeradorDOCX:
             self.regras.aplicar_estilo_tabela_abnt(t)
             
         if tabela_obj.fonte:
-            # O parágrafo da fonte é separado da tabela, então não aplicamos a regra aqui.
             p_fonte = self.doc.add_paragraph()
             p_fonte.add_run(f"Fonte: {tabela_obj.fonte}")
             self.regras.aplicar_estilo_legenda(p_fonte, is_titulo=False)
@@ -171,7 +183,6 @@ class GeradorDOCX:
         p_titulo = self.doc.add_paragraph()
         p_titulo.add_run(f"Figura {figura_obj.numero} – {figura_obj.titulo}")
         self.regras.aplicar_estilo_legenda(p_titulo, is_titulo=True)
-        # NOVO: Impede a quebra entre o título e a imagem.
         p_titulo.paragraph_format.keep_with_next = True
 
         p_imagem = self.doc.add_paragraph()
@@ -179,19 +190,19 @@ class GeradorDOCX:
         try:
             p_imagem.add_run().add_picture(figura_obj.caminho_processado, width=Cm(figura_obj.largura_cm))
         except Exception as e:
-            p_imagem.add_run(f"[ERRO: Imagem '{figura_obj.caminho_processado}' não encontrada ou inválida. {e}]").italic = True
+            run_erro = p_imagem.add_run(f"[ERRO: Imagem '{figura_obj.caminho_processado}' não encontrada ou inválida. {e}]")
+            run_erro.italic = True
+            run_erro.font.color.rgb = self.regras.COR_FONTE_PADRAO
+            
         p_imagem.paragraph_format.space_before = Pt(0)
         p_imagem.paragraph_format.space_after = Pt(0)
-        # NOVO: Impede a quebra entre a imagem e a fonte (se houver fonte).
         p_imagem.paragraph_format.keep_with_next = True
         
         if figura_obj.fonte:
             p_fonte = self.doc.add_paragraph()
             p_fonte.add_run(f"Fonte: {figura_obj.fonte}")
             self.regras.aplicar_estilo_legenda(p_fonte, is_titulo=False)
-            # O parágrafo da fonte é o último, não precisa de 'keep_with_next'
         else:
-            # Se não há fonte, a imagem é o último elemento do bloco, então podemos desativar a propriedade.
             p_imagem.paragraph_format.keep_with_next = False
 
     def _set_page_numbering(self, section):
@@ -199,12 +210,15 @@ class GeradorDOCX:
         header_p = section.header.paragraphs[0]
         header_p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
         run = header_p.add_run()
-        fldChar_begin = OxmlElement('w:fldChar'); fldChar_begin.set(qn('w:fldCharType'), 'begin')
+        fldChar_begin = OxmlElement('w:fldChar')
+        fldChar_begin.set(qn('w:fldCharType'), 'begin')
         run._r.append(fldChar_begin)
-        instrText = OxmlElement('w:instrText'); instrText.set(qn('xml:space'), 'preserve')
+        instrText = OxmlElement('w:instrText')
+        instrText.set(qn('xml:space'), 'preserve')
         instrText.text = 'PAGE'
         run._r.append(instrText)
-        fldChar_end = OxmlElement('w:fldChar'); fldChar_end.set(qn('w:fldCharType'), 'end')
+        fldChar_end = OxmlElement('w:fldChar')
+        fldChar_end.set(qn('w:fldCharType'), 'end')
         run._r.append(fldChar_end)
 
     def _renderizar_capa(self):
@@ -212,56 +226,71 @@ class GeradorDOCX:
         p_inst.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = p_inst.add_run(self.doc_abnt.configuracoes.instituicao.upper())
         run.bold = True
-        self.doc.add_paragraph().add_run('\n')
+        
         p_autores = self.doc.add_paragraph()
+        p_autores.paragraph_format.space_before = Pt(72) # Espaço
         p_autores.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         nomes_autores = '\n'.join([a.nome_completo.upper() for a in self.doc_abnt.autores])
         run = p_autores.add_run(nomes_autores)
         run.bold = True
-        self.doc.add_paragraph().add_run('\n' * 2)
+        
         p_titulo = self.doc.add_paragraph()
+        p_titulo.paragraph_format.space_before = Pt(120) # Espaço
         p_titulo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = p_titulo.add_run(self.doc_abnt.titulo.upper())
         run.bold = True
         run.font.size = self.regras.TAMANHO_FONTE_CAPA
-        p_final = self.doc.add_paragraph('\n' * 10)
+        
+        p_final = self.doc.add_paragraph()
+        p_final.paragraph_format.space_before = Pt(250) # CORRIGIDO: Valor ajustado para melhor posicionamento
         p_final.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         p_final.add_run(f"{self.doc_abnt.configuracoes.cidade.upper()}\n{self.doc_abnt.configuracoes.ano}")
+        
         self.doc.add_page_break()
 
     def _renderizar_folha_rosto(self):
         cfg = self.doc_abnt.configuracoes
+        
         nomes_autores = '\n'.join([a.nome_completo.upper() for a in self.doc_abnt.autores])
         p_autores = self.doc.add_paragraph()
         p_autores.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         p_autores.add_run(nomes_autores).bold = True
-        self.doc.add_paragraph('\n' * 2)
+
         p_titulo = self.doc.add_paragraph()
+        p_titulo.paragraph_format.space_before = Pt(120) # Espaço
         p_titulo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = p_titulo.add_run(self.doc_abnt.titulo.upper())
         run.bold = True
         run.font.size = self.regras.TAMANHO_FONTE_CAPA
-        self.doc.add_paragraph('\n' * 2)
+        
+        p_natureza = self.doc.add_paragraph()
+        p_natureza.paragraph_format.space_before = Pt(90) # Espaço
         texto_natureza = (f"{cfg.tipo_trabalho} apresentado ao curso de {cfg.modalidade_curso} em {cfg.curso} da {cfg.instituicao}, "
                           f"como requisito parcial para a obtenção do título de {cfg.titulo_pretendido}.")
-        p_natureza = self.doc.add_paragraph()
         self.regras.aplicar_estilo_natureza_trabalho(p_natureza, texto_natureza)
-        self.doc.add_paragraph()
+        
         p_orientador = self.doc.add_paragraph()
+        p_orientador.paragraph_format.space_before = Pt(12) # Espaço
         self.regras.aplicar_estilo_natureza_trabalho(p_orientador, f"Orientador(a): {self.doc_abnt.orientador}")
-        p_final = self.doc.add_paragraph('\n' * 5)
+        
+        p_final = self.doc.add_paragraph()
+        p_final.paragraph_format.space_before = Pt(150) # CORRIGIDO: Valor ajustado
         p_final.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         p_final.add_run(f"{cfg.cidade.upper()}\n{cfg.ano}")
+        
         self.doc.add_page_break()
     
     def _renderizar_resumo(self):
         self.regras.aplicar_estilo_titulo_secao(self.doc, numero="", titulo_texto="RESUMO")
+        
         p_resumo = self.doc.add_paragraph()
         self.regras.aplicar_estilo_resumo(p_resumo, self.doc_abnt.resumo)
         self.doc.add_paragraph()
+        
         p_kw = self.doc.add_paragraph()
         run_kw = p_kw.add_run("Palavras-chave: ")
         run_kw.bold = True
+        
         texto_kw = self.doc_abnt.palavras_chave.replace(';', '.') + "."
         p_kw.add_run(texto_kw)
 
