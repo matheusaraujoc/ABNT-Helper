@@ -641,6 +641,14 @@
         "documentation": {}
     },
     {
+        "label": "QSplitter",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "Capitulo",
         "importPath": "documento",
         "description": "documento",
@@ -916,6 +924,14 @@
     },
     {
         "label": "QKeySequence",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QActionGroup",
         "importPath": "PySide6.QtGui",
         "description": "PySide6.QtGui",
         "isExtraImport": true,
@@ -1518,7 +1534,7 @@
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1200, 800)\n        self.documento = DocumentoABNT()\n        self.gerenciador_projeto = GerenciadorProjetos()\n        self.caminho_projeto_atual = None\n        self.modificado = False\n        self._populando_ui = False",
+        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1400, 800)\n        self.documento = DocumentoABNT()\n        self.gerenciador_projeto = GerenciadorProjetos()\n        self.caminho_projeto_atual = None\n        self.modificado = False\n        self._populando_ui = False",
         "detail": "main_app",
         "documentation": {}
     },

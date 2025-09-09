@@ -1,5 +1,6 @@
 # main_app.py
-# Descrição: Versão completa da aplicação principal com todas as funcionalidades.
+# Descrição: Versão unificada da aplicação, com modos de visualização selecionáveis
+# (Lado a Lado e Como Aba) para a pré-visualização do documento.
 
 import sys
 import os
@@ -9,11 +10,12 @@ from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QTextEdit,
                                QPushButton, QVBoxLayout, QHBoxLayout, QFileDialog, 
                                QMessageBox, QTabWidget, QComboBox, 
-                               QFormLayout, QMenuBar, QCheckBox)
-from PySide6.QtGui import QAction, QKeySequence
+                               QFormLayout, QMenuBar, QCheckBox, QSplitter)
+from PySide6.QtGui import QAction, QKeySequence, QActionGroup
 from PySide6.QtWebEngineCore import QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
+# --- Assume que os arquivos abaixo estão na mesma pasta ---
 from documento import DocumentoABNT, Autor, Capitulo
 from gerador_docx import GeradorDOCX
 from referencia import Livro, Artigo, Site
@@ -22,34 +24,41 @@ from gerador_preview import GeradorHTMLPreview
 from gerenciador_projeto import GerenciadorProjetos
 from dialogs import ReferenciaDialog, DialogoFigura
 from modelos_trabalho import get_estrutura_por_nome, get_nomes_modelos
+# ---------------------------------------------------------
 
 class ABNTHelperApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('ABNT Helper Final')
-        self.setGeometry(100, 100, 1200, 800)
+        self.setGeometry(100, 100, 1400, 800)
         
         self.documento = DocumentoABNT()
-        
         self.gerenciador_projeto = GerenciadorProjetos()
         self.caminho_projeto_atual = None
         self.modificado = False
         self._populando_ui = False
+        
+        self.modo_preview = "lado_a_lado" 
+
+        self.preview_update_timer = QtCore.QTimer(self)
+        self.preview_update_timer.setSingleShot(True)
+        self.preview_update_timer.setInterval(750)
+        self.preview_update_timer.timeout.connect(self._atualizar_preview)
+        self.scroll_posicao = 0
+
+        self.main_layout = QVBoxLayout(self)
+        self.main_content_widget = None
 
         self._build_ui()
         self._conectar_sinais_modificacao()
-        
         self._novo_projeto(primeira_execucao=True)
 
     def _build_ui(self):
-        main_layout = QVBoxLayout(self)
-        
         menu_bar = QMenuBar(self)
-        main_layout.setMenuBar(menu_bar)
+        self.main_layout.setMenuBar(menu_bar)
         
         menu_arquivo = menu_bar.addMenu("&Arquivo")
-        acao_novo = QAction("&Novo Projeto", self)
-        acao_novo.triggered.connect(self._novo_projeto)
+        acao_novo = QAction("&Novo Projeto", self); acao_novo.triggered.connect(self._novo_projeto)
         menu_arquivo.addAction(acao_novo)
         acao_carregar = QAction("&Carregar Projeto...", self); acao_carregar.triggered.connect(self._carregar_projeto)
         menu_arquivo.addAction(acao_carregar)
@@ -64,24 +73,79 @@ class ABNTHelperApp(QWidget):
 
         menu_editar = menu_bar.addMenu("&Editar")
         acao_localizar = QAction("&Localizar...", self)
-        acao_localizar.setShortcut(QKeySequence.StandardKey.Find) # Atalho Ctrl+F
+        acao_localizar.setShortcut(QKeySequence.StandardKey.Find)
         acao_localizar.triggered.connect(self._alternar_barra_busca)
         menu_editar.addAction(acao_localizar)
 
+        menu_visualizacao = menu_bar.addMenu("&Visualização")
+        grupo_modos = QActionGroup(self)
+        grupo_modos.setExclusive(True)
+        self.acao_modo_lado_a_lado = QAction("Pré-visualização Lado a Lado", self, checkable=True)
+        self.acao_modo_lado_a_lado.setChecked(True)
+        self.acao_modo_lado_a_lado.triggered.connect(lambda: self._alternar_modo_preview("lado_a_lado"))
+        menu_visualizacao.addAction(self.acao_modo_lado_a_lado)
+        grupo_modos.addAction(self.acao_modo_lado_a_lado)
+        self.acao_modo_aba = QAction("Pré-visualização como Aba", self, checkable=True)
+        self.acao_modo_aba.triggered.connect(lambda: self._alternar_modo_preview("aba"))
+        menu_visualizacao.addAction(self.acao_modo_aba)
+        grupo_modos.addAction(self.acao_modo_aba)
+        
         self.tabs = QTabWidget()
-        main_layout.addWidget(self.tabs)
-        
         self.aba_conteudo = AbaConteudo(self.documento)
-        
         self.tabs.addTab(self._criar_aba_geral(), "Geral e Pré-Textual")
         self.tabs.addTab(self.aba_conteudo, "Conteúdo Textual (Estrutura)")
         self.tabs.addTab(self._criar_aba_referencias(), "Referências")
-        self.tabs.addTab(self._criar_aba_preview(), "Pré-Visualização")
+        self.preview_container = self._criar_painel_preview()
         
         self.generate_btn = QPushButton("Gerar Documento .docx Final")
         self.generate_btn.setStyleSheet("font-size: 16px; padding: 10px;")
         self.generate_btn.clicked.connect(self._gerar_documento_final)
-        main_layout.addWidget(self.generate_btn)
+        self.main_layout.addWidget(self.generate_btn)
+        
+        self._reconfigurar_layout()
+        
+    @QtCore.Slot(str)
+    def _alternar_modo_preview(self, novo_modo):
+        if self.modo_preview != novo_modo:
+            self.modo_preview = novo_modo
+            self._reconfigurar_layout()
+
+    def _reconfigurar_layout(self):
+        """Remove o conteúdo atual e reconstrói com base em self.modo_preview."""
+        if self.main_content_widget is not None:
+            self.main_content_widget.setParent(None)
+            if isinstance(self.main_content_widget, QSplitter):
+                self.main_content_widget.deleteLater()
+        
+        self.main_content_widget = None
+
+        if self.modo_preview == "lado_a_lado":
+            index_preview = self.tabs.indexOf(self.preview_container)
+            if index_preview != -1:
+                # Ao remover da aba, o widget pode manter o estado 'hidden'
+                self.tabs.removeTab(index_preview)
+            
+            self.btn_atualizar_preview.setVisible(False)
+
+            splitter = QSplitter(QtCore.Qt.Orientation.Horizontal, self)
+            splitter.addWidget(self.tabs)
+            splitter.addWidget(self.preview_container)
+            splitter.setSizes([600, 800])
+            self.main_content_widget = splitter
+            
+            # CORREÇÃO FINAL E CRÍTICA: Força a visibilidade do container.
+            # Isso "acorda" o QWebEngineView após ele ter sido escondido pelo QTabWidget.
+            self.preview_container.show()
+
+        else: # modo_preview == "aba"
+            index_preview = self.tabs.indexOf(self.preview_container)
+            if index_preview == -1:
+                 self.tabs.addTab(self.preview_container, "Pré-Visualização")
+            self.btn_atualizar_preview.setVisible(True)
+            self.main_content_widget = self.tabs
+
+        self.main_layout.insertWidget(0, self.main_content_widget, 1)
+
 
     def _criar_aba_geral(self):
         widget = QWidget(); layout = QVBoxLayout(widget)
@@ -114,19 +178,20 @@ class ABNTHelperApp(QWidget):
         btn_del.clicked.connect(self._remover_referencia); layout.addLayout(btn_layout)
         return widget
 
-    def _criar_aba_preview(self):
+    def _criar_painel_preview(self):
         widget = QWidget()
         layout = QVBoxLayout(widget)
+        layout.setContentsMargins(0,0,0,0)
+        
         self.busca_toolbar = QWidget()
         busca_layout = QHBoxLayout(self.busca_toolbar)
-        busca_layout.setContentsMargins(0, 5, 0, 5)
+        busca_layout.setContentsMargins(2, 5, 2, 5)
         self.busca_input = QLineEdit()
-        self.busca_input.setPlaceholderText("Buscar no documento...")
+        self.busca_input.setPlaceholderText("Buscar na pré-visualização...")
         btn_buscar_anterior = QPushButton("Anterior")
         btn_buscar_proximo = QPushButton("Próximo")
         self.busca_case_sensitive = QCheckBox("Diferenciar M/m")
         btn_fechar_busca = QPushButton("Fechar")
-        btn_atualizar = QPushButton("Atualizar Pré-Visualização")
         busca_layout.addWidget(QLabel("Localizar:"))
         busca_layout.addWidget(self.busca_input)
         busca_layout.addWidget(btn_buscar_anterior)
@@ -136,15 +201,23 @@ class ABNTHelperApp(QWidget):
         busca_layout.addWidget(btn_fechar_busca)
         layout.addWidget(self.busca_toolbar)
         self.busca_toolbar.setVisible(False)
+
         self.preview_display = QWebEngineView()
-        self.preview_display.setHtml("<html><body><h1>Pré-Visualização</h1><p>Clique em 'Atualizar' para ver o seu documento.</p></body></html>")
+        self.preview_display.setHtml("<html><body><h1>Pré-Visualização</h1><p>A pré-visualização será atualizada aqui.</p></body></html>")
+        self.preview_display.setZoomFactor(0.75)
+        self.preview_display.loadFinished.connect(self._restaurar_scroll_preview)
         layout.addWidget(self.preview_display, 1)
-        layout.addWidget(btn_atualizar)
-        btn_atualizar.clicked.connect(self._atualizar_preview)
+
+        self.btn_atualizar_preview = QPushButton("Atualizar Pré-Visualização")
+        self.btn_atualizar_preview.clicked.connect(self._atualizar_preview)
+        self.btn_atualizar_preview.setVisible(False)
+        layout.addWidget(self.btn_atualizar_preview)
+        
         btn_buscar_proximo.clicked.connect(self._buscar_proximo_preview)
         btn_buscar_anterior.clicked.connect(self._buscar_anterior_preview)
         self.busca_input.returnPressed.connect(self._buscar_proximo_preview)
         btn_fechar_busca.clicked.connect(self._alternar_barra_busca)
+
         return widget
 
     @QtCore.Slot()
@@ -163,13 +236,59 @@ class ABNTHelperApp(QWidget):
         self.preview_display.findText(texto_busca, flags)
 
     @QtCore.Slot()
-    def _buscar_proximo_preview(self):
-        self._buscar_preview(direcao_reversa=False)
+    def _buscar_proximo_preview(self): self._buscar_preview(direcao_reversa=False)
+    @QtCore.Slot()
+    def _buscar_anterior_preview(self): self._buscar_preview(direcao_reversa=True)
+    
+    @QtCore.Slot()
+    def _disparar_atualizacao_automatica(self):
+        if self.modo_preview == "lado_a_lado":
+            self.preview_update_timer.start()
+        
+    def _salvar_scroll_preview(self):
+        script = "window.scrollY;"
+        self.preview_display.page().runJavaScript(script, self._on_scroll_posicao_recebida)
+
+    @QtCore.Slot(object)
+    def _on_scroll_posicao_recebida(self, result):
+        if isinstance(result, (int, float)):
+            self.scroll_posicao = result
 
     @QtCore.Slot()
-    def _buscar_anterior_preview(self):
-        self._buscar_preview(direcao_reversa=True)
+    def _restaurar_scroll_preview(self):
+        script = f"window.scrollTo(0, {self.scroll_posicao});"
+        self.preview_display.page().runJavaScript(script)
+
+    @QtCore.Slot()
+    def _atualizar_preview(self):
+        if self.modo_preview == "lado_a_lado":
+            self._salvar_scroll_preview()
+            
+        self.aba_conteudo.sincronizar_conteudo_pendente()
+        self._sincronizar_modelo_com_ui()
+        self.preview_display.findText("") 
+        gerador = GeradorHTMLPreview(self.documento)
+        html_content = gerador.gerar_html()
+        base_url = QtCore.QUrl.fromLocalFile(os.path.abspath(os.path.dirname(__file__)))
+        self.preview_display.setHtml(html_content, baseUrl=base_url)
+
+        if self.modo_preview == "aba":
+            QMessageBox.information(self, "Atualizado", "A pré-visualização foi atualizada com sucesso.")
         
+    def _marcar_modificado(self):
+        if self._populando_ui: return
+        if not self.modificado:
+            self.modificado = True
+            self.setWindowTitle(self.windowTitle() + '*')
+        self._disparar_atualizacao_automatica()
+        
+    def closeEvent(self, event):
+        if self._verificar_alteracoes_nao_salvas():
+            self.gerenciador_projeto.fechar_projeto()
+            event.accept()
+        else:
+            event.ignore()
+    
     @QtCore.Slot(bool)
     def _novo_projeto(self, primeira_execucao=False):
         if not primeira_execucao and not self._verificar_alteracoes_nao_salvas():
@@ -184,6 +303,7 @@ class ABNTHelperApp(QWidget):
              self._popular_ui_com_documento()
         self.modificado = False
         self.setWindowTitle('ABNT Helper Final - Novo Projeto (TCC)')
+        self._disparar_atualizacao_automatica()
     
     @QtCore.Slot(str)
     def _on_template_selecionado(self, nome_modelo):
@@ -286,6 +406,7 @@ class ABNTHelperApp(QWidget):
         for ref in self.documento.referencias:
             self.lista_referencias.addItem(ref.formatar().replace('**', ''))
         self._populando_ui = False
+        self._disparar_atualizacao_automatica()
 
     def _verificar_alteracoes_nao_salvas(self) -> bool:
         if not self.modificado: return True
@@ -295,12 +416,6 @@ class ABNTHelperApp(QWidget):
         if resposta == QMessageBox.StandardButton.Cancel: return False
         if resposta == QMessageBox.StandardButton.Save: self._salvar_projeto()
         return True
-
-    def _marcar_modificado(self):
-        if self._populando_ui: return
-        if not self.modificado:
-            self.modificado = True
-            self.setWindowTitle(self.windowTitle() + '*')
         
     def _conectar_sinais_modificacao(self):
         self.cfg_tipo.currentTextChanged.connect(self._marcar_modificado)
@@ -313,13 +428,6 @@ class ABNTHelperApp(QWidget):
         self.aba_conteudo.editor_capitulo.textChanged.connect(self._marcar_modificado)
         self.aba_conteudo.arvore_capitulos.estruturaAlterada.connect(self._marcar_modificado)
         self.aba_conteudo.arvore_capitulos.itemChanged.connect(self._marcar_modificado)
-
-    def closeEvent(self, event):
-        if self._verificar_alteracoes_nao_salvas():
-            self.gerenciador_projeto.fechar_projeto()
-            event.accept()
-        else:
-            event.ignore()
 
     @QtCore.Slot()
     def _adicionar_referencia(self):
@@ -359,17 +467,6 @@ class ABNTHelperApp(QWidget):
         self.documento.autores = [Autor(n.strip()) for n in self.autores_input.toPlainText().splitlines() if n.strip()]
         self.documento.orientador = self.orientador_input.text(); self.documento.resumo = self.resumo_input.toPlainText()
         self.documento.palavras_chave = self.keywords_input.text()
-
-    @QtCore.Slot()
-    def _atualizar_preview(self):
-        self.aba_conteudo.sincronizar_conteudo_pendente()
-        self._sincronizar_modelo_com_ui()
-        self.preview_display.findText("") 
-        gerador = GeradorHTMLPreview(self.documento)
-        html_content = gerador.gerar_html()
-        base_url = QtCore.QUrl.fromLocalFile(os.path.abspath(os.path.dirname(__file__)))
-        self.preview_display.setHtml(html_content, baseUrl=base_url)
-        QMessageBox.information(self, "Atualizado", "A pré-visualização foi atualizada com sucesso.")
 
     def _gerar_documento_final(self):
         self.aba_conteudo.sincronizar_conteudo_pendente()
