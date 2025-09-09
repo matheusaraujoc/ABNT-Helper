@@ -1,5 +1,5 @@
 # main_app.py
-# Descrição: Versão definitiva com todas as funcionalidades e importações corrigidas.
+# Descrição: Versão completa da aplicação principal com todas as funcionalidades.
 
 import sys
 import os
@@ -21,7 +21,6 @@ from aba_conteudo import AbaConteudo
 from gerador_preview import GeradorHTMLPreview
 from gerenciador_projeto import GerenciadorProjetos
 from dialogs import ReferenciaDialog, DialogoFigura
-# A LINHA ABAIXO ESTAVA FALTANDO E CAUSAVA O ERRO. FOI RE-ADICIONADA.
 from modelos_trabalho import get_estrutura_por_nome, get_nomes_modelos
 
 class ABNTHelperApp(QWidget):
@@ -31,6 +30,7 @@ class ABNTHelperApp(QWidget):
         self.setGeometry(100, 100, 1200, 800)
         
         self.documento = DocumentoABNT()
+        
         self.gerenciador_projeto = GerenciadorProjetos()
         self.caminho_projeto_atual = None
         self.modificado = False
@@ -277,10 +277,11 @@ class ABNTHelperApp(QWidget):
         self.keywords_input.setText(self.documento.palavras_chave)
         self.aba_conteudo.documento = self.documento
         self.aba_conteudo._popular_arvore()
+        self.aba_conteudo.atualizar_bancos_visuais()
         if self.aba_conteudo.arvore_capitulos.topLevelItemCount() > 0:
             self.aba_conteudo.arvore_capitulos.setCurrentItem(self.aba_conteudo.arvore_capitulos.topLevelItem(0))
         else:
-            self.aba_conteudo._carregar_capitulo_no_editor(None, None)
+            self.aba_conteudo.atualizar_bancos_visuais()
         self.lista_referencias.clear()
         for ref in self.documento.referencias:
             self.lista_referencias.addItem(ref.formatar().replace('**', ''))

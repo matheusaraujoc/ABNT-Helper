@@ -1,5 +1,5 @@
 # aba_conteudo.py
-# Descrição: Versão com a busca aprimorada para filtrar por títulos e conteúdo dos capítulos.
+# Descrição: Versão completa com o filtro de bancos de dados funcionando em tempo real.
 
 import re
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -39,9 +39,7 @@ class AbaConteudo(QWidget):
         left_panel.setMaximumWidth(350)
 
         left_layout.addWidget(QLabel("Estrutura do Documento"))
-
         self.busca_arvore_input = QLineEdit()
-        # ALTERADO: Placeholder reflete a nova capacidade de busca
         self.busca_arvore_input.setPlaceholderText("Filtrar tópicos e conteúdos...")
         self.busca_arvore_input.textChanged.connect(self._filtrar_arvore)
         left_layout.addWidget(self.busca_arvore_input)
@@ -53,7 +51,7 @@ class AbaConteudo(QWidget):
         self.arvore_capitulos = ArvoreConteudo()
         self.arvore_capitulos.setHeaderLabel("Tópicos")
         self.arvore_capitulos.estruturaAlterada.connect(self._sincronizar_modelo_com_arvore)
-        self.arvore_capitulos.currentItemChanged.connect(self._carregar_capitulo_no_editor)
+        self.arvore_capitulos.currentItemChanged.connect(self._on_capitulo_selecionado_changed)
         self.arvore_capitulos.itemChanged.connect(self._renomear_capitulo)
         
         left_layout.addWidget(self.arvore_capitulos)
@@ -62,9 +60,7 @@ class AbaConteudo(QWidget):
         btn_add_topico = QPushButton("Novo Tópico")
         btn_add_sub = QPushButton("Novo Subtópico")
         btn_del = QPushButton("Remover")
-        btn_layout.addWidget(btn_add_topico)
-        btn_layout.addWidget(btn_add_sub)
-        btn_layout.addWidget(btn_del)
+        btn_layout.addWidget(btn_add_topico); btn_layout.addWidget(btn_add_sub); btn_layout.addWidget(btn_del)
         btn_add_topico.clicked.connect(self._adicionar_topico_principal)
         btn_add_sub.clicked.connect(self._adicionar_subtopico)
         btn_del.clicked.connect(self._remover_topico)
@@ -75,7 +71,7 @@ class AbaConteudo(QWidget):
         right_layout = QVBoxLayout(right_panel)
         self.label_capitulo_atual = QLabel("Selecione um tópico para editar")
         self.editor_capitulo = QTextEdit()
-        self.editor_capitulo.textChanged.connect(self._salvar_conteudo_capitulo)
+        self.editor_capitulo.textChanged.connect(self._on_editor_text_changed)
         
         self.lista_tabelas = QListWidget()
         self.lista_figuras = QListWidget()
@@ -83,30 +79,32 @@ class AbaConteudo(QWidget):
         elementos_layout = QHBoxLayout()
         tabelas_widget = QWidget()
         tabelas_v_layout = QVBoxLayout(tabelas_widget)
-        tabelas_v_layout.addWidget(QLabel("Banco de Tabelas do Tópico:"))
+        tabelas_v_layout.addWidget(QLabel("Banco de Tabelas do Projeto:"))
+        self.filtro_tabelas_check = QCheckBox("Mostrar apenas do tópico atual")
+        self.filtro_tabelas_check.stateChanged.connect(self.atualizar_bancos_visuais)
+        tabelas_v_layout.addWidget(self.filtro_tabelas_check)
         tabelas_v_layout.addWidget(self.lista_tabelas)
         tabelas_btn_layout = QHBoxLayout()
-        btn_add_tabela = QPushButton("Criar Tabela")
-        btn_edit_tabela = QPushButton("Editar Tabela")
-        btn_del_tabela = QPushButton("Remover Tabela")
+        btn_add_tabela = QPushButton("Criar"); btn_edit_tabela = QPushButton("Editar"); btn_del_tabela = QPushButton("Remover")
         tabelas_btn_layout.addWidget(btn_add_tabela); tabelas_btn_layout.addWidget(btn_edit_tabela); tabelas_btn_layout.addWidget(btn_del_tabela)
         tabelas_v_layout.addLayout(tabelas_btn_layout)
-        btn_ins_tabela = QPushButton("Inserir no Texto")
-        tabelas_v_layout.addWidget(btn_ins_tabela)
+        btn_ins_tabela = QPushButton("Inserir no Texto"); tabelas_v_layout.addWidget(btn_ins_tabela)
         
         btn_add_tabela.clicked.connect(self._adicionar_tabela); btn_edit_tabela.clicked.connect(self._editar_tabela); btn_del_tabela.clicked.connect(self._remover_tabela)
         btn_ins_tabela.clicked.connect(self._inserir_marcador_tabela)
         
         figuras_widget = QWidget()
         figuras_v_layout = QVBoxLayout(figuras_widget)
-        figuras_v_layout.addWidget(QLabel("Banco de Figuras do Tópico:"))
+        figuras_v_layout.addWidget(QLabel("Banco de Figuras do Projeto:"))
+        self.filtro_figuras_check = QCheckBox("Mostrar apenas do tópico atual")
+        self.filtro_figuras_check.stateChanged.connect(self.atualizar_bancos_visuais)
+        figuras_v_layout.addWidget(self.filtro_figuras_check)
         figuras_v_layout.addWidget(self.lista_figuras)
         figuras_btn_layout = QHBoxLayout()
-        btn_add_figura = QPushButton("Criar Figura"); btn_edit_figura = QPushButton("Editar Figura"); btn_del_figura = QPushButton("Remover Figura")
+        btn_add_figura = QPushButton("Criar"); btn_edit_figura = QPushButton("Editar"); btn_del_figura = QPushButton("Remover")
         figuras_btn_layout.addWidget(btn_add_figura); figuras_btn_layout.addWidget(btn_edit_figura); figuras_btn_layout.addWidget(btn_del_figura)
         figuras_v_layout.addLayout(figuras_btn_layout)
-        btn_ins_figura = QPushButton("Inserir no Texto")
-        figuras_v_layout.addWidget(btn_ins_figura)
+        btn_ins_figura = QPushButton("Inserir no Texto"); figuras_v_layout.addWidget(btn_ins_figura)
         
         btn_add_figura.clicked.connect(self._adicionar_figura); btn_edit_figura.clicked.connect(self._editar_figura); btn_del_figura.clicked.connect(self._remover_figura)
         btn_ins_figura.clicked.connect(self._inserir_marcador_figura)
@@ -122,38 +120,56 @@ class AbaConteudo(QWidget):
         if self.arvore_capitulos.topLevelItemCount() > 0:
             self.arvore_capitulos.setCurrentItem(self.arvore_capitulos.topLevelItem(0))
 
+    @QtCore.Slot()
+    def atualizar_bancos_visuais(self):
+        capitulo_selecionado = self._get_capitulo_selecionado()
+        conteudo_capitulo = capitulo_selecionado.conteudo if capitulo_selecionado else ""
+        
+        self.lista_tabelas.clear()
+        if self.filtro_tabelas_check.isChecked() and capitulo_selecionado:
+            titulos_usados = set(re.findall(r"\{\{Tabela:([^}]+)\}\}", conteudo_capitulo))
+            for tabela in self.documento.banco_tabelas:
+                if tabela.titulo in titulos_usados: self.lista_tabelas.addItem(tabela.titulo)
+        else:
+            for tabela in self.documento.banco_tabelas: self.lista_tabelas.addItem(tabela.titulo)
+
+        self.lista_figuras.clear()
+        if self.filtro_figuras_check.isChecked() and capitulo_selecionado:
+            titulos_usados = set(re.findall(r"\{\{Figura:([^}]+)\}\}", conteudo_capitulo))
+            for figura in self.documento.banco_figuras:
+                if figura.titulo in titulos_usados: self.lista_figuras.addItem(figura.titulo)
+        else:
+            for figura in self.documento.banco_figuras: self.lista_figuras.addItem(figura.titulo)
+    
+    @QtCore.Slot()
+    def _on_editor_text_changed(self):
+        self._salvar_conteudo_capitulo()
+        self.atualizar_bancos_visuais()
+
+    @QtCore.Slot(QTreeWidgetItem, QTreeWidgetItem)
+    def _on_capitulo_selecionado_changed(self, item_atual, item_anterior):
+        self._carregar_capitulo_no_editor(item_atual, item_anterior)
+        self.atualizar_bancos_visuais()
+
     @QtCore.Slot(str)
     def _filtrar_arvore(self, texto_busca):
         texto_busca = texto_busca.lower()
-        
         def visitar_item(item):
             capitulo_modelo = item.data(0, QtCore.Qt.ItemDataRole.UserRole)
-            
-            # --- LÓGICA DE BUSCA APRIMORADA ---
-            # 1. Verifica se o título corresponde
             titulo_corresponde = texto_busca in item.text(0).lower()
-            
-            # 2. Verifica se o conteúdo do capítulo corresponde
             conteudo_corresponde = False
             if capitulo_modelo and capitulo_modelo.conteudo:
                 conteudo_corresponde = texto_busca in capitulo_modelo.conteudo.lower()
-            
             item_corresponde = titulo_corresponde or conteudo_corresponde
-            # --- FIM DA LÓGICA DE BUSCA ---
-
             algum_filho_corresponde = False
             for i in range(item.childCount()):
                 if visitar_item(item.child(i)):
                     algum_filho_corresponde = True
-            
             deve_ficar_visivel = item_corresponde or algum_filho_corresponde
             item.setHidden(not deve_ficar_visivel)
-            
             if algum_filho_corresponde:
                 item.setExpanded(True)
-                
             return deve_ficar_visivel
-
         root = self.arvore_capitulos.invisibleRootItem()
         for i in range(root.childCount()):
             visitar_item(root.child(i))
@@ -170,11 +186,12 @@ class AbaConteudo(QWidget):
     @QtCore.Slot(QTreeWidgetItem, QTreeWidgetItem)
     def _carregar_capitulo_no_editor(self, item_atual, item_anterior):
         capitulo = self._get_capitulo_selecionado()
+        elementos_habilitados = True if capitulo else False
+        for child in self.findChildren(QPushButton):
+            if child.text() in ["Criar", "Editar", "Remover", "Inserir no Texto"]:
+                child.setEnabled(elementos_habilitados)
         if not capitulo:
-            self.editor_capitulo.clear()
-            self.editor_capitulo.setEnabled(False)
-            self.lista_tabelas.clear()
-            self.lista_figuras.clear()
+            self.editor_capitulo.clear(); self.editor_capitulo.setEnabled(False)
             self.label_capitulo_atual.setText("Selecione um tópico")
             return
         
@@ -182,49 +199,37 @@ class AbaConteudo(QWidget):
         self.label_capitulo_atual.setText(f"Editando: {capitulo.titulo}")
         self.editor_capitulo.setPlainText(capitulo.conteudo)
         self.editor_capitulo.setEnabled(True)
-        self.lista_tabelas.clear()
-        for tabela in capitulo.tabelas:
-            self.lista_tabelas.addItem(tabela.titulo)
-        self.lista_figuras.clear()
-        for figura in capitulo.figuras:
-            self.lista_figuras.addItem(figura.titulo)
         self._carregando_capitulo = False
-        
+
     @QtCore.Slot()
     def _adicionar_tabela(self):
-        capitulo = self._get_capitulo_selecionado()
-        if not capitulo:
-            QMessageBox.warning(self, "Atenção", "Selecione um tópico para criar uma tabela.")
+        if not self._get_capitulo_selecionado():
+            QMessageBox.warning(self, "Atenção", "Selecione um tópico antes de criar uma tabela.")
             return
         dialog = TabelaDialog(parent=self)
         if dialog.exec():
-            nova_tabela = dialog.get_dados_tabela()
-            capitulo.tabelas.append(nova_tabela)
-            self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+            self.documento.banco_tabelas.append(dialog.get_dados_tabela())
+            self.atualizar_bancos_visuais()
 
     @QtCore.Slot()
     def _adicionar_figura(self):
-        capitulo = self._get_capitulo_selecionado()
-        if not capitulo:
-            QMessageBox.warning(self, "Atenção", "Selecione um tópico para criar uma figura.")
+        if not self._get_capitulo_selecionado():
+            QMessageBox.warning(self, "Atenção", "Selecione um tópico antes de criar uma figura.")
             return
         dialog = DialogoFigura(parent=self)
         if dialog.exec():
             nova_figura = dialog.get_dados_figura()
             if nova_figura and nova_figura.caminho_processado:
-                capitulo.figuras.append(nova_figura)
-                self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
-            else:
-                QMessageBox.critical(self, "Erro", "A imagem não foi selecionada ou não pôde ser processada.")
-    
+                self.documento.banco_figuras.append(nova_figura)
+                self.atualizar_bancos_visuais()
+
     @QtCore.Slot()
     def _inserir_marcador_tabela(self):
         item_selecionado = self.lista_tabelas.currentItem()
         if not item_selecionado:
             QMessageBox.warning(self, "Atenção", "Selecione uma tabela do banco para inserir.")
             return
-        titulo_tabela = item_selecionado.text()
-        marcador = f"\n{{{{Tabela:{titulo_tabela}}}}}\n"
+        marcador = f"\n{{{{Tabela:{item_selecionado.text()}}}}}\n"
         self.editor_capitulo.insertPlainText(marcador)
 
     @QtCore.Slot()
@@ -233,8 +238,7 @@ class AbaConteudo(QWidget):
         if not item_selecionado:
             QMessageBox.warning(self, "Atenção", "Selecione uma figura do banco para inserir.")
             return
-        titulo_figura = item_selecionado.text()
-        marcador = f"\n{{{{Figura:{titulo_figura}}}}}\n"
+        marcador = f"\n{{{{Figura:{item_selecionado.text()}}}}}\n"
         self.editor_capitulo.insertPlainText(marcador)
 
     def _get_capitulo_selecionado(self) -> Capitulo | None:
@@ -250,46 +254,39 @@ class AbaConteudo(QWidget):
 
     @QtCore.Slot()
     def _editar_tabela(self):
-        capitulo = self._get_capitulo_selecionado()
-        linha_selecionada = self.lista_tabelas.currentRow()
-        if not capitulo or linha_selecionada == -1: return
-        tabela_para_editar = capitulo.tabelas[linha_selecionada]
-        dialog = TabelaDialog(tabela=tabela_para_editar, parent=self)
+        linha = self.lista_tabelas.currentRow();
+        if linha == -1: return
+        dialog = TabelaDialog(tabela=self.documento.banco_tabelas[linha], parent=self)
         if dialog.exec():
-            tabela_atualizada = dialog.get_dados_tabela()
-            capitulo.tabelas[linha_selecionada] = tabela_atualizada
-            self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+            self.documento.banco_tabelas[linha] = dialog.get_dados_tabela()
+            self.atualizar_bancos_visuais()
 
     @QtCore.Slot()
     def _remover_tabela(self):
-        capitulo = self._get_capitulo_selecionado()
-        linha_selecionada = self.lista_tabelas.currentRow()
-        if not capitulo or linha_selecionada == -1: return
-        if QMessageBox.question(self, "Confirmar", "Remover esta tabela do banco?") == QMessageBox.StandardButton.Yes:
-            del capitulo.tabelas[linha_selecionada]
-            self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+        linha = self.lista_tabelas.currentRow();
+        if linha == -1: return
+        if QMessageBox.question(self, "Confirmar", "Remover esta tabela do banco de dados do projeto?") == QMessageBox.StandardButton.Yes:
+            del self.documento.banco_tabelas[linha]
+            self.atualizar_bancos_visuais()
             
     @QtCore.Slot()
     def _editar_figura(self):
-        capitulo = self._get_capitulo_selecionado()
-        linha_selecionada = self.lista_figuras.currentRow()
-        if not capitulo or linha_selecionada == -1: return
-        figura_para_editar = capitulo.figuras[linha_selecionada]
-        dialog = DialogoFigura(figura=figura_para_editar, parent=self)
+        linha = self.lista_figuras.currentRow();
+        if linha == -1: return
+        dialog = DialogoFigura(figura=self.documento.banco_figuras[linha], parent=self)
         if dialog.exec():
-            figura_atualizada = dialog.get_dados_figura()
-            if figura_atualizada and figura_atualizada.caminho_processado:
-                capitulo.figuras[linha_selecionada] = figura_atualizada
-                self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+            figura = dialog.get_dados_figura()
+            if figura and figura.caminho_processado:
+                self.documento.banco_figuras[linha] = figura
+                self.atualizar_bancos_visuais()
     
     @QtCore.Slot()
     def _remover_figura(self):
-        capitulo = self._get_capitulo_selecionado()
-        linha_selecionada = self.lista_figuras.currentRow()
-        if not capitulo or linha_selecionada == -1: return
-        if QMessageBox.question(self, "Confirmar", "Remover esta figura do banco?") == QMessageBox.StandardButton.Yes:
-            del capitulo.figuras[linha_selecionada]
-            self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
+        linha = self.lista_figuras.currentRow();
+        if linha == -1: return
+        if QMessageBox.question(self, "Confirmar", "Remover esta figura do banco de dados do projeto?") == QMessageBox.StandardButton.Yes:
+            del self.documento.banco_figuras[linha]
+            self.atualizar_bancos_visuais()
     
     def _popular_arvore(self):
         self.arvore_capitulos.blockSignals(True)

@@ -882,12 +882,44 @@
         "documentation": {}
     },
     {
+        "label": "Image",
+        "importPath": "PIL",
+        "description": "PIL",
+        "isExtraImport": true,
+        "detail": "PIL",
+        "documentation": {}
+    },
+    {
         "label": "shutil",
         "kind": 6,
         "isExtraImport": true,
         "importPath": "shutil",
         "description": "shutil",
         "detail": "shutil",
+        "documentation": {}
+    },
+    {
+        "label": "QPixmap",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QAction",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QKeySequence",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
         "documentation": {}
     },
     {
@@ -1193,22 +1225,6 @@
         "documentation": {}
     },
     {
-        "label": "QAction",
-        "importPath": "PySide6.QtGui",
-        "description": "PySide6.QtGui",
-        "isExtraImport": true,
-        "detail": "PySide6.QtGui",
-        "documentation": {}
-    },
-    {
-        "label": "QKeySequence",
-        "importPath": "PySide6.QtGui",
-        "description": "PySide6.QtGui",
-        "isExtraImport": true,
-        "detail": "PySide6.QtGui",
-        "documentation": {}
-    },
-    {
         "label": "QWebEnginePage",
         "importPath": "PySide6.QtWebEngineCore",
         "description": "PySide6.QtWebEngineCore",
@@ -1322,7 +1338,7 @@
         "kind": 6,
         "importPath": "dialogs",
         "description": "dialogs",
-        "peekOfCode": "class DialogoFigura(QDialog):\n    \"\"\"\n    Janela de diálogo para criar e editar um objeto Figura.\n    \"\"\"\n    def __init__(self, figura: Figura = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Figura\")\n        self.setMinimumWidth(500)\n        self.figura = figura if figura else Figura()\n        # Guarda os caminhos para o processamento",
+        "peekOfCode": "class DialogoFigura(QDialog):\n    def __init__(self, figura: Figura = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Figura ABNT\")\n        self.setMinimumSize(800, 400)\n        self.figura = figura if figura else Figura()\n        self.caminho_imagem_atual = self.figura.caminho_original or self.figura.caminho_processado\n        self.layout = QHBoxLayout(self)\n        left_panel = QWidget()\n        left_layout = QVBoxLayout(left_panel)",
         "detail": "dialogs",
         "documentation": {}
     },
@@ -1331,7 +1347,7 @@
         "kind": 6,
         "importPath": "dialogs",
         "description": "dialogs",
-        "peekOfCode": "class TabelaDialog(QDialog):\n    def __init__(self, tabela: Tabela = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Tabela ABNT\")\n        # ... (Restante da classe TabelaDialog inalterada)\n        self.setMinimumSize(600, 400)\n        self.tabela = tabela if tabela else Tabela(dados=[[\"Cabeçalho 1\", \"Cabeçalho 2\"], [\"Dado 1\", \"Dado 2\"]])\n        self.layout = QVBoxLayout(self)\n        self.titulo_input = QLineEdit(self.tabela.titulo)\n        self.fonte_input = QLineEdit(self.tabela.fonte)",
+        "peekOfCode": "class TabelaDialog(QDialog):\n    def __init__(self, tabela: Tabela = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Tabela ABNT\")\n        self.setMinimumSize(600, 400)\n        self.tabela = tabela if tabela else Tabela(dados=[[\"Cabeçalho 1\", \"Cabeçalho 2\"], [\"Dado 1\", \"Dado 2\"]])\n        self.layout = QVBoxLayout(self)\n        self.titulo_input = QLineEdit(self.tabela.titulo)\n        self.fonte_input = QLineEdit(self.tabela.fonte)\n        self.estilo_borda_combo = QComboBox()",
         "detail": "dialogs",
         "documentation": {}
     },
@@ -1340,7 +1356,16 @@
         "kind": 6,
         "importPath": "dialogs",
         "description": "dialogs",
-        "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        # ... (Restante da classe ReferenciaDialog inalterada) ...\n        self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox(); self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")\n        self.titulo_input = QLineEdit(); self.ano_input = QLineEdit()\n        self.campos_livro = { \"Local\": QLineEdit(), \"Editora\": QLineEdit() }",
+        "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox(); self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")\n        self.titulo_input = QLineEdit(); self.ano_input = QLineEdit()\n        self.campos_livro = { \"Local\": QLineEdit(), \"Editora\": QLineEdit() }\n        self.campos_artigo = { \"Revista\": QLineEdit(), \"Volume\": QLineEdit(), \"Pág. Inicial\": QLineEdit(), \"Pág. Final\": QLineEdit() }",
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
+        "label": "LARGURA_MAXIMA_CM",
+        "kind": 5,
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "peekOfCode": "LARGURA_MAXIMA_CM = 16.0\nclass DialogoFigura(QDialog):\n    def __init__(self, figura: Figura = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Figura ABNT\")\n        self.setMinimumSize(800, 400)\n        self.figura = figura if figura else Figura()\n        self.caminho_imagem_atual = self.figura.caminho_original or self.figura.caminho_processado\n        self.layout = QHBoxLayout(self)\n        left_panel = QWidget()",
         "detail": "dialogs",
         "documentation": {}
     },
@@ -1376,7 +1401,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Autor:\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False  # <-- A LINHA QUE FALTAVA NO SEU ARQUIVO\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    tabelas: List[Tabela] = field(default_factory=list)",
+        "peekOfCode": "class Autor:\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    # REMOVIDO: As listas foram movidas para DocumentoABNT para se tornarem globais.",
         "detail": "documento",
         "documentation": {}
     },
@@ -1385,7 +1410,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False  # <-- A LINHA QUE FALTAVA NO SEU ARQUIVO\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    tabelas: List[Tabela] = field(default_factory=list)\n    figuras: List[Figura] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self",
+        "peekOfCode": "class Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    # REMOVIDO: As listas foram movidas para DocumentoABNT para se tornarem globais.\n    # tabelas: List[Tabela] = field(default_factory=list)\n    # figuras: List[Figura] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):",
         "detail": "documento",
         "documentation": {}
     },

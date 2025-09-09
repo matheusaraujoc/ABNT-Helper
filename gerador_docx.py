@@ -1,5 +1,5 @@
 # gerador_docx.py
-# Descrição: Versão que diferencia a geração de Trabalho Acadêmico e Artigo.
+# Descrição: Versão com a regra "Manter com o próximo" para títulos de figuras e tabelas.
 
 import os
 from docx import Document
@@ -55,7 +55,6 @@ class GeradorDOCX:
             word.Visible = False
             doc_path = os.path.abspath(caminho_arquivo)
             doc = word.Documents.Open(doc_path)
-            # Acessa o primeiro sumário do documento e o atualiza
             if doc.TablesOfContents.Count > 0:
                 doc.TablesOfContents(1).Update()
             doc.Save()
@@ -79,7 +78,6 @@ class GeradorDOCX:
         self._renderizar_capa()
         self._renderizar_folha_rosto()
         self._renderizar_resumo()
-        # Adiciona nova seção para o conteúdo textual, onde a numeração de página começa
         section = self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._set_page_numbering(section)
         self._renderizar_sumario()
@@ -92,11 +90,8 @@ class GeradorDOCX:
 
     def _gerar_artigo(self, caminho_arquivo: str):
         section = self.doc.sections[0]
-        self._set_page_numbering(section) # Numeração começa na primeira página
-        
-        # Artigos não têm capa, folha de rosto ou sumário separado.
+        self._set_page_numbering(section)
         self.regras.renderizar_cabecalho_artigo(self.doc)
-        
         self._renderizar_secoes_recursivamente(self.doc_abnt.estrutura_textual)
         self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._renderizar_referencias()
@@ -127,13 +122,13 @@ class GeradorDOCX:
                         tipo = parte
                         titulo = partes[k+1]
                         if tipo == "Tabela":
-                            tabela_obj = next((t for t in no_filho.tabelas if t.titulo == titulo), None)
+                            tabela_obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
                             if tabela_obj:
                                 self.contador_tabelas += 1
                                 tabela_obj.numero = self.contador_tabelas
                                 self._renderizar_tabela(tabela_obj)
                         elif tipo == "Figura":
-                            figura_obj = next((f for f in no_filho.figuras if f.titulo == titulo), None)
+                            figura_obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
                             if figura_obj:
                                 self.contador_figuras += 1
                                 figura_obj.numero = self.contador_figuras
@@ -145,6 +140,8 @@ class GeradorDOCX:
         p_titulo = self.doc.add_paragraph()
         run_titulo = p_titulo.add_run(f"Tabela {tabela_obj.numero} – {tabela_obj.titulo}")
         self.regras.aplicar_estilo_legenda(p_titulo, is_titulo=True)
+        # NOVO: Impede que o Word quebre a página entre o título e a tabela
+        p_titulo.paragraph_format.keep_with_next = True
         
         if not tabela_obj.dados: return
         
@@ -155,12 +152,9 @@ class GeradorDOCX:
         
         for i, row_data in enumerate(tabela_obj.dados):
             for j, cell_data in enumerate(row_data):
-                cell = t.cell(i, j)
-                cell.text = cell_data
-                p = cell.paragraphs[0]
-                run = p.runs[0]
-                run.font.name = self.regras.FONTE_PADRAO
-                run.font.size = self.regras.TAMANHO_FONTE_LEGENDA
+                cell = t.cell(i, j); cell.text = cell_data
+                p = cell.paragraphs[0]; run = p.runs[0]
+                run.font.name = self.regras.FONTE_PADRAO; run.font.size = self.regras.TAMANHO_FONTE_LEGENDA
                 if i == 0:
                     p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
                     
@@ -168,17 +162,18 @@ class GeradorDOCX:
             self.regras.aplicar_estilo_tabela_abnt(t)
             
         if tabela_obj.fonte:
+            # O parágrafo da fonte é separado da tabela, então não aplicamos a regra aqui.
             p_fonte = self.doc.add_paragraph()
             p_fonte.add_run(f"Fonte: {tabela_obj.fonte}")
             self.regras.aplicar_estilo_legenda(p_fonte, is_titulo=False)
 
     def _renderizar_figura(self, figura_obj):
-        # Legenda do título (acima da imagem para figuras)
         p_titulo = self.doc.add_paragraph()
         p_titulo.add_run(f"Figura {figura_obj.numero} – {figura_obj.titulo}")
         self.regras.aplicar_estilo_legenda(p_titulo, is_titulo=True)
+        # NOVO: Impede a quebra entre o título e a imagem.
+        p_titulo.paragraph_format.keep_with_next = True
 
-        # Imagem centralizada
         p_imagem = self.doc.add_paragraph()
         p_imagem.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         try:
@@ -187,12 +182,17 @@ class GeradorDOCX:
             p_imagem.add_run(f"[ERRO: Imagem '{figura_obj.caminho_processado}' não encontrada ou inválida. {e}]").italic = True
         p_imagem.paragraph_format.space_before = Pt(0)
         p_imagem.paragraph_format.space_after = Pt(0)
+        # NOVO: Impede a quebra entre a imagem e a fonte (se houver fonte).
+        p_imagem.paragraph_format.keep_with_next = True
         
-        # Fonte (abaixo da imagem)
         if figura_obj.fonte:
             p_fonte = self.doc.add_paragraph()
             p_fonte.add_run(f"Fonte: {figura_obj.fonte}")
             self.regras.aplicar_estilo_legenda(p_fonte, is_titulo=False)
+            # O parágrafo da fonte é o último, não precisa de 'keep_with_next'
+        else:
+            # Se não há fonte, a imagem é o último elemento do bloco, então podemos desativar a propriedade.
+            p_imagem.paragraph_format.keep_with_next = False
 
     def _set_page_numbering(self, section):
         section.header.is_linked_to_previous = False

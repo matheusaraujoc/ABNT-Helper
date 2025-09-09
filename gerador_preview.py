@@ -1,5 +1,5 @@
 # gerador_preview.py
-# Descrição: Versão estável com a adição da lógica para formatar Artigos Científicos.
+# Descrição: Versão final que busca tabelas/figuras no banco de dados global do projeto.
 
 import os
 import re
@@ -25,11 +25,7 @@ class GeradorHTMLPreview:
         self.contador_tabelas = 0
         self.contador_figuras = 0
         self.classe_pagina_atual = 'pagina'
-        # NOVO: Flag para verificar o tipo de trabalho
         self.is_artigo = self.doc_abnt.configuracoes.tipo_trabalho == "Artigo Científico"
-
-    # Este método não precisa mais do _parsear_paragrafos_por_indentacao
-    # pois a lógica de split('\n') já está no loop de renderização.
 
     def _estimar_paginacao_e_coletar_sumario(self):
         self.entradas_sumario = []
@@ -91,10 +87,10 @@ class GeradorHTMLPreview:
                         elif k % 3 == 1:
                             tipo, titulo = parte, partes[k+1]
                             if tipo == "Tabela":
-                                obj = next((t for t in no_filho.tabelas if t.titulo == titulo), None)
+                                obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
                                 if obj: simular_adicao_bloco((len(obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2))
                             elif tipo == "Figura":
-                                obj = next((f for f in no_filho.figuras if f.titulo == titulo), None)
+                                obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
                                 if obj: simular_adicao_bloco((obj.largura_cm / 16 * 9) + (ALTURA_LEGENDA * 2))
                 coletar_recursivo(no_filho, f"{numero_completo}.")
         coletar_recursivo(self.doc_abnt.estrutura_textual)
@@ -125,7 +121,7 @@ class GeradorHTMLPreview:
             linhas_que_cabem = math.floor(self.altura_restante / ALTURA_LINHA_TEXTO)
             if linhas_que_cabem <= 0:
                 self._nova_pagina()
-                linhas_que_cabem = math.floor(self.altura_restante / ALTURA_LINHA_TEXTO)
+                continue
             caracteres_que_cabem = linhas_que_cabem * CARACTERES_POR_LINHA
             if len(texto_restante) <= caracteres_que_cabem:
                 self.conteudo_pagina_atual.append(f'<p class="{base_class}">{texto_restante}</p>')
@@ -140,13 +136,12 @@ class GeradorHTMLPreview:
                 texto_restante = texto_restante[ponto_quebra:].lstrip()
                 classe_final = f"{base_class} paragrafo-quebrado"
                 self.conteudo_pagina_atual.append(f'<p class="{classe_final}">{texto_para_pagina_atual}</p>')
+                self.altura_restante -= math.ceil(len(texto_para_pagina_atual)/CARACTERES_POR_LINHA) * ALTURA_LINHA_TEXTO
                 self._nova_pagina()
                 is_continuacao = True
-    
-    # NOVO: Método para renderizar o cabeçalho de um artigo
+
     def _renderizar_cabecalho_artigo_html(self):
         autores_html = ", ".join([a.nome_completo for a in self.doc_abnt.autores])
-        # Adiciona o conteúdo do cabeçalho à página atual, um elemento de cada vez
         self._adicionar_elemento_bloco(f'<p style="text-align: center;"><strong>{self.doc_abnt.titulo.upper()}</strong></p><br>', ALTURA_LINHA_TEXTO * 2)
         self._adicionar_elemento_bloco(f'<p style="text-align: center;">{autores_html}</p><br>', ALTURA_LINHA_TEXTO * 2)
         self._adicionar_elemento_bloco(f'<p><strong>Resumo</strong></p>', ALTURA_LINHA_TEXTO)
@@ -154,9 +149,8 @@ class GeradorHTMLPreview:
         self._adicionar_elemento_bloco(f'<br><p><strong>Palavras-chave:</strong> {self.doc_abnt.palavras_chave.replace(";", ".")}.</p>', ALTURA_LINHA_TEXTO * 2)
 
     def gerar_html(self) -> str:
-        # Limpa o estado anterior
         self.paginas_html = []; self.conteudo_pagina_atual = []
-        self.altura_restante = ALTURA_CONTEUDO_PAGINA
+        self.altura_restante = ALTURA_CONTEUDO_PAGINA; self.classe_pagina_atual = 'pagina'
         
         cfg = self.doc_abnt.configuracoes
         
@@ -205,14 +199,11 @@ class GeradorHTMLPreview:
         </style>
         """
         
-        # --- ALTERADO: Lógica condicional para renderização ---
         if self.is_artigo:
-            # Fluxo de renderização para Artigo Científico
             self.classe_pagina_atual = 'pagina'
             self.conteudo_pagina_atual = [self.classe_pagina_atual]
             self._renderizar_cabecalho_artigo_html()
         else:
-            # Fluxo de renderização para Trabalho Acadêmico (TCC, Tese, etc.)
             self._estimar_paginacao_e_coletar_sumario()
             autores_capa_html = "<br>".join([a.nome_completo.upper() for a in self.doc_abnt.autores])
             self.paginas_html.append(f'<div class="pagina capa pre-textual">{self._renderizar_capa_html(cfg, autores_capa_html)}</div>')
@@ -224,8 +215,6 @@ class GeradorHTMLPreview:
             self.conteudo_pagina_atual = [self.classe_pagina_atual]
             self.altura_restante = ALTURA_CONTEUDO_PAGINA
 
-        # --- FIM DA LÓGICA CONDICIONAL ---
-        
         self._renderizar_secoes_recursivamente_html(self.doc_abnt.estrutura_textual)
         self._nova_pagina()
         
@@ -244,9 +233,8 @@ class GeradorHTMLPreview:
             numero_completo = f"{prefixo_numeracao}{i}"
             nivel = len(numero_completo.split('.'))
             
-            # Formatação do título da seção/capítulo
             if self.is_artigo:
-                titulo_texto = f"{numero_completo} {no_filho.titulo}" # Para artigos, sem maiúsculas
+                titulo_texto = f"{numero_completo} {no_filho.titulo}"
             else:
                 titulo_texto = f"{numero_completo} {no_filho.titulo.upper() if nivel == 1 else no_filho.titulo}"
             
@@ -265,13 +253,13 @@ class GeradorHTMLPreview:
                     elif k % 3 == 1:
                         tipo, titulo = parte, partes[k+1]
                         if tipo == "Tabela":
-                            tabela_obj = next((t for t in no_filho.tabelas if t.titulo == titulo), None)
+                            tabela_obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
                             if tabela_obj:
                                 self.contador_tabelas += 1; tabela_obj.numero = self.contador_tabelas
                                 altura = (len(tabela_obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2)
                                 self._adicionar_elemento_bloco(self._renderizar_tabela_html(tabela_obj), altura)
                         elif tipo == "Figura":
-                            figura_obj = next((f for f in no_filho.figuras if f.titulo == titulo), None)
+                            figura_obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
                             if figura_obj:
                                 self.contador_figuras += 1; figura_obj.numero = self.contador_figuras
                                 altura = (figura_obj.largura_cm / 16 * 9) + (ALTURA_LEGENDA * 2)

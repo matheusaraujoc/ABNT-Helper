@@ -1,5 +1,5 @@
 # dialogs.py
-# Descrição: Contém todas as classes de janelas de diálogo utilizadas pela aplicação.
+# Descrição: Contém as classes de janelas de diálogo utilizadas pela aplicação.
 
 import os
 import shutil
@@ -8,107 +8,158 @@ from PySide6.QtWidgets import (QDialog, QWidget, QLabel, QLineEdit, QComboBox,
                                QFormLayout, QVBoxLayout, QDialogButtonBox, QListWidget,
                                QListWidgetItem, QTableWidget, QTableWidgetItem, QMessageBox,
                                QPushButton, QHBoxLayout, QFileDialog, QDoubleSpinBox)
+from PySide6.QtGui import QPixmap
+from PIL import Image
 
 from referencia import Livro, Artigo, Site
 from documento import Tabela, Figura
 
+LARGURA_MAXIMA_CM = 16.0
+
 class DialogoFigura(QDialog):
-    """
-    Janela de diálogo para criar e editar um objeto Figura.
-    """
     def __init__(self, figura: Figura = None, parent: QWidget = None):
         super().__init__(parent)
-        self.setWindowTitle("Editor de Figura")
-        self.setMinimumWidth(500)
+        self.setWindowTitle("Editor de Figura ABNT")
+        self.setMinimumSize(800, 400)
 
         self.figura = figura if figura else Figura()
+        self.caminho_imagem_atual = self.figura.caminho_original or self.figura.caminho_processado
 
-        # Guarda os caminhos para o processamento
-        self.caminho_original_selecionado = self.figura.caminho_original
-        self.caminho_processado_final = self.figura.caminho_processado
+        self.layout = QHBoxLayout(self)
 
-        # UI Setup
-        self.layout = QVBoxLayout(self)
-        form_layout = QFormLayout()
+        left_panel = QWidget()
+        left_layout = QVBoxLayout(left_panel)
+        form_layout = QtWidgets.QFormLayout()
 
         self.titulo_input = QLineEdit(self.figura.titulo)
         self.fonte_input = QLineEdit(self.figura.fonte)
-        self.largura_input = QDoubleSpinBox()
-        self.largura_input.setRange(1.0, 20.0)
-        self.largura_input.setSuffix(" cm")
-        self.largura_input.setValue(self.figura.largura_cm)
+        self.caminho_input = QLineEdit(self.figura.caminho_original)
+        self.caminho_input.setReadOnly(True)
+        self.largura_combo = QComboBox()
+        self.largura_combo.addItems(["Pequena (8 cm)", "Média (12 cm)", "Grande (Largura Máxima)"])
         
-        self.caminho_label = QLabel(self.caminho_original_selecionado or "Nenhum arquivo selecionado.")
-        self.caminho_label.setWordWrap(True)
-        btn_selecionar_arquivo = QPushButton("Selecionar Imagem...")
-        btn_selecionar_arquivo.clicked.connect(self._selecionar_arquivo)
+        if self.figura.largura_cm == 8.0: self.largura_combo.setCurrentIndex(0)
+        elif self.figura.largura_cm == 12.0: self.largura_combo.setCurrentIndex(1)
+        else: self.largura_combo.setCurrentIndex(2)
+
+        btn_procurar = QPushButton("Procurar...")
+        btn_procurar.clicked.connect(self.procurar_arquivo)
+        
+        caminho_layout = QHBoxLayout()
+        caminho_layout.addWidget(self.caminho_input)
+        caminho_layout.addWidget(btn_procurar)
 
         form_layout.addRow("Título (sem a palavra 'Figura X'):", self.titulo_input)
         form_layout.addRow("Fonte:", self.fonte_input)
-        form_layout.addRow("Largura da Imagem:", self.largura_input)
-        form_layout.addRow("Arquivo de Imagem:", btn_selecionar_arquivo)
-        form_layout.addRow("", self.caminho_label)
+        form_layout.addRow("Arquivo da Imagem:", caminho_layout)
+        form_layout.addRow("Largura da Imagem:", self.largura_combo)
         
-        self.layout.addLayout(form_layout)
+        left_layout.addLayout(form_layout)
+        left_layout.addStretch()
 
         self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         self.buttons.accepted.connect(self.accept)
         self.buttons.rejected.connect(self.reject)
-        self.layout.addWidget(self.buttons)
+        left_layout.addWidget(self.buttons)
 
-    def _selecionar_arquivo(self):
-        caminho, _ = QFileDialog.getOpenFileName(self, "Selecionar Imagem", "", "Imagens (*.png *.jpg *.jpeg *.bmp)")
+        right_panel = QWidget()
+        right_layout = QVBoxLayout(right_panel)
+        
+        self.preview_label = QLabel("A prévia da imagem aparecerá aqui.")
+        self.preview_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.preview_label.setStyleSheet("border: 1px dashed gray; padding: 5px;")
+        self.preview_label.setMinimumSize(300, 300)
+        
+        right_layout.addWidget(QLabel("<b>Pré-visualização:</b>"))
+        right_layout.addWidget(self.preview_label, 1)
+
+        self.layout.addWidget(left_panel, 1)
+        self.layout.addWidget(right_panel, 1)
+
+        if self.caminho_imagem_atual:
+            self._atualizar_preview(self.caminho_imagem_atual)
+            
+    def procurar_arquivo(self):
+        caminho, _ = QFileDialog.getOpenFileName(self, "Selecionar Imagem", "", 
+                  "Arquivos de Imagem (*.png *.jpg *.jpeg *.webp *.bmp *.gif)")
         if caminho:
-            self.caminho_original_selecionado = caminho
-            self.caminho_label.setText(caminho)
+            self.caminho_input.setText(caminho)
+            self.caminho_imagem_atual = caminho
+            self._atualizar_preview(caminho)
+
+    def _atualizar_preview(self, caminho_imagem):
+        if not caminho_imagem or not os.path.exists(caminho_imagem):
+            self.preview_label.setText("Imagem não encontrada.")
+            self.preview_label.setPixmap(QPixmap())
+            return
+        
+        pixmap = QPixmap(caminho_imagem)
+        scaled_pixmap = pixmap.scaled(self.preview_label.size(),
+                                      QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+                                      QtCore.Qt.TransformationMode.SmoothTransformation)
+        self.preview_label.setPixmap(scaled_pixmap)
+        
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.caminho_imagem_atual:
+            self._atualizar_preview(self.caminho_imagem_atual)
 
     def accept(self):
-        # Validação antes de fechar
         if not self.titulo_input.text().strip():
             QMessageBox.warning(self, "Dados Incompletos", "O título da figura é obrigatório.")
             return
-
-        if not self.caminho_original_selecionado:
+        if not self.caminho_input.text():
             QMessageBox.warning(self, "Dados Incompletos", "É necessário selecionar um arquivo de imagem.")
             return
-            
-        # Processa a imagem (copia para uma pasta local do projeto para portabilidade)
-        try:
-            imagens_dir = os.path.join(os.getcwd(), "imagens_processadas")
-            os.makedirs(imagens_dir, exist_ok=True)
-            
-            nome_arquivo = os.path.basename(self.caminho_original_selecionado)
-            # Evita sobreposição de nomes de arquivos
-            nome_base, extensao = os.path.splitext(nome_arquivo)
-            caminho_destino = os.path.join(imagens_dir, nome_arquivo)
-            
-            contador = 1
-            while os.path.exists(caminho_destino):
-                caminho_destino = os.path.join(imagens_dir, f"{nome_base}_{contador}{extensao}")
-                contador += 1
-
-            shutil.copy2(self.caminho_original_selecionado, caminho_destino)
-            self.caminho_processado_final = caminho_destino
-            
-        except Exception as e:
-            QMessageBox.critical(self, "Erro ao Processar Imagem", f"Não foi possível copiar a imagem:\n{e}")
+        if not self._processar_imagem():
             return
-
         super().accept()
 
+    def _processar_imagem(self) -> bool:
+        caminho_original = self.caminho_input.text()
+        if not caminho_original:
+            return False
+        if self.figura.caminho_original == caminho_original and self.figura.caminho_processado and os.path.exists(self.figura.caminho_processado):
+             return True
+
+        try:
+            pasta_imagens = "_imagens_processadas"
+            os.makedirs(pasta_imagens, exist_ok=True)
+            nome_arquivo = os.path.basename(caminho_original)
+            nome_base, _ = os.path.splitext(nome_arquivo)
+            caminho_saida = os.path.join(pasta_imagens, f"{nome_base}.png")
+            contador = 1
+            while os.path.exists(caminho_saida):
+                caminho_saida = os.path.join(pasta_imagens, f"{nome_base}_{contador}.png")
+                contador += 1
+            with Image.open(caminho_original) as img:
+                img = img.convert("RGB")
+                largura_maxima_px = LARGURA_MAXIMA_CM * 37.8
+                if img.width > largura_maxima_px:
+                    ratio = largura_maxima_px / img.width
+                    nova_altura = int(img.height * ratio)
+                    img = img.resize((int(largura_maxima_px), nova_altura), Image.Resampling.LANCZOS)
+                img.save(caminho_saida, "PNG")
+                self.figura.caminho_processado = caminho_saida
+                return True
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Processar Imagem", f"Não foi possível processar o arquivo de imagem:\n{e}")
+            return False
+
     def get_dados_figura(self) -> Figura:
-        self.figura.titulo = self.titulo_input.text().strip()
-        self.figura.fonte = self.fonte_input.text().strip()
-        self.figura.largura_cm = self.largura_input.value()
-        self.figura.caminho_original = self.caminho_original_selecionado
-        self.figura.caminho_processado = self.caminho_processado_final
+        self.figura.titulo = self.titulo_input.text()
+        self.figura.fonte = self.fonte_input.text()
+        self.figura.caminho_original = self.caminho_input.text()
+        largura_str = self.largura_combo.currentText()
+        if "Pequena" in largura_str: self.figura.largura_cm = 8.0
+        elif "Média" in largura_str: self.figura.largura_cm = 12.0
+        else: self.figura.largura_cm = LARGURA_MAXIMA_CM
         return self.figura
 
 class TabelaDialog(QDialog):
     def __init__(self, tabela: Tabela = None, parent: QWidget = None):
         super().__init__(parent)
         self.setWindowTitle("Editor de Tabela ABNT")
-        # ... (Restante da classe TabelaDialog inalterada)
         self.setMinimumSize(600, 400)
         self.tabela = tabela if tabela else Tabela(dados=[["Cabeçalho 1", "Cabeçalho 2"], ["Dado 1", "Dado 2"]])
         self.layout = QVBoxLayout(self)
@@ -181,7 +232,6 @@ class ReferenciaDialog(QDialog):
     def __init__(self, ref=None, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Adicionar/Editar Referência")
-        # ... (Restante da classe ReferenciaDialog inalterada) ...
         self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()
         self.tipo_combo = QComboBox(); self.tipo_combo.addItems(["Livro", "Artigo", "Site"])
         self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText("Autor 1; Autor 2")
@@ -233,11 +283,15 @@ class ReferenciaDialog(QDialog):
         except ValueError: ano_val = 0
         common_data = { "autores": self.autores_input.text(), "titulo": self.titulo_input.text(), "ano": ano_val }
         if tipo == "Livro":
-            specific_data = { "local": self.campos_livro["Local"].text(), "editora": self.campos_livro["Editora"].text()}; return Livro(**common_data, **specific_data)
+            specific_data = { "local": self.campos_livro["Local"].text(), "editora": self.campos_livro["Editora"].text()}
+            return Livro(**common_data, **specific_data)
+        # CORRIGIDO: A verificação aqui deve usar a variável 'tipo', e não 'ref'.
         elif tipo == "Artigo":
             try: pg_ini, pg_fim = int(self.campos_artigo["Pág. Inicial"].text() or 0), int(self.campos_artigo["Pág. Final"].text() or 0)
             except ValueError: pg_ini, pg_fim = 0, 0
-            specific_data = { "revista": self.campos_artigo["Revista"].text(), "volume": self.campos_artigo["Volume"].text(), "pagina_inicial": pg_ini, "pagina_final": pg_fim }; return Artigo(**common_data, **specific_data)
+            specific_data = { "revista": self.campos_artigo["Revista"].text(), "volume": self.campos_artigo["Volume"].text(), "pagina_inicial": pg_ini, "pagina_final": pg_fim }
+            return Artigo(**common_data, **specific_data)
         elif tipo == "Site":
-            specific_data = { "url": self.campos_site["URL"].text(), "data_acesso": self.campos_site["Data de Acesso"].text()}; return Site(**common_data, **specific_data)
+            specific_data = { "url": self.campos_site["URL"].text(), "data_acesso": self.campos_site["Data de Acesso"].text()}
+            return Site(**common_data, **specific_data)
         return None
