@@ -81,6 +81,22 @@
         "documentation": {}
     },
     {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
         "label": "QWidget",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -361,6 +377,142 @@
         "documentation": {}
     },
     {
+        "label": "QDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QComboBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFormLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialogButtonBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QListWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QListWidgetItem",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTableWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTableWidgetItem",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFileDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDoubleSpinBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "QApplication",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -457,14 +609,6 @@
         "documentation": {}
     },
     {
-        "label": "QDialog",
-        "importPath": "PySide6.QtWidgets",
-        "description": "PySide6.QtWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWidgets",
-        "documentation": {}
-    },
-    {
         "label": "QFormLayout",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -473,7 +617,7 @@
         "documentation": {}
     },
     {
-        "label": "QDialogButtonBox",
+        "label": "QMenuBar",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
         "isExtraImport": true,
@@ -521,6 +665,22 @@
         "documentation": {}
     },
     {
+        "label": "Tabela",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Figura",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "DocumentoABNT",
         "importPath": "documento",
         "description": "documento",
@@ -546,6 +706,78 @@
     },
     {
         "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Figura",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Configuracoes",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Autor",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Referencia",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Livro",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Artigo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Site",
         "importPath": "documento",
         "description": "documento",
         "isExtraImport": true,
@@ -569,19 +801,35 @@
         "documentation": {}
     },
     {
-        "label": "TabelaDialog",
-        "importPath": "dialogo_tabela",
-        "description": "dialogo_tabela",
+        "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
         "isExtraImport": true,
-        "detail": "dialogo_tabela",
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "TabelaDialog",
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "isExtraImport": true,
+        "detail": "dialogs",
         "documentation": {}
     },
     {
         "label": "DialogoFigura",
-        "importPath": "dialogo_figura",
-        "description": "dialogo_figura",
+        "importPath": "dialogs",
+        "description": "dialogs",
         "isExtraImport": true,
-        "detail": "dialogo_figura",
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
+        "label": "ReferenciaDialog",
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "isExtraImport": true,
+        "detail": "dialogs",
         "documentation": {}
     },
     {
@@ -599,6 +847,103 @@
         "description": "PIL",
         "isExtraImport": true,
         "detail": "PIL",
+        "documentation": {}
+    },
+    {
+        "label": "shutil",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "shutil",
+        "description": "shutil",
+        "detail": "shutil",
+        "documentation": {}
+    },
+    {
+        "label": "Livro",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Artigo",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Site",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Referencia",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Livro",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Artigo",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Site",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "formatar_autores",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Livro",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Artigo",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Site",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
         "documentation": {}
     },
     {
@@ -650,43 +995,11 @@
         "documentation": {}
     },
     {
-        "label": "Referencia",
-        "importPath": "referencia",
-        "description": "referencia",
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "referencia",
-        "documentation": {}
-    },
-    {
-        "label": "formatar_autores",
-        "importPath": "referencia",
-        "description": "referencia",
-        "isExtraImport": true,
-        "detail": "referencia",
-        "documentation": {}
-    },
-    {
-        "label": "Livro",
-        "importPath": "referencia",
-        "description": "referencia",
-        "isExtraImport": true,
-        "detail": "referencia",
-        "documentation": {}
-    },
-    {
-        "label": "Artigo",
-        "importPath": "referencia",
-        "description": "referencia",
-        "isExtraImport": true,
-        "detail": "referencia",
-        "documentation": {}
-    },
-    {
-        "label": "Site",
-        "importPath": "referencia",
-        "description": "referencia",
-        "isExtraImport": true,
-        "detail": "referencia",
+        "detail": "datetime",
         "documentation": {}
     },
     {
@@ -803,12 +1116,56 @@
         "documentation": {}
     },
     {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "zipfile",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "zipfile",
+        "description": "zipfile",
+        "detail": "zipfile",
+        "documentation": {}
+    },
+    {
+        "label": "tempfile",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "tempfile",
+        "description": "tempfile",
+        "detail": "tempfile",
+        "documentation": {}
+    },
+    {
+        "label": "copy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "copy",
+        "description": "copy",
+        "detail": "copy",
+        "documentation": {}
+    },
+    {
         "label": "sys",
         "kind": 6,
         "isExtraImport": true,
         "importPath": "sys",
         "description": "sys",
         "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "QAction",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
         "documentation": {}
     },
     {
@@ -841,6 +1198,30 @@
         "description": "gerador_preview",
         "isExtraImport": true,
         "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
+        "label": "GerenciadorProjetos",
+        "importPath": "gerenciador_projeto",
+        "description": "gerenciador_projeto",
+        "isExtraImport": true,
+        "detail": "gerenciador_projeto",
+        "documentation": {}
+    },
+    {
+        "label": "get_estrutura_por_nome",
+        "importPath": "modelos_trabalho",
+        "description": "modelos_trabalho",
+        "isExtraImport": true,
+        "detail": "modelos_trabalho",
+        "documentation": {}
+    },
+    {
+        "label": "get_nomes_modelos",
+        "importPath": "modelos_trabalho",
+        "description": "modelos_trabalho",
+        "isExtraImport": true,
+        "detail": "modelos_trabalho",
         "documentation": {}
     },
     {
@@ -889,11 +1270,38 @@
         "documentation": {}
     },
     {
+        "label": "DialogoFigura",
+        "kind": 6,
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "peekOfCode": "class DialogoFigura(QDialog):\n    \"\"\"\n    Janela de diálogo para criar e editar um objeto Figura.\n    \"\"\"\n    def __init__(self, figura: Figura = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Figura\")\n        self.setMinimumWidth(500)\n        self.figura = figura if figura else Figura()\n        # Guarda os caminhos para o processamento",
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
+        "label": "TabelaDialog",
+        "kind": 6,
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "peekOfCode": "class TabelaDialog(QDialog):\n    def __init__(self, tabela: Tabela = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Tabela ABNT\")\n        # ... (Restante da classe TabelaDialog inalterada)\n        self.setMinimumSize(600, 400)\n        self.tabela = tabela if tabela else Tabela(dados=[[\"Cabeçalho 1\", \"Cabeçalho 2\"], [\"Dado 1\", \"Dado 2\"]])\n        self.layout = QVBoxLayout(self)\n        self.titulo_input = QLineEdit(self.tabela.titulo)\n        self.fonte_input = QLineEdit(self.tabela.fonte)",
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
+        "label": "ReferenciaDialog",
+        "kind": 6,
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        # ... (Restante da classe ReferenciaDialog inalterada) ...\n        self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox(); self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")\n        self.titulo_input = QLineEdit(); self.ano_input = QLineEdit()\n        self.campos_livro = { \"Local\": QLineEdit(), \"Editora\": QLineEdit() }",
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
         "label": "Tabela",
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Tabela:\n    # (sem alterações)\n    titulo: str = \"\"; fonte: str = \"\"; dados: List[List[str]] = field(default_factory=list)\n    estilo_borda: str = 'abnt'; numero: int = 0\n# --- ## NOVO: Classe para armazenar os dados de uma Figura ## ---\n@dataclass\nclass Figura:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    caminho_original: str = \"\" # Caminho do arquivo que o usuário selecionou",
+        "peekOfCode": "class Tabela:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    dados: List[List[str]] = field(default_factory=list)\n    estilo_borda: str = 'abnt'\n    numero: int = 0\n@dataclass\nclass Figura:\n    titulo: str = \"\"\n    fonte: str = \"\"",
         "detail": "documento",
         "documentation": {}
     },
@@ -902,7 +1310,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Figura:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    caminho_original: str = \"\" # Caminho do arquivo que o usuário selecionou\n    caminho_processado: str = \"\" # Caminho do arquivo convertido/redimensionado\n    largura_cm: float = 12.0 # Largura padrão em cm\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    # (sem alterações)",
+        "peekOfCode": "class Figura:\n    titulo: str = \"\"\n    fonte: str = \"\"\n    caminho_original: str = \"\"\n    caminho_processado: str = \"\"\n    largura_cm: float = 12.0\n    numero: int = 0\n@dataclass\nclass Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"",
         "detail": "documento",
         "documentation": {}
     },
@@ -911,7 +1319,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Configuracoes:\n    # (sem alterações)\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"; curso: str = \"Ciência da Computação\"\n    modalidade_curso: str = \"Bacharelado\"; titulo_pretendido: str = \"Bacharel\"\n    cidade: str = \"Araioses\"; estado: str = \"MA\"; ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()\n@dataclass\nclass Autor:\n    # (sem alterações)",
+        "peekOfCode": "class Configuracoes:\n    tipo_trabalho: str = \"Trabalho de Conclusão de Curso (TCC)\"\n    instituicao: str = \"Universidade Estadual do Piauí (UESPI)\"\n    curso: str = \"Ciência da Computação\"\n    modalidade_curso: str = \"Bacharelado\"\n    titulo_pretendido: str = \"Bacharel\"\n    cidade: str = \"Araioses\"\n    estado: str = \"MA\"\n    ano: int = datetime.now().year\n    mes: str = datetime.now().strftime(\"%B\").capitalize()",
         "detail": "documento",
         "documentation": {}
     },
@@ -920,7 +1328,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Autor:\n    # (sem alterações)\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    # (sem alterações, apenas adiciona a lista de figuras)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None",
+        "peekOfCode": "class Autor:\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False  # <-- A LINHA QUE FALTAVA NO SEU ARQUIVO\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    tabelas: List[Tabela] = field(default_factory=list)",
         "detail": "documento",
         "documentation": {}
     },
@@ -929,7 +1337,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Capitulo:\n    # (sem alterações, apenas adiciona a lista de figuras)\n    titulo: str\n    conteudo: str = \"\"\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = None\n    tabelas: List[Tabela] = field(default_factory=list)\n    # --- ## NOVO: Cada capítulo agora pode ter uma lista de figuras ## ---\n    figuras: List[Figura] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):",
+        "peekOfCode": "class Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False  # <-- A LINHA QUE FALTAVA NO SEU ARQUIVO\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    tabelas: List[Tabela] = field(default_factory=list)\n    figuras: List[Figura] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self",
         "detail": "documento",
         "documentation": {}
     },
@@ -938,7 +1346,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class DocumentoABNT:\n    # (sem alterações)\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"; self.autores: List[Autor] = []; self.orientador: str = \"\"\n        self.resumo: str = \"\"; self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"INTRODUÇÃO\"))\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"DESENVOLVIMENTO\"))\n        self.estrutura_textual.adicionar_filho(Capitulo(titulo=\"CONCLUSÃO\"))",
+        "peekOfCode": "class DocumentoABNT:\n    def __init__(self):\n        self.configuracoes: Configuracoes = Configuracoes()\n        self.titulo: str = \"\"\n        self.autores: List[Autor] = []\n        self.orientador: str = \"\"\n        self.resumo: str = \"\"\n        self.palavras_chave: str = \"\"\n        self.estrutura_textual = Capitulo(titulo=\"Raiz do Documento\")\n        self.referencias: List[Referencia] = []",
         "detail": "documento",
         "documentation": {}
     },
@@ -1024,12 +1432,12 @@
         "documentation": {}
     },
     {
-        "label": "ReferenciaDialog",
+        "label": "GerenciadorProjetos",
         "kind": 6,
-        "importPath": "main_app",
-        "description": "main_app",
-        "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent); self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox(); self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")\n        self.titulo_input = QLineEdit(); self.ano_input = QLineEdit()\n        self.campos_livro = { \"Local\": QLineEdit(), \"Editora\": QLineEdit() }\n        self.campos_artigo = { \"Revista\": QLineEdit(), \"Volume\": QLineEdit(), \"Pág. Inicial\": QLineEdit(), \"Pág. Final\": QLineEdit() }\n        self.campos_site = { \"URL\": QLineEdit(), \"Data de Acesso\": QLineEdit(\"dd/mm/aaaa\") }",
-        "detail": "main_app",
+        "importPath": "gerenciador_projeto",
+        "description": "gerenciador_projeto",
+        "peekOfCode": "class GerenciadorProjetos:\n    def __init__(self):\n        self.diretorio_temporario_atual = None\n    def _limpar_diretorio_temporario(self):\n        \"\"\"Remove o diretório temporário anterior, se existir.\"\"\"\n        if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):\n            shutil.rmtree(self.diretorio_temporario_atual)\n        self.diretorio_temporario_atual = None\n    def _iterar_figuras(self, no_capitulo: Capitulo):\n        \"\"\"Um gerador para encontrar todas as figuras na árvore de capítulos.\"\"\"",
+        "detail": "gerenciador_projeto",
         "documentation": {}
     },
     {
@@ -1037,8 +1445,35 @@
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1200, 800)\n        self.documento = DocumentoABNT()\n        self._build_ui()\n    def _build_ui(self):\n        main_layout = QVBoxLayout(self)\n        self.tabs = QTabWidget()",
+        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1200, 800)\n        self.documento = DocumentoABNT()\n        self.gerenciador_projeto = GerenciadorProjetos()\n        self.caminho_projeto_atual = None\n        self.modificado = False\n        self._populando_ui = False",
         "detail": "main_app",
+        "documentation": {}
+    },
+    {
+        "label": "get_nomes_modelos",
+        "kind": 2,
+        "importPath": "modelos_trabalho",
+        "description": "modelos_trabalho",
+        "peekOfCode": "def get_nomes_modelos():\n    \"\"\"Retorna uma lista com os nomes de todos os modelos disponíveis.\"\"\"\n    return list(ESTRUTURAS_MODELO.keys())\ndef get_estrutura_por_nome(nome_modelo: str):\n    \"\"\"Retorna a lista de capítulos para um determinado nome de modelo.\"\"\"\n    return ESTRUTURAS_MODELO.get(nome_modelo, [])",
+        "detail": "modelos_trabalho",
+        "documentation": {}
+    },
+    {
+        "label": "get_estrutura_por_nome",
+        "kind": 2,
+        "importPath": "modelos_trabalho",
+        "description": "modelos_trabalho",
+        "peekOfCode": "def get_estrutura_por_nome(nome_modelo: str):\n    \"\"\"Retorna a lista de capítulos para um determinado nome de modelo.\"\"\"\n    return ESTRUTURAS_MODELO.get(nome_modelo, [])",
+        "detail": "modelos_trabalho",
+        "documentation": {}
+    },
+    {
+        "label": "ESTRUTURAS_MODELO",
+        "kind": 5,
+        "importPath": "modelos_trabalho",
+        "description": "modelos_trabalho",
+        "peekOfCode": "ESTRUTURAS_MODELO = {\n    \"Trabalho de Conclusão de Curso (TCC)\": [\n        \"INTRODUÇÃO\",\n        \"FUNDAMENTAÇÃO TEÓRICA\",\n        \"METODOLOGIA\",\n        \"ANÁLISE E RESULTADOS\",\n        \"CONCLUSÃO\"\n    ],\n    \"Artigo Científico\": [\n        \"INTRODUÇÃO\",",
+        "detail": "modelos_trabalho",
         "documentation": {}
     },
     {

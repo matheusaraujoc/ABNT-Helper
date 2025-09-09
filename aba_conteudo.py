@@ -1,5 +1,5 @@
 # aba_conteudo.py
-# Descrição: Implementa a inserção de marcadores para tabelas e figuras.
+# Descrição: Versão que aplica o destaque visual apenas nos tópicos de nível 1.
 
 import re
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -8,8 +8,7 @@ from PySide6.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, QListWid
                                QTreeWidgetItem, QInputDialog, QAbstractItemView)
 
 from documento import Capitulo, Tabela, Figura
-from dialogo_tabela import TabelaDialog
-from dialogo_figura import DialogoFigura
+from dialogs import TabelaDialog, DialogoFigura
 
 class ArvoreConteudo(QTreeWidget):
     estruturaAlterada = QtCore.Signal()
@@ -18,6 +17,7 @@ class ArvoreConteudo(QTreeWidget):
         self.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setDropIndicatorShown(True)
+        
     def dropEvent(self, event: QtGui.QDropEvent):
         if self.dragDropMode() == QAbstractItemView.DragDropMode.InternalMove:
             super().dropEvent(event)
@@ -48,7 +48,7 @@ class AbaConteudo(QWidget):
         self.arvore_capitulos.estruturaAlterada.connect(self._sincronizar_modelo_com_arvore)
         self.arvore_capitulos.currentItemChanged.connect(self._carregar_capitulo_no_editor)
         self.arvore_capitulos.itemChanged.connect(self._renomear_capitulo)
-        self._popular_arvore()
+        
         left_layout.addWidget(self.arvore_capitulos)
 
         btn_layout = QHBoxLayout()
@@ -122,6 +122,8 @@ class AbaConteudo(QWidget):
         right_layout.addLayout(elementos_layout, 1)
         layout.addWidget(right_panel)
         
+        # Chamada inicial para popular a árvore
+        self._popular_arvore()
         if self.arvore_capitulos.topLevelItemCount() > 0:
             self.arvore_capitulos.setCurrentItem(self.arvore_capitulos.topLevelItem(0))
 
@@ -134,7 +136,7 @@ class AbaConteudo(QWidget):
             self.arvore_capitulos.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)
             self.arvore_capitulos.setHeaderLabel("Tópicos")
             
-    @QtCore.Slot(QTreeWidgetItem)
+    @QtCore.Slot(QTreeWidgetItem, QTreeWidgetItem)
     def _carregar_capitulo_no_editor(self, item_atual, item_anterior):
         capitulo = self._get_capitulo_selecionado()
         if not capitulo:
@@ -167,9 +169,6 @@ class AbaConteudo(QWidget):
         dialog = TabelaDialog(parent=self)
         if dialog.exec():
             nova_tabela = dialog.get_dados_tabela()
-            if not nova_tabela.titulo:
-                QMessageBox.warning(self, "Atenção", "O título da tabela é obrigatório.")
-                return
             capitulo.tabelas.append(nova_tabela)
             self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
 
@@ -183,14 +182,9 @@ class AbaConteudo(QWidget):
         dialog = DialogoFigura(parent=self)
         if dialog.exec():
             nova_figura = dialog.get_dados_figura()
-            if not nova_figura or not nova_figura.titulo:
-                QMessageBox.warning(self, "Atenção", "O título da figura é obrigatório.")
-                return
-            if nova_figura.caminho_processado:
+            if nova_figura and nova_figura.caminho_processado:
                 capitulo.figuras.append(nova_figura)
                 self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
-            elif not nova_figura.caminho_original:
-                 QMessageBox.warning(self, "Atenção", "Nenhum arquivo de imagem foi selecionado.")
             else:
                 QMessageBox.critical(self, "Erro", "A imagem não foi selecionada ou não pôde ser processada.")
     
@@ -231,9 +225,7 @@ class AbaConteudo(QWidget):
     def _editar_tabela(self):
         capitulo = self._get_capitulo_selecionado()
         linha_selecionada = self.lista_tabelas.currentRow()
-        if not capitulo or linha_selecionada == -1:
-            QMessageBox.warning(self, "Atenção", "Selecione uma tabela para editar.")
-            return
+        if not capitulo or linha_selecionada == -1: return
         tabela_para_editar = capitulo.tabelas[linha_selecionada]
         dialog = TabelaDialog(tabela=tabela_para_editar, parent=self)
         if dialog.exec():
@@ -245,9 +237,7 @@ class AbaConteudo(QWidget):
     def _remover_tabela(self):
         capitulo = self._get_capitulo_selecionado()
         linha_selecionada = self.lista_tabelas.currentRow()
-        if not capitulo or linha_selecionada == -1:
-            QMessageBox.warning(self, "Atenção", "Selecione uma tabela para remover.")
-            return
+        if not capitulo or linha_selecionada == -1: return
         if QMessageBox.question(self, "Confirmar", "Remover esta tabela do banco?") == QMessageBox.StandardButton.Yes:
             del capitulo.tabelas[linha_selecionada]
             self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
@@ -256,9 +246,7 @@ class AbaConteudo(QWidget):
     def _editar_figura(self):
         capitulo = self._get_capitulo_selecionado()
         linha_selecionada = self.lista_figuras.currentRow()
-        if not capitulo or linha_selecionada == -1:
-            QMessageBox.warning(self, "Atenção", "Selecione uma figura para editar.")
-            return
+        if not capitulo or linha_selecionada == -1: return
         figura_para_editar = capitulo.figuras[linha_selecionada]
         dialog = DialogoFigura(figura=figura_para_editar, parent=self)
         if dialog.exec():
@@ -266,16 +254,12 @@ class AbaConteudo(QWidget):
             if figura_atualizada and figura_atualizada.caminho_processado:
                 capitulo.figuras[linha_selecionada] = figura_atualizada
                 self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
-            else:
-                QMessageBox.critical(self, "Erro", "Não foi possível processar a imagem selecionada na edição.")
     
     @QtCore.Slot()
     def _remover_figura(self):
         capitulo = self._get_capitulo_selecionado()
         linha_selecionada = self.lista_figuras.currentRow()
-        if not capitulo or linha_selecionada == -1:
-            QMessageBox.warning(self, "Atenção", "Selecione uma figura para remover.")
-            return
+        if not capitulo or linha_selecionada == -1: return
         if QMessageBox.question(self, "Confirmar", "Remover esta figura do banco?") == QMessageBox.StandardButton.Yes:
             del capitulo.figuras[linha_selecionada]
             self._carregar_capitulo_no_editor(self.arvore_capitulos.currentItem(), None)
@@ -283,23 +267,37 @@ class AbaConteudo(QWidget):
     def _popular_arvore(self):
         self.arvore_capitulos.blockSignals(True)
         self.arvore_capitulos.clear()
+        
         def adicionar_filhos_recursivo(no_pai_modelo, no_pai_widget):
             for filho_modelo in no_pai_modelo.filhos:
                 item_widget = QTreeWidgetItem([filho_modelo.titulo])
                 item_widget.setData(0, QtCore.Qt.ItemDataRole.UserRole, filho_modelo)
                 item_widget.setFlags(item_widget.flags() | QtCore.Qt.ItemFlag.ItemIsEditable)
+
+                # --- LÓGICA DE FORMATAÇÃO VISUAL ALTERADA ---
+                # Aplica o destaque apenas se for um item não-padrão E um tópico principal (filho da raiz)
+                if not filho_modelo.is_template_item and filho_modelo.pai == self.documento.estrutura_textual:
+                    font = item_widget.font(0)
+                    font.setItalic(True)
+                    item_widget.setFont(0, font)
+                    item_widget.setForeground(0, QtGui.QColor('dimgray'))
+                    item_widget.setToolTip(0, "Este é um capítulo personalizado (não pertence ao modelo padrão).")
+                # --- FIM DA ALTERAÇÃO ---
+
                 if no_pai_widget is self.arvore_capitulos:
                     no_pai_widget.addTopLevelItem(item_widget)
                 else:
                     no_pai_widget.addChild(item_widget)
+                
                 adicionar_filhos_recursivo(filho_modelo, item_widget)
+                
         adicionar_filhos_recursivo(self.documento.estrutura_textual, self.arvore_capitulos)
         self.arvore_capitulos.expandAll()
         self.arvore_capitulos.blockSignals(False)
 
     @QtCore.Slot()
     def _adicionar_topico_principal(self):
-        novo_capitulo = Capitulo(titulo="Novo Tópico")
+        novo_capitulo = Capitulo(titulo="Novo Tópico") # is_template_item=False por padrão
         self.documento.estrutura_textual.adicionar_filho(novo_capitulo)
         self._popular_arvore()
 
@@ -310,17 +308,25 @@ class AbaConteudo(QWidget):
             QMessageBox.warning(self, "Atenção", "Selecione um tópico para adicionar um subtópico.")
             return
         no_pai_modelo = item_pai_widget.data(0, QtCore.Qt.ItemDataRole.UserRole)
-        novo_subtopico = Capitulo(titulo="Novo Subtópico")
+        novo_subtopico = Capitulo(titulo="Novo Subtópico") # is_template_item=False por padrão
         no_pai_modelo.adicionar_filho(novo_subtopico)
         self._popular_arvore()
+        item_pai_widget.setExpanded(True)
         
     @QtCore.Slot()
     def _remover_topico(self):
         item_selecionado = self.arvore_capitulos.currentItem()
         if not item_selecionado: return
-        resposta = QMessageBox.question(self, "Confirmar", "Remover este tópico e todos os seus subtópicos?")
+        
+        no_modelo = item_selecionado.data(0, QtCore.Qt.ItemDataRole.UserRole)
+        
+        mensagem = f"Remover o tópico '{no_modelo.titulo}'?"
+        if no_modelo.filhos:
+            mensagem = f"Remover o tópico '{no_modelo.titulo}' e todos os seus subtópicos?"
+
+        resposta = QMessageBox.question(self, "Confirmar Remoção", mensagem,
+                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if resposta == QMessageBox.StandardButton.Yes:
-            no_modelo = item_selecionado.data(0, QtCore.Qt.ItemDataRole.UserRole)
             no_pai_modelo = no_modelo.pai
             if no_pai_modelo:
                 no_pai_modelo.filhos.remove(no_modelo)
@@ -339,14 +345,17 @@ class AbaConteudo(QWidget):
         
     @QtCore.Slot()
     def _sincronizar_modelo_com_arvore(self):
-        self.documento.estrutura_textual.filhos.clear()
+        nova_raiz = Capitulo(titulo="Raiz do Documento")
+        
         def percorrer_arvore_ui(parent_item_widget, parent_node_modelo):
             for i in range(parent_item_widget.childCount()):
                 child_item_widget = parent_item_widget.child(i)
                 child_node_modelo = child_item_widget.data(0, QtCore.Qt.ItemDataRole.UserRole)
-                child_node_modelo.filhos.clear()
+                child_node_modelo.filhos.clear() 
                 parent_node_modelo.adicionar_filho(child_node_modelo)
                 percorrer_arvore_ui(child_item_widget, child_node_modelo)
+
         root_widget = self.arvore_capitulos.invisibleRootItem()
-        percorrer_arvore_ui(root_widget, self.documento.estrutura_textual)
-        print("Modelo de dados sincronizado com a nova ordem da árvore.")
+        percorrer_arvore_ui(root_widget, nova_raiz)
+        
+        self.documento.estrutura_textual.filhos = nova_raiz.filhos

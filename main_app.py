@@ -1,92 +1,69 @@
 # main_app.py
-# Descrição: Corrigido o nome da chamada do método para gerar o documento final.
+# Descrição: Versão final que descarta capítulos órfãos vazios.
 
 import sys
 import os
 import re
+from datetime import datetime
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QTextEdit,
                                QPushButton, QVBoxLayout, QHBoxLayout, QFileDialog, 
                                QMessageBox, QTabWidget, QComboBox, 
-                               QDialog, QFormLayout, QDialogButtonBox)
+                               QFormLayout, QMenuBar)
+from PySide6.QtGui import QAction
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
-from documento import DocumentoABNT, Autor
+from documento import DocumentoABNT, Autor, Capitulo
 from gerador_docx import GeradorDOCX
 from referencia import Livro, Artigo, Site
 from aba_conteudo import AbaConteudo
 from gerador_preview import GeradorHTMLPreview
-
-class ReferenciaDialog(QDialog):
-    def __init__(self, ref=None, parent=None):
-        super().__init__(parent); self.setWindowTitle("Adicionar/Editar Referência")
-        self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()
-        self.tipo_combo = QComboBox(); self.tipo_combo.addItems(["Livro", "Artigo", "Site"])
-        self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText("Autor 1; Autor 2")
-        self.titulo_input = QLineEdit(); self.ano_input = QLineEdit()
-        self.campos_livro = { "Local": QLineEdit(), "Editora": QLineEdit() }
-        self.campos_artigo = { "Revista": QLineEdit(), "Volume": QLineEdit(), "Pág. Inicial": QLineEdit(), "Pág. Final": QLineEdit() }
-        self.campos_site = { "URL": QLineEdit(), "Data de Acesso": QLineEdit("dd/mm/aaaa") }
-        self.layout.addWidget(QLabel("Tipo de Referência:")); self.layout.addWidget(self.tipo_combo)
-        self.layout.addLayout(self.form_layout); self.form_layout.addRow("Autores:", self.autores_input)
-        self.form_layout.addRow("Título:", self.titulo_input); self.form_layout.addRow("Ano:", self.ano_input)
-        for label, widget in self.campos_livro.items(): self.form_layout.addRow(label, widget)
-        for label, widget in self.campos_artigo.items(): self.form_layout.addRow(label, widget)
-        for label, widget in self.campos_site.items(): self.form_layout.addRow(label, widget)
-        self.tipo_combo.currentTextChanged.connect(self.update_form_visibility)
-        self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        self.buttons.accepted.connect(self.accept); self.buttons.rejected.connect(self.reject)
-        self.layout.addWidget(self.buttons)
-        if ref: self._popular_campos(ref)
-        else: self.update_form_visibility(self.tipo_combo.currentText())
-    def _popular_campos(self, ref):
-        self.tipo_combo.setCurrentText(ref.tipo); self.autores_input.setText(ref.autores)
-        self.titulo_input.setText(ref.titulo); self.ano_input.setText(str(ref.ano))
-        if isinstance(ref, Livro): self.campos_livro["Local"].setText(ref.local); self.campos_livro["Editora"].setText(ref.editora)
-        elif isinstance(ref, Artigo):
-            self.campos_artigo["Revista"].setText(ref.revista); self.campos_artigo["Volume"].setText(ref.volume)
-            self.campos_artigo["Pág. Inicial"].setText(str(ref.pagina_inicial)); self.campos_artigo["Pág. Final"].setText(str(ref.pagina_final))
-        elif isinstance(ref, Site): self.campos_site["URL"].setText(ref.url); self.campos_site["Data de Acesso"].setText(ref.data_acesso)
-        self.update_form_visibility(ref.tipo)
-    def update_form_visibility(self, tipo):
-        all_specific_fields = {**self.campos_livro, **self.campos_artigo, **self.campos_site}
-        for widget in all_specific_fields.values():
-            label = self.form_layout.labelForField(widget)
-            if label: label.setVisible(False)
-            widget.setVisible(False)
-        fields_to_show = {}
-        if tipo == "Livro": fields_to_show = self.campos_livro
-        elif tipo == "Artigo": fields_to_show = self.campos_artigo
-        elif tipo == "Site": fields_to_show = self.campos_site
-        for widget in fields_to_show.values():
-            label = self.form_layout.labelForField(widget)
-            if label: label.setVisible(True)
-            widget.setVisible(True)
-    def get_data(self):
-        tipo = self.tipo_combo.currentText()
-        try: ano_val = int(self.ano_input.text()) if self.ano_input.text().isdigit() else 0
-        except ValueError: ano_val = 0
-        common_data = { "autores": self.autores_input.text(), "titulo": self.titulo_input.text(), "ano": ano_val }
-        if tipo == "Livro":
-            specific_data = {k.lower(): w.text() for k, w in self.campos_livro.items()}; return Livro(**common_data, **specific_data)
-        elif tipo == "Artigo":
-            try: pg_ini, pg_fim = int(self.campos_artigo["Pág. Inicial"].text() or 0), int(self.campos_artigo["Pág. Final"].text() or 0)
-            except ValueError: pg_ini, pg_fim = 0, 0
-            specific_data = { "revista": self.campos_artigo["Revista"].text(), "volume": self.campos_artigo["Volume"].text(), "pagina_inicial": pg_ini, "pagina_final": pg_fim }; return Artigo(**common_data, **specific_data)
-        elif tipo == "Site":
-            specific_data = {k.lower().replace(' de ', '_'): w.text() for k, w in self.campos_site.items()}; return Site(**common_data, **specific_data)
-        return None
+from gerenciador_projeto import GerenciadorProjetos
+from dialogs import ReferenciaDialog
+from modelos_trabalho import get_estrutura_por_nome, get_nomes_modelos
 
 class ABNTHelperApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('ABNT Helper Final')
         self.setGeometry(100, 100, 1200, 800)
+        
         self.documento = DocumentoABNT()
+        self.gerenciador_projeto = GerenciadorProjetos()
+        self.caminho_projeto_atual = None
+        self.modificado = False
+        self._populando_ui = False
+
         self._build_ui()
+        self._conectar_sinais_modificacao()
+        
+        self._novo_projeto(primeira_execucao=True)
 
     def _build_ui(self):
         main_layout = QVBoxLayout(self)
+        
+        menu_bar = QMenuBar(self)
+        main_layout.setMenuBar(menu_bar)
+        menu_arquivo = menu_bar.addMenu("&Arquivo")
+        
+        acao_novo = QAction("&Novo Projeto", self)
+        acao_novo.triggered.connect(self._novo_projeto)
+        menu_arquivo.addAction(acao_novo)
+        
+        acao_carregar = QAction("&Carregar Projeto...", self); acao_carregar.triggered.connect(self._carregar_projeto)
+        menu_arquivo.addAction(acao_carregar)
+        menu_arquivo.addSeparator()
+
+        acao_salvar = QAction("&Salvar", self); acao_salvar.setShortcut("Ctrl+S"); acao_salvar.triggered.connect(self._salvar_projeto)
+        menu_arquivo.addAction(acao_salvar)
+
+        acao_salvar_como = QAction("Salvar &Como...", self); acao_salvar_como.triggered.connect(self._salvar_projeto_como)
+        menu_arquivo.addAction(acao_salvar_como)
+        menu_arquivo.addSeparator()
+
+        acao_sair = QAction("Sai&r", self); acao_sair.triggered.connect(self.close)
+        menu_arquivo.addAction(acao_sair)
+
         self.tabs = QTabWidget()
         main_layout.addWidget(self.tabs)
         
@@ -102,62 +79,20 @@ class ABNTHelperApp(QWidget):
         self.generate_btn.clicked.connect(self._gerar_documento_final)
         main_layout.addWidget(self.generate_btn)
 
-    def _criar_aba_preview(self):
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        
-        btn_atualizar = QPushButton("Atualizar Pré-Visualização")
-        btn_atualizar.clicked.connect(self._atualizar_preview)
-        
-        self.preview_display = QWebEngineView()
-        self.preview_display.setHtml("<html><body><h1>Pré-Visualização</h1><p>Clique em 'Atualizar' para ver o seu documento.</p></body></html>")
-        
-        layout.addWidget(btn_atualizar)
-        layout.addWidget(self.preview_display)
-        
-        return widget
-
-    @QtCore.Slot()
-    def _atualizar_preview(self):
-        self.aba_conteudo.sincronizar_conteudo_pendente()
-        self._sincronizar_modelo_com_ui()
-        
-        gerador = GeradorHTMLPreview(self.documento)
-        html_content = gerador.gerar_html()
-        
-        base_url = QtCore.QUrl.fromLocalFile(os.path.abspath(os.path.dirname(__file__)))
-        self.preview_display.setHtml(html_content, baseUrl=base_url)
-        
-        QMessageBox.information(self, "Atualizado", "A pré-visualização foi atualizada com sucesso.")
-
-    def _gerar_documento_final(self):
-        self.aba_conteudo.sincronizar_conteudo_pendente()
-        self._sincronizar_modelo_com_ui()
-        if not self.documento.titulo or not self.documento.autores:
-            QMessageBox.warning(self, "Erro", "Título e Autores são campos obrigatórios.")
-            return
-        filename, _ = QFileDialog.getSaveFileName(self, "Salvar Documento", "trabalho_abnt.docx", "Word Documents (*.docx)")
-        if not filename: return
-        try:
-            gerador = GeradorDOCX(self.documento)
-            # --- ## CORREÇÃO: Chamando o método com o nome correto ## ---
-            gerador.gerar_documento(filename)
-            
-            QMessageBox.information(self, "Sucesso", f"Documento .docx gerado com sucesso em:\n{filename}")
-        except Exception as e:
-            QMessageBox.critical(self, "Erro na Geração", f"Ocorreu um erro: {e}")
-            
     def _criar_aba_geral(self):
-        widget = QWidget(); layout = QVBoxLayout(widget); layout.addWidget(QLabel("<h3>Configurações do Documento</h3>"))
+        widget = QWidget(); layout = QVBoxLayout(widget)
+        layout.addWidget(QLabel("<h3>Configurações do Documento</h3>"))
         form_layout1 = QFormLayout(); self.cfg_tipo = QComboBox()
-        self.cfg_tipo.addItems(["Trabalho de Conclusão de Curso (TCC)", "Artigo Científico", "Dissertação de Mestrado", "Tese de Doutorado"])
-        self.cfg_instituicao = QLineEdit(self.documento.configuracoes.instituicao); self.cfg_curso = QLineEdit(self.documento.configuracoes.curso)
-        self.cfg_modalidade_curso = QLineEdit(self.documento.configuracoes.modalidade_curso); self.cfg_titulo_pretendido = QLineEdit(self.documento.configuracoes.titulo_pretendido)
-        self.cfg_cidade = QLineEdit(self.documento.configuracoes.cidade); self.cfg_ano = QLineEdit(str(self.documento.configuracoes.ano))
+        self.cfg_tipo.addItems(get_nomes_modelos())
+        self.cfg_tipo.currentTextChanged.connect(self._on_template_selecionado)
+        self.cfg_instituicao = QLineEdit(); self.cfg_curso = QLineEdit()
+        self.cfg_modalidade_curso = QLineEdit(); self.cfg_titulo_pretendido = QLineEdit()
+        self.cfg_cidade = QLineEdit(); self.cfg_ano = QLineEdit()
         form_layout1.addRow("Tipo de Trabalho:", self.cfg_tipo); form_layout1.addRow("Instituição:", self.cfg_instituicao)
         form_layout1.addRow("Nome do Curso (Ex: Ciência da Computação):", self.cfg_curso); form_layout1.addRow("Modalidade do Curso (Ex: Bacharelado):", self.cfg_modalidade_curso)
         form_layout1.addRow("Título Pretendido (Ex: Bacharel):", self.cfg_titulo_pretendido); form_layout1.addRow("Cidade:", self.cfg_cidade)
-        form_layout1.addRow("Ano:", self.cfg_ano); layout.addLayout(form_layout1); layout.addWidget(QLabel("<h3>Informações Pré-Textuais</h3>"))
+        form_layout1.addRow("Ano:", self.cfg_ano); layout.addLayout(form_layout1)
+        layout.addWidget(QLabel("<h3>Informações Pré-Textuais</h3>"))
         form_layout2 = QFormLayout(); self.titulo_input = QLineEdit(); self.autores_input = QTextEdit()
         self.orientador_input = QLineEdit(); self.resumo_input = QTextEdit(); self.keywords_input = QLineEdit()
         form_layout2.addRow("Título do Trabalho:", self.titulo_input); form_layout2.addRow("Autores (um por linha):", self.autores_input)
@@ -175,6 +110,181 @@ class ABNTHelperApp(QWidget):
         btn_del.clicked.connect(self._remover_referencia); layout.addLayout(btn_layout)
         return widget
 
+    def _criar_aba_preview(self):
+        widget = QWidget(); layout = QVBoxLayout(widget)
+        btn_atualizar = QPushButton("Atualizar Pré-Visualização")
+        btn_atualizar.clicked.connect(self._atualizar_preview)
+        self.preview_display = QWebEngineView()
+        self.preview_display.setHtml("<html><body><h1>Pré-Visualização</h1><p>Clique em 'Atualizar' para ver o seu documento.</p></body></html>")
+        layout.addWidget(btn_atualizar); layout.addWidget(self.preview_display)
+        return widget
+
+    @QtCore.Slot(bool)
+    def _novo_projeto(self, primeira_execucao=False):
+        if not primeira_execucao and not self._verificar_alteracoes_nao_salvas():
+            return
+        
+        self.documento = DocumentoABNT()
+        estrutura_padrao = get_estrutura_por_nome("Trabalho de Conclusão de Curso (TCC)")
+        for titulo in estrutura_padrao:
+            self.documento.estrutura_textual.adicionar_filho(Capitulo(titulo=titulo, is_template_item=True))
+            
+        self.caminho_projeto_atual = None
+        self.gerenciador_projeto.fechar_projeto()
+        
+        if hasattr(self, 'cfg_tipo'):
+             self._popular_ui_com_documento()
+
+        self.modificado = False
+        self.setWindowTitle('ABNT Helper Final - Novo Projeto (TCC)')
+    
+    # ALTERADO: Lógica de "Mesclagem Inteligente" agora descarta órfãos vazios.
+    @QtCore.Slot(str)
+    def _on_template_selecionado(self, nome_modelo):
+        if self._populando_ui or not nome_modelo:
+            return
+        if nome_modelo == self.documento.configuracoes.tipo_trabalho:
+            return
+
+        resposta = QMessageBox.question(self, "Mudar Modelo de Trabalho",
+                                          f"Mudar o modelo para '{nome_modelo}' irá reorganizar sua estrutura de capítulos.\n"
+                                          "Capítulos existentes serão preservados. Capítulos que não pertencem ao novo modelo e que contêm conteúdo serão movidos para o final.\n\n"
+                                          "Deseja continuar?",
+                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+        if resposta == QMessageBox.StandardButton.No:
+            self._populando_ui = True
+            self.cfg_tipo.setCurrentText(self.documento.configuracoes.tipo_trabalho)
+            self._populando_ui = False
+            return
+        
+        mapa_capitulos_atuais = {c.titulo.upper().strip(): c for c in self.documento.estrutura_textual.filhos}
+        titulos_novos = get_estrutura_por_nome(nome_modelo)
+        nova_lista_de_capitulos = []
+
+        for titulo_novo in titulos_novos:
+            titulo_normalizado = titulo_novo.upper().strip()
+            if titulo_normalizado in mapa_capitulos_atuais:
+                capitulo_existente = mapa_capitulos_atuais.pop(titulo_normalizado)
+                capitulo_existente.is_template_item = True
+                nova_lista_de_capitulos.append(capitulo_existente)
+            else:
+                nova_lista_de_capitulos.append(Capitulo(titulo=titulo_novo, is_template_item=True))
+
+        # NOVO: Filtra os órfãos para manter apenas os que têm conteúdo
+        capitulos_orfaos_com_conteudo = []
+        for orfao in mapa_capitulos_atuais.values():
+            if orfao.conteudo.strip() or orfao.filhos:
+                orfao.is_template_item = False
+                capitulos_orfaos_com_conteudo.append(orfao)
+        
+        if capitulos_orfaos_com_conteudo:
+            nova_lista_de_capitulos.extend(capitulos_orfaos_com_conteudo)
+            QMessageBox.information(self, "Capítulos Preservados",
+                                    "Alguns capítulos da estrutura anterior que continham conteúdo "
+                                    "não fazem parte do novo modelo e foram movidos para o final.\n"
+                                    "Capítulos órfãos que estavam vazios foram descartados.")
+
+        self.documento.estrutura_textual.filhos = nova_lista_de_capitulos
+        for filho in self.documento.estrutura_textual.filhos:
+            filho.pai = self.documento.estrutura_textual
+
+        self.aba_conteudo._popular_arvore()
+        self.documento.configuracoes.tipo_trabalho = nome_modelo
+        self._marcar_modificado()
+
+    def _salvar_projeto(self):
+        if not self.caminho_projeto_atual:
+            self._salvar_projeto_como()
+            return
+        self.aba_conteudo.sincronizar_conteudo_pendente()
+        self._sincronizar_modelo_com_ui()
+        try:
+            self.gerenciador_projeto.salvar_projeto(self.documento, self.caminho_projeto_atual)
+            self.modificado = False
+            self.setWindowTitle(f'ABNT Helper Final - {os.path.basename(self.caminho_projeto_atual)}')
+            QMessageBox.information(self, "Sucesso", "Projeto salvo com sucesso!")
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Salvar", f"Não foi possível salvar o projeto:\n{e}")
+
+    def _salvar_projeto_como(self):
+        caminho, _ = QFileDialog.getSaveFileName(self, "Salvar Projeto Como...", "", "Arquivo ABNF (*.abnf)")
+        if caminho:
+            self.caminho_projeto_atual = caminho
+            self._salvar_projeto()
+
+    def _carregar_projeto(self):
+        if self._verificar_alteracoes_nao_salvas():
+            caminho, _ = QFileDialog.getOpenFileName(self, "Carregar Projeto", "", "Arquivo ABNF (*.abnf)")
+            if caminho:
+                try:
+                    self.documento = self.gerenciador_projeto.carregar_projeto(caminho)
+                    self.caminho_projeto_atual = caminho
+                    self._popular_ui_com_documento()
+                    self.modificado = False
+                    self.setWindowTitle(f'ABNT Helper Final - {os.path.basename(caminho)}')
+                    QMessageBox.information(self, "Sucesso", "Projeto carregado com sucesso!")
+                except Exception as e:
+                    QMessageBox.critical(self, "Erro ao Carregar", f"Não foi possível carregar o projeto:\n{e}")
+                    self.gerenciador_projeto.fechar_projeto()
+
+    def _popular_ui_com_documento(self):
+        self._populando_ui = True
+        cfg = self.documento.configuracoes
+        self.cfg_tipo.setCurrentText(cfg.tipo_trabalho)
+        self.cfg_instituicao.setText(cfg.instituicao); self.cfg_curso.setText(cfg.curso)
+        self.cfg_modalidade_curso.setText(cfg.modalidade_curso); self.cfg_titulo_pretendido.setText(cfg.titulo_pretendido)
+        self.cfg_cidade.setText(cfg.cidade); self.cfg_ano.setText(str(cfg.ano))
+        self.titulo_input.setText(self.documento.titulo)
+        self.autores_input.setPlainText('\n'.join([a.nome_completo for a in self.documento.autores]))
+        self.orientador_input.setText(self.documento.orientador)
+        self.resumo_input.setPlainText(self.documento.resumo)
+        self.keywords_input.setText(self.documento.palavras_chave)
+        self.aba_conteudo.documento = self.documento
+        self.aba_conteudo._popular_arvore()
+        if self.aba_conteudo.arvore_capitulos.topLevelItemCount() > 0:
+            self.aba_conteudo.arvore_capitulos.setCurrentItem(self.aba_conteudo.arvore_capitulos.topLevelItem(0))
+        else:
+            self.aba_conteudo._carregar_capitulo_no_editor(None, None)
+        self.lista_referencias.clear()
+        for ref in self.documento.referencias:
+            self.lista_referencias.addItem(ref.formatar().replace('**', ''))
+        self._populando_ui = False
+
+    def _verificar_alteracoes_nao_salvas(self) -> bool:
+        if not self.modificado: return True
+        resposta = QMessageBox.question(self, "Salvar Alterações?",
+                                          "Você tem alterações não salvas. Deseja salvá-las?",
+                                          QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
+        if resposta == QMessageBox.StandardButton.Cancel: return False
+        if resposta == QMessageBox.StandardButton.Save: self._salvar_projeto()
+        return True
+
+    def _marcar_modificado(self):
+        if self._populando_ui: return
+        if not self.modificado:
+            self.modificado = True
+            self.setWindowTitle(self.windowTitle() + '*')
+        
+    def _conectar_sinais_modificacao(self):
+        self.cfg_tipo.currentTextChanged.connect(self._marcar_modificado)
+        self.cfg_instituicao.textChanged.connect(self._marcar_modificado); self.cfg_curso.textChanged.connect(self._marcar_modificado)
+        self.cfg_modalidade_curso.textChanged.connect(self._marcar_modificado); self.cfg_titulo_pretendido.textChanged.connect(self._marcar_modificado)
+        self.cfg_cidade.textChanged.connect(self._marcar_modificado); self.cfg_ano.textChanged.connect(self._marcar_modificado)
+        self.titulo_input.textChanged.connect(self._marcar_modificado); self.autores_input.textChanged.connect(self._marcar_modificado)
+        self.orientador_input.textChanged.connect(self._marcar_modificado); self.resumo_input.textChanged.connect(self._marcar_modificado)
+        self.keywords_input.textChanged.connect(self._marcar_modificado)
+        self.aba_conteudo.editor_capitulo.textChanged.connect(self._marcar_modificado)
+        self.aba_conteudo.arvore_capitulos.estruturaAlterada.connect(self._marcar_modificado)
+        self.aba_conteudo.arvore_capitulos.itemChanged.connect(self._marcar_modificado)
+
+    def closeEvent(self, event):
+        if self._verificar_alteracoes_nao_salvas():
+            self.gerenciador_projeto.fechar_projeto()
+            event.accept()
+        else:
+            event.ignore()
+
     @QtCore.Slot()
     def _adicionar_referencia(self):
         dialog = ReferenciaDialog(parent=self)
@@ -182,6 +292,7 @@ class ABNTHelperApp(QWidget):
             nova_ref = dialog.get_data()
             if nova_ref:
                 self.documento.referencias.append(nova_ref); self.lista_referencias.addItem(nova_ref.formatar().replace('**', ''))
+                self._marcar_modificado()
 
     @QtCore.Slot()
     def _editar_referencia(self):
@@ -193,23 +304,51 @@ class ABNTHelperApp(QWidget):
             if ref_atualizada:
                 self.documento.referencias[linha] = ref_atualizada; item_lista = self.lista_referencias.item(linha)
                 item_lista.setText(ref_atualizada.formatar().replace('**', ''))
+                self._marcar_modificado()
 
     @QtCore.Slot()
     def _remover_referencia(self):
         linha = self.lista_referencias.currentRow()
         if linha == -1: return
-        if QMessageBox.question(self, "Confirmar", "Remover esta referência?") == QMessageBox.Yes:
+        if QMessageBox.question(self, "Confirmar", "Remover esta referência?") == QMessageBox.StandardButton.Yes:
             self.lista_referencias.takeItem(linha); del self.documento.referencias[linha]
-
+            self._marcar_modificado()
+            
     def _sincronizar_modelo_com_ui(self):
-        cfg = self.documento.configuracoes; cfg.tipo_trabalho = self.cfg_tipo.currentText()
+        # A sincronização do tipo de trabalho é feita dinamicamente agora
+        # self.documento.configuracoes.tipo_trabalho = self.cfg_tipo.currentText()
+        cfg = self.documento.configuracoes
         cfg.instituicao = self.cfg_instituicao.text(); cfg.curso = self.cfg_curso.text()
         cfg.modalidade_curso = self.cfg_modalidade_curso.text(); cfg.titulo_pretendido = self.cfg_titulo_pretendido.text()
-        cfg.cidade = self.cfg_cidade.text(); cfg.ano = int(self.cfg_ano.text())
+        cfg.cidade = self.cfg_cidade.text(); cfg.ano = int(self.cfg_ano.text() or datetime.now().year)
         self.documento.titulo = self.titulo_input.text()
         self.documento.autores = [Autor(n.strip()) for n in self.autores_input.toPlainText().splitlines() if n.strip()]
         self.documento.orientador = self.orientador_input.text(); self.documento.resumo = self.resumo_input.toPlainText()
         self.documento.palavras_chave = self.keywords_input.text()
+
+    @QtCore.Slot()
+    def _atualizar_preview(self):
+        self.aba_conteudo.sincronizar_conteudo_pendente()
+        self._sincronizar_modelo_com_ui()
+        gerador = GeradorHTMLPreview(self.documento)
+        html_content = gerador.gerar_html()
+        base_url = QtCore.QUrl.fromLocalFile(os.path.abspath(os.path.dirname(__file__)))
+        self.preview_display.setHtml(html_content, baseUrl=base_url)
+        QMessageBox.information(self, "Atualizado", "A pré-visualização foi atualizada com sucesso.")
+
+    def _gerar_documento_final(self):
+        self.aba_conteudo.sincronizar_conteudo_pendente()
+        self._sincronizar_modelo_com_ui()
+        if not self.documento.titulo or not self.documento.autores:
+            QMessageBox.warning(self, "Erro", "Título e Autores são campos obrigatórios."); return
+        filename, _ = QFileDialog.getSaveFileName(self, "Salvar Documento", "trabalho_abnt.docx", "Word Documents (*.docx)")
+        if not filename: return
+        try:
+            gerador = GeradorDOCX(self.documento)
+            gerador.gerar_documento(filename)
+            QMessageBox.information(self, "Sucesso", f"Documento .docx gerado com sucesso em:\n{filename}")
+        except Exception as e:
+            QMessageBox.critical(self, "Erro na Geração", f"Ocorreu um erro: {e}")
 
 if __name__ == '__main__':
     try:
