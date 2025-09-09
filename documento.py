@@ -46,17 +46,12 @@ class Capitulo:
     is_template_item: bool = False
     filhos: List['Capitulo'] = field(default_factory=list)
     pai: Optional['Capitulo'] = field(default=None, repr=False)
-    
-    # REMOVIDO: As listas foram movidas para DocumentoABNT para se tornarem globais.
-    # tabelas: List[Tabela] = field(default_factory=list)
-    # figuras: List[Figura] = field(default_factory=list)
 
     def adicionar_filho(self, filho: 'Capitulo'):
         filho.pai = self
         self.filhos.append(filho)
     
     def to_dict(self):
-        # ALTERADO: Remove a serialização de tabelas e figuras daqui.
         return {
             "titulo": self.titulo,
             "conteudo": self.conteudo,
@@ -66,7 +61,6 @@ class Capitulo:
 
     @classmethod
     def from_dict(cls, data):
-        # ALTERADO: Remove a desserialização de tabelas e figuras daqui.
         capitulo = cls(
             titulo=data['titulo'],
             conteudo=data.get('conteudo', ''),
@@ -88,7 +82,6 @@ class DocumentoABNT:
         self.estrutura_textual = Capitulo(titulo="Raiz do Documento")
         self.referencias: List[Referencia] = []
         
-        # NOVO: Bancos de dados globais para o projeto.
         self.banco_tabelas: List[Tabela] = []
         self.banco_figuras: List[Figura] = []
 
@@ -111,7 +104,6 @@ class DocumentoABNT:
             "palavras_chave": self.palavras_chave,
             "estrutura_textual": self.estrutura_textual.to_dict(),
             "referencias": refs_serializadas,
-            # ADICIONADO: Salva os bancos globais no arquivo de projeto.
             "banco_tabelas": [t.__dict__ for t in self.banco_tabelas],
             "banco_figuras": [f.__dict__ for f in self.banco_figuras]
         }
@@ -127,12 +119,16 @@ class DocumentoABNT:
         doc.palavras_chave = data.get('palavras_chave', '')
         doc.estrutura_textual = Capitulo.from_dict(data.get('estrutura_textual', {"titulo": "Raiz"}))
         
-        # ADICIONADO: Carrega os bancos globais do arquivo de projeto.
         doc.banco_tabelas = [Tabela(**t) for t in data.get('banco_tabelas', [])]
         doc.banco_figuras = [Figura(**f) for f in data.get('banco_figuras', [])]
 
         for ref_data in data.get('referencias', []):
             tipo = ref_data.pop('tipo_ref', None)
+            
+            # CORREÇÃO: Remove a chave 'tipo' original do dicionário, pois ela não é
+            # esperada pelo construtor (__init__) da dataclass.
+            ref_data.pop('tipo', None)
+            
             if tipo == 'Livro':
                 doc.referencias.append(Livro(**ref_data))
             elif tipo == 'Artigo':

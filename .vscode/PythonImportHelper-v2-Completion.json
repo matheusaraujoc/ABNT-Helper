@@ -97,6 +97,30 @@
         "documentation": {}
     },
     {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtGui",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
         "label": "QWidget",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -649,6 +673,102 @@
         "documentation": {}
     },
     {
+        "label": "QDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QListWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QListWidgetItem",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QFileDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QScrollArea",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QSizePolicy",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "Capitulo",
         "importPath": "documento",
         "description": "documento",
@@ -1083,6 +1203,14 @@
         "documentation": {}
     },
     {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "Document",
         "importPath": "docx",
         "description": "docx",
@@ -1232,6 +1360,15 @@
         "documentation": {}
     },
     {
+        "label": "gerenciador_config",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
         "label": "sys",
         "kind": 6,
         "isExtraImport": true,
@@ -1302,6 +1439,22 @@
         "description": "modelos_trabalho",
         "isExtraImport": true,
         "detail": "modelos_trabalho",
+        "documentation": {}
+    },
+    {
+        "label": "get_nomes_modelos",
+        "importPath": "modelos_trabalho",
+        "description": "modelos_trabalho",
+        "isExtraImport": true,
+        "detail": "modelos_trabalho",
+        "documentation": {}
+    },
+    {
+        "label": "TelaInicial",
+        "importPath": "tela_inicial",
+        "description": "tela_inicial",
+        "isExtraImport": true,
+        "detail": "tela_inicial",
         "documentation": {}
     },
     {
@@ -1417,7 +1570,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Autor:\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    # REMOVIDO: As listas foram movidas para DocumentoABNT para se tornarem globais.",
+        "peekOfCode": "class Autor:\n    nome_completo: str\n@dataclass\nclass Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    def adicionar_filho(self, filho: 'Capitulo'):",
         "detail": "documento",
         "documentation": {}
     },
@@ -1426,7 +1579,7 @@
         "kind": 6,
         "importPath": "documento",
         "description": "documento",
-        "peekOfCode": "class Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    # REMOVIDO: As listas foram movidas para DocumentoABNT para se tornarem globais.\n    # tabelas: List[Tabela] = field(default_factory=list)\n    # figuras: List[Figura] = field(default_factory=list)\n    def adicionar_filho(self, filho: 'Capitulo'):",
+        "peekOfCode": "class Capitulo:\n    titulo: str\n    conteudo: str = \"\"\n    is_template_item: bool = False\n    filhos: List['Capitulo'] = field(default_factory=list)\n    pai: Optional['Capitulo'] = field(default=None, repr=False)\n    def adicionar_filho(self, filho: 'Capitulo'):\n        filho.pai = self\n        self.filhos.append(filho)\n    def to_dict(self):",
         "detail": "documento",
         "documentation": {}
     },
@@ -1521,11 +1674,74 @@
         "documentation": {}
     },
     {
+        "label": "carregar_config",
+        "kind": 2,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "def carregar_config():\n    \"\"\"Carrega o arquivo de configuração JSON.\"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return {\"recent_projects\": []}\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:\n            return json.load(f)\n    except (json.JSONDecodeError, IOError):\n        # Em caso de arquivo corrompido ou erro de leitura, retorna um padrão seguro.\n        return {\"recent_projects\": []}",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
+        "label": "salvar_config",
+        "kind": 2,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "def salvar_config(data):\n    \"\"\"Salva os dados no arquivo de configuração JSON.\"\"\"\n    try:\n        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:\n            json.dump(data, f, indent=4)\n    except IOError as e:\n        print(f\"Erro ao salvar configuração: {e}\")\ndef get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
+        "label": "get_projetos_recentes",
+        "kind": 2,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "def get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    # Ordena para que os mais recentes apareçam primeiro\n    projetos.sort(key=lambda p: p.get(\"timestamp\", 0), reverse=True)\n    return projetos\ndef add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
+        "label": "add_projeto_recente",
+        "kind": 2,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "def add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:\n        return\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    caminho_abs = os.path.abspath(caminho_arquivo)\n    # Remove qualquer entrada existente com o mesmo caminho para evitar duplicatas\n    projetos = [p for p in projetos if p.get(\"path\") != caminho_abs]\n    # Adiciona a nova entrada no início da lista",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
+        "label": "remover_projeto_recente",
+        "kind": 2,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "def remover_projeto_recente(caminho_arquivo):\n    \"\"\"Remove um projeto da lista de recentes (ex: se o arquivo foi deletado).\"\"\"\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    caminho_abs = os.path.abspath(caminho_arquivo)\n    projetos_atualizados = [p for p in projetos if p.get(\"path\") != caminho_abs]\n    if len(projetos_atualizados) < len(projetos):\n        config[\"recent_projects\"] = projetos_atualizados\n        salvar_config(config)",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
+        "label": "CONFIG_FILE",
+        "kind": 5,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "CONFIG_FILE = \"abnf_helper_config.json\"\nMAX_RECENT_PROJECTS = 10\ndef carregar_config():\n    \"\"\"Carrega o arquivo de configuração JSON.\"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return {\"recent_projects\": []}\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:\n            return json.load(f)\n    except (json.JSONDecodeError, IOError):",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
+        "label": "MAX_RECENT_PROJECTS",
+        "kind": 5,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "MAX_RECENT_PROJECTS = 10\ndef carregar_config():\n    \"\"\"Carrega o arquivo de configuração JSON.\"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return {\"recent_projects\": []}\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:\n            return json.load(f)\n    except (json.JSONDecodeError, IOError):\n        # Em caso de arquivo corrompido ou erro de leitura, retorna um padrão seguro.",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
         "label": "GerenciadorProjetos",
         "kind": 6,
         "importPath": "gerenciador_projeto",
         "description": "gerenciador_projeto",
-        "peekOfCode": "class GerenciadorProjetos:\n    def __init__(self):\n        self.diretorio_temporario_atual = None\n    def _limpar_diretorio_temporario(self):\n        \"\"\"Remove o diretório temporário anterior, se existir.\"\"\"\n        if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):\n            shutil.rmtree(self.diretorio_temporario_atual)\n        self.diretorio_temporario_atual = None\n    def _iterar_figuras(self, no_capitulo: Capitulo):\n        \"\"\"Um gerador para encontrar todas as figuras na árvore de capítulos.\"\"\"",
+        "peekOfCode": "class GerenciadorProjetos:\n    def __init__(self):\n        self.diretorio_temporario_atual = None\n    def _limpar_diretorio_temporario(self):\n        if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):\n            shutil.rmtree(self.diretorio_temporario_atual)\n        self.diretorio_temporario_atual = None\n    # =============================================================================\n    # REMOVIDO: A função _iterar_figuras(no_capitulo) não é mais necessária,\n    # pois as figuras agora estão em um banco de dados global.",
         "detail": "gerenciador_projeto",
         "documentation": {}
     },
@@ -1617,6 +1833,24 @@
         "description": "referencia",
         "peekOfCode": "def formatar_autores(autores_str: str) -> str:\n    if not autores_str:\n        return \"\"\n    autores = [a.strip() for a in autores_str.split(';')]\n    autores_formatados = []\n    for autor in autores:\n        partes = autor.split()\n        if len(partes) > 1:\n            sobrenome = partes[-1].upper()\n            prenomes = \" \".join(partes[:-1])",
         "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "ProjetoRecenteItem",
+        "kind": 6,
+        "importPath": "tela_inicial",
+        "description": "tela_inicial",
+        "peekOfCode": "class ProjetoRecenteItem(QWidget):\n    \"\"\"Widget customizado para exibir um item na lista de projetos recentes.\"\"\"\n    def __init__(self, nome, caminho, parent=None):\n        super().__init__(parent)\n        layout = QVBoxLayout(self)\n        layout.setContentsMargins(5, 5, 5, 5)\n        nome_label = QLabel(f\"<b>{nome}</b>\")\n        caminho_label = QLabel(caminho)\n        caminho_label.setStyleSheet(\"color: gray;\")\n        caminho_label.setWordWrap(True) # Permite que o caminho quebre a linha se for muito longo",
+        "detail": "tela_inicial",
+        "documentation": {}
+    },
+    {
+        "label": "TelaInicial",
+        "kind": 6,
+        "importPath": "tela_inicial",
+        "description": "tela_inicial",
+        "peekOfCode": "class TelaInicial(QDialog):\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Bem-vindo ao ABNT Helper\")\n        # CORREÇÃO 1: Aumentar a largura mínima da janela para dar mais espaço\n        self.setMinimumSize(950, 550)\n        # CORREÇÃO 2: Adicionar a propriedade 'white-space' para permitir quebra de linha nos botões\n        self.setStyleSheet(\"\"\"\n            QDialog { background-color: #f0f0f0; }\n            QPushButton { ",
+        "detail": "tela_inicial",
         "documentation": {}
     }
 ]

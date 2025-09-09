@@ -1,6 +1,6 @@
 # main_app.py
-# Descrição: Versão unificada da aplicação, com modos de visualização selecionáveis
-# (Lado a Lado e Como Aba) para a pré-visualização do documento.
+# Descrição: Versão final da aplicação, com modos de visualização selecionáveis
+# e uma tela de boas-vindas para gerenciamento de projetos.
 
 import sys
 import os
@@ -24,7 +24,11 @@ from gerador_preview import GeradorHTMLPreview
 from gerenciador_projeto import GerenciadorProjetos
 from dialogs import ReferenciaDialog, DialogoFigura
 from modelos_trabalho import get_estrutura_por_nome, get_nomes_modelos
-# ---------------------------------------------------------
+
+# NOVO: Imports para a tela inicial e gerenciamento de configuração
+from tela_inicial import TelaInicial
+import gerenciador_config
+# -----------------------------------------------------------------
 
 class ABNTHelperApp(QWidget):
     def __init__(self):
@@ -51,7 +55,7 @@ class ABNTHelperApp(QWidget):
 
         self._build_ui()
         self._conectar_sinais_modificacao()
-        self._novo_projeto(primeira_execucao=True)
+        # A inicialização do projeto agora é feita externamente, pelo bloco __main__
 
     def _build_ui(self):
         menu_bar = QMenuBar(self)
@@ -111,7 +115,6 @@ class ABNTHelperApp(QWidget):
             self._reconfigurar_layout()
 
     def _reconfigurar_layout(self):
-        """Remove o conteúdo atual e reconstrói com base em self.modo_preview."""
         if self.main_content_widget is not None:
             self.main_content_widget.setParent(None)
             if isinstance(self.main_content_widget, QSplitter):
@@ -122,22 +125,16 @@ class ABNTHelperApp(QWidget):
         if self.modo_preview == "lado_a_lado":
             index_preview = self.tabs.indexOf(self.preview_container)
             if index_preview != -1:
-                # Ao remover da aba, o widget pode manter o estado 'hidden'
                 self.tabs.removeTab(index_preview)
             
             self.btn_atualizar_preview.setVisible(False)
-
             splitter = QSplitter(QtCore.Qt.Orientation.Horizontal, self)
             splitter.addWidget(self.tabs)
             splitter.addWidget(self.preview_container)
             splitter.setSizes([600, 800])
             self.main_content_widget = splitter
-            
-            # CORREÇÃO FINAL E CRÍTICA: Força a visibilidade do container.
-            # Isso "acorda" o QWebEngineView após ele ter sido escondido pelo QTabWidget.
             self.preview_container.show()
-
-        else: # modo_preview == "aba"
+        else:
             index_preview = self.tabs.indexOf(self.preview_container)
             if index_preview == -1:
                  self.tabs.addTab(self.preview_container, "Pré-Visualização")
@@ -145,7 +142,6 @@ class ABNTHelperApp(QWidget):
             self.main_content_widget = self.tabs
 
         self.main_layout.insertWidget(0, self.main_content_widget, 1)
-
 
     def _criar_aba_geral(self):
         widget = QWidget(); layout = QVBoxLayout(widget)
@@ -182,7 +178,6 @@ class ABNTHelperApp(QWidget):
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(0,0,0,0)
-        
         self.busca_toolbar = QWidget()
         busca_layout = QHBoxLayout(self.busca_toolbar)
         busca_layout.setContentsMargins(2, 5, 2, 5)
@@ -201,23 +196,19 @@ class ABNTHelperApp(QWidget):
         busca_layout.addWidget(btn_fechar_busca)
         layout.addWidget(self.busca_toolbar)
         self.busca_toolbar.setVisible(False)
-
         self.preview_display = QWebEngineView()
         self.preview_display.setHtml("<html><body><h1>Pré-Visualização</h1><p>A pré-visualização será atualizada aqui.</p></body></html>")
         self.preview_display.setZoomFactor(0.75)
         self.preview_display.loadFinished.connect(self._restaurar_scroll_preview)
         layout.addWidget(self.preview_display, 1)
-
         self.btn_atualizar_preview = QPushButton("Atualizar Pré-Visualização")
         self.btn_atualizar_preview.clicked.connect(self._atualizar_preview)
         self.btn_atualizar_preview.setVisible(False)
         layout.addWidget(self.btn_atualizar_preview)
-        
         btn_buscar_proximo.clicked.connect(self._buscar_proximo_preview)
         btn_buscar_anterior.clicked.connect(self._buscar_anterior_preview)
         self.busca_input.returnPressed.connect(self._buscar_proximo_preview)
         btn_fechar_busca.clicked.connect(self._alternar_barra_busca)
-
         return widget
 
     @QtCore.Slot()
@@ -263,7 +254,6 @@ class ABNTHelperApp(QWidget):
     def _atualizar_preview(self):
         if self.modo_preview == "lado_a_lado":
             self._salvar_scroll_preview()
-            
         self.aba_conteudo.sincronizar_conteudo_pendente()
         self._sincronizar_modelo_com_ui()
         self.preview_display.findText("") 
@@ -271,7 +261,6 @@ class ABNTHelperApp(QWidget):
         html_content = gerador.gerar_html()
         base_url = QtCore.QUrl.fromLocalFile(os.path.abspath(os.path.dirname(__file__)))
         self.preview_display.setHtml(html_content, baseUrl=base_url)
-
         if self.modo_preview == "aba":
             QMessageBox.information(self, "Atualizado", "A pré-visualização foi atualizada com sucesso.")
         
@@ -293,17 +282,9 @@ class ABNTHelperApp(QWidget):
     def _novo_projeto(self, primeira_execucao=False):
         if not primeira_execucao and not self._verificar_alteracoes_nao_salvas():
             return
-        self.documento = DocumentoABNT()
-        estrutura_padrao = get_estrutura_por_nome("Trabalho de Conclusão de Curso (TCC)")
-        for titulo in estrutura_padrao:
-            self.documento.estrutura_textual.adicionar_filho(Capitulo(titulo=titulo, is_template_item=True))
-        self.caminho_projeto_atual = None
-        self.gerenciador_projeto.fechar_projeto()
-        if hasattr(self, 'cfg_tipo'):
-             self._popular_ui_com_documento()
-        self.modificado = False
-        self.setWindowTitle('ABNT Helper Final - Novo Projeto (TCC)')
-        self._disparar_atualizacao_automatica()
+        # Usa o primeiro modelo como padrão
+        modelo_padrao = get_nomes_modelos()[0]
+        self.iniciar_novo_projeto_com_modelo(modelo_padrao)
     
     @QtCore.Slot(str)
     def _on_template_selecionado(self, nome_modelo):
@@ -311,8 +292,7 @@ class ABNTHelperApp(QWidget):
         if nome_modelo == self.documento.configuracoes.tipo_trabalho: return
         resposta = QMessageBox.question(self, "Mudar Modelo de Trabalho",
                                           f"Mudar o modelo para '{nome_modelo}' irá reorganizar sua estrutura de capítulos.\n"
-                                          "Capítulos existentes serão preservados. Capítulos que não pertencem ao novo modelo e que contêm conteúdo serão movidos para o final.\n\n"
-                                          "Deseja continuar?",
+                                          "Capítulos existentes serão preservados...\nDeseja continuar?",
                                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if resposta == QMessageBox.StandardButton.No:
             self._populando_ui = True
@@ -321,29 +301,14 @@ class ABNTHelperApp(QWidget):
             return
         mapa_capitulos_atuais = {c.titulo.upper().strip(): c for c in self.documento.estrutura_textual.filhos}
         titulos_novos = get_estrutura_por_nome(nome_modelo)
-        nova_lista_de_capitulos = []
-        for titulo_novo in titulos_novos:
-            titulo_normalizado = titulo_novo.upper().strip()
-            if titulo_normalizado in mapa_capitulos_atuais:
-                capitulo_existente = mapa_capitulos_atuais.pop(titulo_normalizado)
-                capitulo_existente.is_template_item = True
-                nova_lista_de_capitulos.append(capitulo_existente)
-            else:
-                nova_lista_de_capitulos.append(Capitulo(titulo=titulo_novo, is_template_item=True))
-        capitulos_orfaos_com_conteudo = []
-        for orfao in mapa_capitulos_atuais.values():
-            if orfao.conteudo.strip() or orfao.filhos:
-                orfao.is_template_item = False
-                capitulos_orfaos_com_conteudo.append(orfao)
-        if capitulos_orfaos_com_conteudo:
-            nova_lista_de_capitulos.extend(capitulos_orfaos_com_conteudo)
-            QMessageBox.information(self, "Capítulos Preservados",
-                                    "Alguns capítulos da estrutura anterior que continham conteúdo "
-                                    "não fazem parte do novo modelo e foram movidos para o final.\n"
-                                    "Capítulos órfãos que estavam vazios foram descartados.")
+        nova_lista_de_capitulos = [mapa_capitulos_atuais.pop(t.upper().strip(), Capitulo(titulo=t, is_template_item=True)) for t in titulos_novos]
+        capitulos_orfaos = [c for c in mapa_capitulos_atuais.values() if c.conteudo.strip() or c.filhos]
+        if capitulos_orfaos:
+            for c in capitulos_orfaos: c.is_template_item = False
+            nova_lista_de_capitulos.extend(capitulos_orfaos)
+            QMessageBox.information(self, "Capítulos Preservados", "Capítulos com conteúdo que não pertencem ao novo modelo foram movidos para o final.")
         self.documento.estrutura_textual.filhos = nova_lista_de_capitulos
-        for filho in self.documento.estrutura_textual.filhos:
-            filho.pai = self.documento.estrutura_textual
+        for filho in self.documento.estrutura_textual.filhos: filho.pai = self.documento.estrutura_textual
         self.aba_conteudo._popular_arvore()
         self.documento.configuracoes.tipo_trabalho = nome_modelo
         self._marcar_modificado()
@@ -372,16 +337,7 @@ class ABNTHelperApp(QWidget):
         if self._verificar_alteracoes_nao_salvas():
             caminho, _ = QFileDialog.getOpenFileName(self, "Carregar Projeto", "", "Arquivo ABNF (*.abnf)")
             if caminho:
-                try:
-                    self.documento = self.gerenciador_projeto.carregar_projeto(caminho)
-                    self.caminho_projeto_atual = caminho
-                    self._popular_ui_com_documento()
-                    self.modificado = False
-                    self.setWindowTitle(f'ABNT Helper Final - {os.path.basename(caminho)}')
-                    QMessageBox.information(self, "Sucesso", "Projeto carregado com sucesso!")
-                except Exception as e:
-                    QMessageBox.critical(self, "Erro ao Carregar", f"Não foi possível carregar o projeto:\n{e}")
-                    self.gerenciador_projeto.fechar_projeto()
+                self.carregar_projeto_pelo_caminho(caminho)
 
     def _popular_ui_com_documento(self):
         self._populando_ui = True
@@ -418,6 +374,7 @@ class ABNTHelperApp(QWidget):
         return True
         
     def _conectar_sinais_modificacao(self):
+        # ... (conexões de sinais existentes)
         self.cfg_tipo.currentTextChanged.connect(self._marcar_modificado)
         self.cfg_instituicao.textChanged.connect(self._marcar_modificado); self.cfg_curso.textChanged.connect(self._marcar_modificado)
         self.cfg_modalidade_curso.textChanged.connect(self._marcar_modificado); self.cfg_titulo_pretendido.textChanged.connect(self._marcar_modificado)
@@ -428,6 +385,7 @@ class ABNTHelperApp(QWidget):
         self.aba_conteudo.editor_capitulo.textChanged.connect(self._marcar_modificado)
         self.aba_conteudo.arvore_capitulos.estruturaAlterada.connect(self._marcar_modificado)
         self.aba_conteudo.arvore_capitulos.itemChanged.connect(self._marcar_modificado)
+
 
     @QtCore.Slot()
     def _adicionar_referencia(self):
@@ -482,6 +440,52 @@ class ABNTHelperApp(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Erro na Geração", f"Ocorreu um erro: {e}")
 
+    # NOVO: Método para carregar um projeto a partir de um caminho (usado pela tela inicial)
+    def carregar_projeto_pelo_caminho(self, caminho):
+        """Carrega um projeto a partir de um caminho de arquivo fornecido."""
+        if not self._verificar_alteracoes_nao_salvas():
+            self.close()
+            return
+
+        try:
+            self.documento = self.gerenciador_projeto.carregar_projeto(caminho)
+            self.caminho_projeto_atual = caminho
+            self._popular_ui_com_documento()
+            self.modificado = False
+            self.setWindowTitle(f'ABNT Helper Final - {os.path.basename(caminho)}')
+            gerenciador_config.add_projeto_recente(caminho)
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Carregar", f"Não foi possível carregar o projeto:\n{e}")
+            self.gerenciador_projeto.fechar_projeto()
+            self.close()
+
+    # NOVO: Método para criar um novo projeto com um modelo específico (usado pela tela inicial)
+    def iniciar_novo_projeto_com_modelo(self, nome_modelo):
+        """Inicia a UI com um novo projeto baseado em um modelo."""
+        if not self._verificar_alteracoes_nao_salvas():
+            self.close()
+            return
+
+        self.documento = DocumentoABNT()
+        estrutura = get_estrutura_por_nome(nome_modelo)
+        for titulo in estrutura:
+            self.documento.estrutura_textual.adicionar_filho(Capitulo(titulo=titulo, is_template_item=True))
+        
+        self.caminho_projeto_atual = None
+        self.gerenciador_projeto.fechar_projeto()
+        
+        if hasattr(self, 'cfg_tipo'):
+            self._popular_ui_com_documento()
+            self._populando_ui = True
+            self.cfg_tipo.setCurrentText(nome_modelo)
+            self.documento.configuracoes.tipo_trabalho = nome_modelo
+            self._populando_ui = False
+
+        self.modificado = False
+        self.setWindowTitle(f'ABNT Helper Final - Novo Projeto ({nome_modelo})')
+        self._disparar_atualizacao_automatica()
+
+
 if __name__ == '__main__':
     try:
         from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -491,6 +495,21 @@ if __name__ == '__main__':
         sys.exit(1)
         
     app = QApplication(sys.argv)
-    win = ABNTHelperApp()
-    win.show()
-    sys.exit(app.exec())
+    
+    tela_inicial = TelaInicial()
+    
+    if tela_inicial.exec():
+        acao, dados = tela_inicial.get_resultado()
+
+        if acao:
+            win = ABNTHelperApp()
+            
+            if acao == 'novo':
+                win.iniciar_novo_projeto_com_modelo(dados) # dados = nome_modelo
+            elif acao == 'abrir':
+                win.carregar_projeto_pelo_caminho(dados) # dados = caminho do arquivo
+            
+            win.show()
+            sys.exit(app.exec())
+    
+    sys.exit(0)
