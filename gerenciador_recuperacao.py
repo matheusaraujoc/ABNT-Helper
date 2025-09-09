@@ -15,7 +15,7 @@ RECOVERY_DIR = Path(os.getenv('LOCALAPPDATA', Path.home())) / 'ABNTHelper' / 're
 BACKUP_SUBDIR = ".abnf_backups"
 
 def setup_diretorios():
-    """Garante que os diretórios de recuperação e backup existam."""
+    """Garante que os diretórios de recuperação existam."""
     os.makedirs(RECOVERY_DIR, exist_ok=True)
 
 # --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---
@@ -46,12 +46,12 @@ def salvar_recuperacao(gerenciador_projeto, documento, caminho_projeto_original:
         'original_path': caminho_projeto_original,
         'original_name': os.path.basename(caminho_projeto_original) if caminho_projeto_original else "Novo Projeto",
         'recovery_save_time': datetime.now().isoformat(),
-        'recovery_file_path': str(caminho_recuperacao) # Armazena o caminho exato
+        'recovery_file_path': str(caminho_recuperacao) # Armazena o caminho exato para limpeza confiável
     }
 
     try:
-        # Usa o mesmo mecanismo de salvamento do projeto principal
-        gerenciador_projeto.salvar_projeto(documento, str(caminho_recuperacao))
+        # Salva o projeto sem adicioná-lo à lista de recentes
+        gerenciador_projeto.salvar_projeto(documento, str(caminho_recuperacao), add_to_recents=False)
         
         # Salva os metadados com o caminho exato
         with open(metadata_path, 'w', encoding='utf-8') as f:
@@ -73,14 +73,14 @@ def verificar_arquivos_recuperaveis() -> list[dict]:
             caminho_recuperacao = RECOVERY_DIR / item
             metadata_path = caminho_recuperacao.with_suffix('.json')
             if os.path.exists(metadata_path):
-                with open(metadata_path, 'r', encoding='utf-8') as f:
-                    try:
+                try:
+                    with open(metadata_path, 'r', encoding='utf-8') as f:
                         metadata = json.load(f)
-                        # Garante que o caminho no metadado está correto
-                        metadata['recovery_file_path'] = str(caminho_recuperacao)
-                        arquivos_encontrados.append(metadata)
-                    except json.JSONDecodeError:
-                        continue # Metadados corrompidos, ignora
+                    # Garante que o caminho no metadado está correto e atualizado
+                    metadata['recovery_file_path'] = str(caminho_recuperacao)
+                    arquivos_encontrados.append(metadata)
+                except (json.JSONDecodeError, IOError):
+                    continue # Metadados corrompidos ou erro de leitura, ignora
     return arquivos_encontrados
 
 # --- LÓGICA DE BACKUP (A CADA SALVAMENTO) ---
@@ -107,25 +107,28 @@ def criar_backup(caminho_projeto: str, max_backups: int):
 
 def _limpar_backups_antigos(backup_dir: Path, max_backups: int):
     """Mantém apenas o número máximo de backups, removendo os mais antigos."""
-    backups = sorted(
-        [f for f in backup_dir.iterdir() if f.is_file() and f.name.endswith(".abnf.bak")],
-        key=os.path.getmtime,
-        reverse=True
-    )
-    
-    if len(backups) > max_backups:
-        backups_para_remover = backups[max_backups:]
-        for backup in backups_para_remover:
-            os.remove(backup)
-            print(f"Backup antigo removido: {backup.name}")
+    try:
+        backups = sorted(
+            [f for f in backup_dir.iterdir() if f.is_file() and f.name.endswith(".abnf.bak")],
+            key=os.path.getmtime,
+            reverse=True
+        )
+        
+        if len(backups) > max_backups:
+            backups_para_remover = backups[max_backups:]
+            for backup in backups_para_remover:
+                os.remove(backup)
+                print(f"Backup antigo removido: {backup.name}")
+    except FileNotFoundError:
+        # Isso pode acontecer se o diretório for removido entre a listagem e a exclusão. É seguro ignorar.
+        pass
 
 # --- LÓGICA DE LIMPEZA DE ARQUIVOS DE RECUPERAÇÃO ---
 
 def limpar_recuperacao(caminho_projeto_original: str | None):
     """
     Remove o arquivo de recuperação tentando recriar seu nome.
-    Funciona bem para projetos já salvos, mas não é confiável para
-    projetos novos que nunca foram salvos e sofreram uma falha.
+    Usado para limpeza em eventos normais (salvar, fechar) em projetos já salvos.
     """
     if caminho_projeto_original is None:
         return
@@ -146,7 +149,7 @@ def limpar_recuperacao_pelo_caminho_direto(caminho_arquivo_recuperacao: str):
     """
     Remove um arquivo de recuperação específico usando seu caminho exato.
     Esta é a forma 100% confiável de garantir a exclusão, especialmente
-    após o usuário descartar uma recuperação.
+    após o usuário descartar uma recuperação de um projeto nunca salvo.
     """
     if not caminho_arquivo_recuperacao or not isinstance(caminho_arquivo_recuperacao, str):
         return

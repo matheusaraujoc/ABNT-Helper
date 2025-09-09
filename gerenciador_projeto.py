@@ -16,26 +16,24 @@ class GerenciadorProjetos:
 
     def _limpar_diretorio_temporario(self):
         if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):
-            shutil.rmtree(self.diretorio_temporario_atual)
+            try:
+                shutil.rmtree(self.diretorio_temporario_atual)
+            except OSError as e:
+                print(f"Erro ao limpar diretório temporário {self.diretorio_temporario_atual}: {e}")
         self.diretorio_temporario_atual = None
 
-    # =============================================================================
-    # REMOVIDO: A função _iterar_figuras(no_capitulo) não é mais necessária,
-    # pois as figuras agora estão em um banco de dados global.
-    # =============================================================================
-
-    def salvar_projeto(self, documento: DocumentoABNT, caminho_arquivo: str):
-        """Salva o estado atual do documento e suas imagens em um arquivo .abnf."""
+    def salvar_projeto(self, documento: DocumentoABNT, caminho_arquivo: str, add_to_recents: bool = True):
+        """
+        Salva o estado atual do documento e suas imagens em um arquivo .abnf.
+        O parâmetro 'add_to_recents' controla se o arquivo deve ser adicionado
+        à lista de projetos recentes, evitando que arquivos de recuperação apareçam lá.
+        """
         with tempfile.TemporaryDirectory(prefix="abnf_save_") as temp_dir:
             imagens_dir = os.path.join(temp_dir, 'imagens')
             os.makedirs(imagens_dir)
 
             doc_para_salvar = copy.deepcopy(documento)
 
-            # =============================================================================
-            # CORREÇÃO: Iterar diretamente sobre o `banco_figuras` do documento,
-            # em vez de tentar encontrar figuras dentro dos capítulos.
-            # =============================================================================
             for figura in doc_para_salvar.banco_figuras:
                 if figura.caminho_processado and os.path.exists(figura.caminho_processado):
                     nome_arquivo = os.path.basename(figura.caminho_processado)
@@ -52,11 +50,14 @@ class GerenciadorProjetos:
             base_name = os.path.splitext(caminho_arquivo)[0]
             shutil.make_archive(base_name, 'zip', temp_dir)
             
+            # Remove o arquivo .abnf antigo antes de renomear o novo .zip para .abnf
             if os.path.exists(caminho_arquivo):
                 os.remove(caminho_arquivo)
             os.rename(base_name + '.zip', caminho_arquivo)
 
-        gerenciador_config.add_projeto_recente(caminho_arquivo)
+        # A adição à lista de recentes agora é condicional
+        if add_to_recents:
+            gerenciador_config.add_projeto_recente(caminho_arquivo)
 
     def carregar_projeto(self, caminho_arquivo: str) -> DocumentoABNT:
         """Carrega um projeto de um arquivo .abnf, extraindo seus conteúdos."""
@@ -75,10 +76,7 @@ class GerenciadorProjetos:
             
         documento_carregado = DocumentoABNT.from_dict(dados_dict)
 
-        # =============================================================================
-        # CORREÇÃO: Atualizar os caminhos das figuras iterando diretamente sobre o
-        # `banco_figuras` do documento carregado.
-        # =============================================================================
+        # Atualiza os caminhos das figuras para apontar para a pasta temporária
         for figura in documento_carregado.banco_figuras:
             if figura.caminho_processado:
                 # O caminho no JSON é relativo (ex: "imagens/foto.png")

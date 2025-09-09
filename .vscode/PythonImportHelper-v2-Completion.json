@@ -1001,6 +1001,14 @@
         "documentation": {}
     },
     {
+        "label": "DialogoRecuperacao",
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "isExtraImport": true,
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
         "label": "os",
         "kind": 6,
         "isExtraImport": true,
@@ -1737,7 +1745,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI FICA O TIMER DEFINIDO EM MINUTOS DO SISTEMA DE RECUPERAÇÃO DE ARQUIVOS POR FALHAS ABRUPTAS DO SISTEMA\n            # MUDANÇA: Agora é um intervalo periódico, não de inatividade. 10 minutos é um padrão seguro.\n            \"autosave_periodic_interval_min\": 1\n        },",
+        "peekOfCode": "def get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI ESTÁ ESTABELECIDO O INTERVALO DE AUTOSAVE PARA 10 MINUTOS\n            \"autosave_periodic_interval_min\": 10\n        },\n        \"backup\": {",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1746,7 +1754,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def carregar_config():\n    \"\"\"\n    Carrega o arquivo de configuração JSON. Se o arquivo não existir ou estiver\n    corrompido, retorna uma configuração padrão. Garante que configurações\n    antigas sejam atualizadas com as novas chaves sem perder dados.\n    \"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return get_default_config()\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:",
+        "peekOfCode": "def carregar_config():\n    \"\"\"\n    Carrega o arquivo de configuração JSON, garantindo que seja compatível\n    com a versão mais recente do programa.\n    \"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return get_default_config()\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:\n            config = json.load(f)",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1755,7 +1763,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def salvar_config(data):\n    \"\"\"Salva os dados no arquivo de configuração JSON.\"\"\"\n    try:\n        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:\n            json.dump(data, f, indent=4, ensure_ascii=False)\n    except IOError as e:\n        print(f\"Erro ao salvar configuração: {e}\")\ndef get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()",
+        "peekOfCode": "def salvar_config(data):\n    \"\"\"Salva os dados no arquivo de configuração JSON.\"\"\"\n    try:\n        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:\n            json.dump(data, f, indent=4, ensure_ascii=False)\n    except IOError as e:\n        print(f\"Erro ao salvar configuração: {e}\")\ndef get_projetos_recentes():\n    \"\"\"\n    Retorna a lista de projetos recentes, FILTRANDO quaisquer arquivos",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1764,7 +1772,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    projetos.sort(key=lambda p: p.get(\"timestamp\", 0), reverse=True)\n    return projetos\ndef add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:\n        return",
+        "peekOfCode": "def get_projetos_recentes():\n    \"\"\"\n    Retorna a lista de projetos recentes, FILTRANDO quaisquer arquivos\n    de recuperação que possam ter sido adicionados por engano.\n    \"\"\"\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    # BLINDAGEM (PARTE 1): Filtra a lista ao ser lida.\n    projetos_filtrados = [\n        p for p in projetos if p.get(\"path\") and not p[\"path\"].endswith(\".abnf.recovery\")",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1773,7 +1781,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:\n        return\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    caminho_abs = os.path.abspath(caminho_arquivo)\n    projetos = [p for p in projetos if p.get(\"path\") != caminho_abs]\n    novo_projeto = {\n        \"path\": caminho_abs,",
+        "peekOfCode": "def add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:\n        return\n    # BLINDAGEM (PARTE 2): Recusa-se a adicionar arquivos de recuperação.\n    if caminho_arquivo.endswith(\".abnf.recovery\"):\n        print(f\"Tentativa de adicionar arquivo de recuperação '{os.path.basename(caminho_arquivo)}' aos recentes foi bloqueada.\")\n        return\n    config = carregar_config()\n    # Usa a função get_projetos_recentes para começar com uma lista já limpa",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1791,7 +1799,7 @@
         "kind": 5,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "CONFIG_FILE = \"abnf_helper_config.json\"\nMAX_RECENT_PROJECTS = 10\ndef get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI FICA O TIMER DEFINIDO EM MINUTOS DO SISTEMA DE RECUPERAÇÃO DE ARQUIVOS POR FALHAS ABRUPTAS DO SISTEMA\n            # MUDANÇA: Agora é um intervalo periódico, não de inatividade. 10 minutos é um padrão seguro.",
+        "peekOfCode": "CONFIG_FILE = \"abnf_helper_config.json\"\nMAX_RECENT_PROJECTS = 10\ndef get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI ESTÁ ESTABELECIDO O INTERVALO DE AUTOSAVE PARA 10 MINUTOS\n            \"autosave_periodic_interval_min\": 10",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1800,7 +1808,7 @@
         "kind": 5,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "MAX_RECENT_PROJECTS = 10\ndef get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI FICA O TIMER DEFINIDO EM MINUTOS DO SISTEMA DE RECUPERAÇÃO DE ARQUIVOS POR FALHAS ABRUPTAS DO SISTEMA\n            # MUDANÇA: Agora é um intervalo periódico, não de inatividade. 10 minutos é um padrão seguro.\n            \"autosave_periodic_interval_min\": 1",
+        "peekOfCode": "MAX_RECENT_PROJECTS = 10\ndef get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI ESTÁ ESTABELECIDO O INTERVALO DE AUTOSAVE PARA 10 MINUTOS\n            \"autosave_periodic_interval_min\": 10\n        },",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1809,7 +1817,7 @@
         "kind": 6,
         "importPath": "gerenciador_projeto",
         "description": "gerenciador_projeto",
-        "peekOfCode": "class GerenciadorProjetos:\n    def __init__(self):\n        self.diretorio_temporario_atual = None\n    def _limpar_diretorio_temporario(self):\n        if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):\n            shutil.rmtree(self.diretorio_temporario_atual)\n        self.diretorio_temporario_atual = None\n    # =============================================================================\n    # REMOVIDO: A função _iterar_figuras(no_capitulo) não é mais necessária,\n    # pois as figuras agora estão em um banco de dados global.",
+        "peekOfCode": "class GerenciadorProjetos:\n    def __init__(self):\n        self.diretorio_temporario_atual = None\n    def _limpar_diretorio_temporario(self):\n        if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):\n            try:\n                shutil.rmtree(self.diretorio_temporario_atual)\n            except OSError as e:\n                print(f\"Erro ao limpar diretório temporário {self.diretorio_temporario_atual}: {e}\")\n        self.diretorio_temporario_atual = None",
         "detail": "gerenciador_projeto",
         "documentation": {}
     },
@@ -1818,7 +1826,7 @@
         "kind": 2,
         "importPath": "gerenciador_recuperacao",
         "description": "gerenciador_recuperacao",
-        "peekOfCode": "def setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação e backup existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"\n    if caminho_projeto_original:\n        # Cria um nome de arquivo baseado no hash do caminho original para ser consistente.",
+        "peekOfCode": "def setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"\n    if caminho_projeto_original:\n        # Cria um nome de arquivo baseado no hash do caminho original para ser consistente.",
         "detail": "gerenciador_recuperacao",
         "documentation": {}
     },
@@ -1863,7 +1871,7 @@
         "kind": 2,
         "importPath": "gerenciador_recuperacao",
         "description": "gerenciador_recuperacao",
-        "peekOfCode": "def limpar_recuperacao(caminho_projeto_original: str | None):\n    \"\"\"\n    Remove o arquivo de recuperação tentando recriar seu nome.\n    Funciona bem para projetos já salvos, mas não é confiável para\n    projetos novos que nunca foram salvos e sofreram uma falha.\n    \"\"\"\n    if caminho_projeto_original is None:\n        return\n    caminho_recuperacao = get_caminho_recuperacao(caminho_projeto_original)\n    metadata_path = caminho_recuperacao.with_suffix('.json')",
+        "peekOfCode": "def limpar_recuperacao(caminho_projeto_original: str | None):\n    \"\"\"\n    Remove o arquivo de recuperação tentando recriar seu nome.\n    Usado para limpeza em eventos normais (salvar, fechar) em projetos já salvos.\n    \"\"\"\n    if caminho_projeto_original is None:\n        return\n    caminho_recuperacao = get_caminho_recuperacao(caminho_projeto_original)\n    metadata_path = caminho_recuperacao.with_suffix('.json')\n    try:",
         "detail": "gerenciador_recuperacao",
         "documentation": {}
     },
@@ -1872,7 +1880,7 @@
         "kind": 2,
         "importPath": "gerenciador_recuperacao",
         "description": "gerenciador_recuperacao",
-        "peekOfCode": "def limpar_recuperacao_pelo_caminho_direto(caminho_arquivo_recuperacao: str):\n    \"\"\"\n    Remove um arquivo de recuperação específico usando seu caminho exato.\n    Esta é a forma 100% confiável de garantir a exclusão, especialmente\n    após o usuário descartar uma recuperação.\n    \"\"\"\n    if not caminho_arquivo_recuperacao or not isinstance(caminho_arquivo_recuperacao, str):\n        return\n    caminho_recuperacao = Path(caminho_arquivo_recuperacao)\n    metadata_path = caminho_recuperacao.with_suffix('.json')",
+        "peekOfCode": "def limpar_recuperacao_pelo_caminho_direto(caminho_arquivo_recuperacao: str):\n    \"\"\"\n    Remove um arquivo de recuperação específico usando seu caminho exato.\n    Esta é a forma 100% confiável de garantir a exclusão, especialmente\n    após o usuário descartar uma recuperação de um projeto nunca salvo.\n    \"\"\"\n    if not caminho_arquivo_recuperacao or not isinstance(caminho_arquivo_recuperacao, str):\n        return\n    caminho_recuperacao = Path(caminho_arquivo_recuperacao)\n    metadata_path = caminho_recuperacao.with_suffix('.json')",
         "detail": "gerenciador_recuperacao",
         "documentation": {}
     },
@@ -1881,7 +1889,7 @@
         "kind": 5,
         "importPath": "gerenciador_recuperacao",
         "description": "gerenciador_recuperacao",
-        "peekOfCode": "RECOVERY_DIR = Path(os.getenv('LOCALAPPDATA', Path.home())) / 'ABNTHelper' / 'recovery'\nBACKUP_SUBDIR = \".abnf_backups\"\ndef setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação e backup existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"",
+        "peekOfCode": "RECOVERY_DIR = Path(os.getenv('LOCALAPPDATA', Path.home())) / 'ABNTHelper' / 'recovery'\nBACKUP_SUBDIR = \".abnf_backups\"\ndef setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"",
         "detail": "gerenciador_recuperacao",
         "documentation": {}
     },
@@ -1890,7 +1898,7 @@
         "kind": 5,
         "importPath": "gerenciador_recuperacao",
         "description": "gerenciador_recuperacao",
-        "peekOfCode": "BACKUP_SUBDIR = \".abnf_backups\"\ndef setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação e backup existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"\n    if caminho_projeto_original:",
+        "peekOfCode": "BACKUP_SUBDIR = \".abnf_backups\"\ndef setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"\n    if caminho_projeto_original:",
         "detail": "gerenciador_recuperacao",
         "documentation": {}
     },
@@ -1989,7 +1997,7 @@
         "kind": 6,
         "importPath": "tela_inicial",
         "description": "tela_inicial",
-        "peekOfCode": "class ProjetoRecenteItem(QWidget):\n    \"\"\"Widget customizado para exibir um item na lista de projetos recentes.\"\"\"\n    def __init__(self, nome, caminho, parent=None):\n        super().__init__(parent)\n        layout = QVBoxLayout(self)\n        layout.setContentsMargins(5, 5, 5, 5)\n        nome_label = QLabel(f\"<b>{nome}</b>\")\n        caminho_label = QLabel(caminho)\n        caminho_label.setStyleSheet(\"color: gray;\")\n        caminho_label.setWordWrap(True) # Permite que o caminho quebre a linha se for muito longo",
+        "peekOfCode": "class ProjetoRecenteItem(QWidget):\n    \"\"\"Widget customizado para exibir um item na lista de projetos recentes.\"\"\"\n    def __init__(self, nome, caminho, parent=None):\n        super().__init__(parent)\n        layout = QVBoxLayout(self)\n        layout.setContentsMargins(5, 5, 5, 5)\n        nome_label = QLabel(f\"<b>{nome}</b>\")\n        caminho_label = QLabel(caminho)\n        caminho_label.setStyleSheet(\"color: gray;\")\n        caminho_label.setWordWrap(True)",
         "detail": "tela_inicial",
         "documentation": {}
     },
@@ -1998,7 +2006,7 @@
         "kind": 6,
         "importPath": "tela_inicial",
         "description": "tela_inicial",
-        "peekOfCode": "class TelaInicial(QDialog):\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Bem-vindo ao ABNT Helper\")\n        # CORREÇÃO 1: Aumentar a largura mínima da janela para dar mais espaço\n        self.setMinimumSize(950, 550)\n        # CORREÇÃO 2: Adicionar a propriedade 'white-space' para permitir quebra de linha nos botões\n        self.setStyleSheet(\"\"\"\n            QDialog { background-color: #f0f0f0; }\n            QPushButton { ",
+        "peekOfCode": "class TelaInicial(QDialog):\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Bem-vindo ao ABNT Helper\")\n        self.setMinimumSize(950, 550)\n        self.setStyleSheet(\"\"\"\n            QDialog { background-color: #f0f0f0; }\n            QPushButton { \n                background-color: #0078d4; color: white; border: none; \n                padding: 10px; border-radius: 5px; font-size: 14px;",
         "detail": "tela_inicial",
         "documentation": {}
     }

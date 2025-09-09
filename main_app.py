@@ -40,34 +40,32 @@ class ABNTHelperApp(QWidget):
         self.setGeometry(100, 100, 1400, 800)
 
         self.config = gerenciador_config.carregar_config()
-
         self.documento = DocumentoABNT()
         self.gerenciador_projeto = GerenciadorProjetos()
         self.caminho_projeto_atual = None
         self.modificado = False
         self._populando_ui = False
+        
+        # Flag para controlar o reinício para a tela inicial
+        self.wants_to_restart = False
 
         self.modo_preview = "lado_a_lado"
-
         self.preview_update_timer = QtCore.QTimer(self)
         self.preview_update_timer.setSingleShot(True)
         self.preview_update_timer.setInterval(750)
         self.preview_update_timer.timeout.connect(self._atualizar_preview)
-
-        # Timer para auto-save periódico (não mais por inatividade)
+        
         self.autosave_timer = QtCore.QTimer(self)
         intervalo_ms = self.config['recovery']['autosave_periodic_interval_min'] * 60 * 1000
         self.autosave_timer.setInterval(intervalo_ms)
         self.autosave_timer.timeout.connect(self._auto_salvar_recuperacao)
-
+        
         self.scroll_posicao = 0
-
         self.main_layout = QVBoxLayout(self)
         self.main_content_widget = None
 
         self._build_ui()
         self._conectar_sinais_modificacao()
-        
         gerenciador_recuperacao.setup_diretorios()
 
     def _build_ui(self):
@@ -75,6 +73,7 @@ class ABNTHelperApp(QWidget):
         self.main_layout.setMenuBar(menu_bar)
 
         menu_arquivo = menu_bar.addMenu("&Arquivo")
+        
         acao_novo = QAction("&Novo Projeto", self)
         acao_novo.triggered.connect(self._novo_projeto)
         menu_arquivo.addAction(acao_novo)
@@ -94,10 +93,15 @@ class ABNTHelperApp(QWidget):
         menu_arquivo.addAction(acao_salvar_como)
         menu_arquivo.addSeparator()
 
+        acao_voltar = QAction("Voltar à Tela Inicial", self)
+        acao_voltar.triggered.connect(self._voltar_tela_inicial)
+        menu_arquivo.addAction(acao_voltar)
+        menu_arquivo.addSeparator()
+
         acao_sair = QAction("Sai&r", self)
         acao_sair.triggered.connect(self.close)
         menu_arquivo.addAction(acao_sair)
-
+        
         menu_editar = menu_bar.addMenu("&Editar")
         acao_localizar = QAction("&Localizar...", self)
         acao_localizar.setShortcut(QKeySequence.StandardKey.Find)
@@ -133,6 +137,12 @@ class ABNTHelperApp(QWidget):
 
         self._reconfigurar_layout()
 
+    @QtCore.Slot()
+    def _voltar_tela_inicial(self):
+        if self._verificar_alteracoes_nao_salvas():
+            self.wants_to_restart = True
+            self.close()
+
     @QtCore.Slot(str)
     def _alternar_modo_preview(self, novo_modo):
         if self.modo_preview != novo_modo:
@@ -144,14 +154,12 @@ class ABNTHelperApp(QWidget):
             self.main_content_widget.setParent(None)
             if isinstance(self.main_content_widget, QSplitter):
                 self.main_content_widget.deleteLater()
-
         self.main_content_widget = None
-
+        
         if self.modo_preview == "lado_a_lado":
             index_preview = self.tabs.indexOf(self.preview_container)
             if index_preview != -1:
                 self.tabs.removeTab(index_preview)
-            
             self.btn_atualizar_preview.setVisible(False)
             splitter = QSplitter(QtCore.Qt.Orientation.Horizontal, self)
             splitter.addWidget(self.tabs)
@@ -162,17 +170,17 @@ class ABNTHelperApp(QWidget):
         else:
             index_preview = self.tabs.indexOf(self.preview_container)
             if index_preview == -1:
-                 self.tabs.addTab(self.preview_container, "Pré-Visualização")
+                self.tabs.addTab(self.preview_container, "Pré-Visualização")
             self.btn_atualizar_preview.setVisible(True)
             self.main_content_widget = self.tabs
-
+        
         self.main_layout.insertWidget(0, self.main_content_widget, 1)
 
     def _criar_aba_geral(self):
         widget = QWidget()
         layout = QVBoxLayout(widget)
-        
         layout.addWidget(QLabel("<h3>Configurações do Documento</h3>"))
+        
         form_layout1 = QFormLayout()
         self.cfg_tipo = QComboBox()
         self.cfg_tipo.addItems(get_nomes_modelos())
@@ -224,7 +232,6 @@ class ABNTHelperApp(QWidget):
         btn_layout.addWidget(btn_add)
         btn_layout.addWidget(btn_edit)
         btn_layout.addWidget(btn_del)
-        
         btn_add.clicked.connect(self._adicionar_referencia)
         btn_edit.clicked.connect(self._editar_referencia)
         btn_del.clicked.connect(self._remover_referencia)
@@ -283,8 +290,7 @@ class ABNTHelperApp(QWidget):
 
     def _buscar_preview(self, direcao_reversa=False):
         texto_busca = self.busca_input.text()
-        if not texto_busca:
-            return
+        if not texto_busca: return
         flags = QWebEnginePage.FindFlag(0)
         if direcao_reversa:
             flags |= QWebEnginePage.FindFlag.FindBackward
@@ -337,7 +343,6 @@ class ABNTHelperApp(QWidget):
         if not self.modificado:
             self.modificado = True
             self.setWindowTitle(self.windowTitle() + '*')
-
         if self.config['recovery']['autosave_enabled']:
             if not self.autosave_timer.isActive():
                 intervalo_min = self.config['recovery']['autosave_periodic_interval_min']
@@ -363,11 +368,8 @@ class ABNTHelperApp(QWidget):
 
     @QtCore.Slot(str)
     def _on_template_selecionado(self, nome_modelo):
-        if self._populando_ui or not nome_modelo:
+        if self._populando_ui or not nome_modelo or nome_modelo == self.documento.configuracoes.tipo_trabalho:
             return
-        if nome_modelo == self.documento.configuracoes.tipo_trabalho:
-            return
-            
         resposta = QMessageBox.question(self, "Mudar Modelo de Trabalho",
                                           f"Mudar o modelo para '{nome_modelo}' irá reorganizar sua estrutura de capítulos.\n"
                                           "Capítulos existentes serão preservados...\nDeseja continuar?",
@@ -377,22 +379,18 @@ class ABNTHelperApp(QWidget):
             self.cfg_tipo.setCurrentText(self.documento.configuracoes.tipo_trabalho)
             self._populando_ui = False
             return
-            
         mapa_capitulos_atuais = {c.titulo.upper().strip(): c for c in self.documento.estrutura_textual.filhos}
         titulos_novos = get_estrutura_por_nome(nome_modelo)
         nova_lista_de_capitulos = [mapa_capitulos_atuais.pop(t.upper().strip(), Capitulo(titulo=t, is_template_item=True)) for t in titulos_novos]
         capitulos_orfaos = [c for c in mapa_capitulos_atuais.values() if c.conteudo.strip() or c.filhos]
-        
         if capitulos_orfaos:
             for c in capitulos_orfaos:
                 c.is_template_item = False
             nova_lista_de_capitulos.extend(capitulos_orfaos)
             QMessageBox.information(self, "Capítulos Preservados", "Capítulos com conteúdo que não pertencem ao novo modelo foram movidos para o final.")
-            
         self.documento.estrutura_textual.filhos = nova_lista_de_capitulos
         for filho in self.documento.estrutura_textual.filhos:
             filho.pai = self.documento.estrutura_textual
-            
         self.aba_conteudo._popular_arvore()
         self.documento.configuracoes.tipo_trabalho = nome_modelo
         self._marcar_modificado()
@@ -401,13 +399,10 @@ class ABNTHelperApp(QWidget):
         if not self.caminho_projeto_atual:
             self._salvar_projeto_como()
             return
-
         if self.config['backup']['backup_on_save_enabled']:
             gerenciador_recuperacao.criar_backup(self.caminho_projeto_atual, self.config['backup']['max_backups_per_project'])
-
         self.aba_conteudo.sincronizar_conteudo_pendente()
         self._sincronizar_modelo_com_ui()
-        
         try:
             self.gerenciador_projeto.salvar_projeto(self.documento, self.caminho_projeto_atual)
             self.modificado = False
@@ -433,7 +428,6 @@ class ABNTHelperApp(QWidget):
 
     def _popular_ui_com_documento(self):
         self._populando_ui = True
-        
         cfg = self.documento.configuracoes
         self.cfg_tipo.setCurrentText(cfg.tipo_trabalho)
         self.cfg_instituicao.setText(cfg.instituicao)
@@ -447,24 +441,20 @@ class ABNTHelperApp(QWidget):
         self.orientador_input.setText(self.documento.orientador)
         self.resumo_input.setPlainText(self.documento.resumo)
         self.keywords_input.setText(self.documento.palavras_chave)
-        
         self.aba_conteudo.documento = self.documento
         self.aba_conteudo._popular_arvore()
         self.aba_conteudo.atualizar_bancos_visuais()
         if self.aba_conteudo.arvore_capitulos.topLevelItemCount() > 0:
             self.aba_conteudo.arvore_capitulos.setCurrentItem(self.aba_conteudo.arvore_capitulos.topLevelItem(0))
-        
         self.lista_referencias.clear()
         for ref in self.documento.referencias:
             self.lista_referencias.addItem(ref.formatar().replace('**', ''))
-            
         self._populando_ui = False
         self._disparar_atualizacao_automatica()
 
     def _verificar_alteracoes_nao_salvas(self) -> bool:
         if not self.modificado:
             return True
-        
         resposta = QMessageBox.question(self, "Salvar Alterações?",
                                           "Você tem alterações não salvas. Deseja salvá-las?",
                                           QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
@@ -507,7 +497,6 @@ class ABNTHelperApp(QWidget):
         if linha == -1:
             QMessageBox.warning(self, "Atenção", "Nenhuma referência selecionada para editar.")
             return
-            
         ref_para_editar = self.documento.referencias[linha]
         dialog = ReferenciaDialog(ref=ref_para_editar, parent=self)
         if dialog.exec():
@@ -520,8 +509,7 @@ class ABNTHelperApp(QWidget):
     @QtCore.Slot()
     def _remover_referencia(self):
         linha = self.lista_referencias.currentRow()
-        if linha == -1:
-            return
+        if linha == -1: return
         if QMessageBox.question(self, "Confirmar", "Remover esta referência?") == QMessageBox.StandardButton.Yes:
             self.lista_referencias.takeItem(linha)
             del self.documento.referencias[linha]
@@ -548,11 +536,8 @@ class ABNTHelperApp(QWidget):
         if not self.documento.titulo or not self.documento.autores:
             QMessageBox.warning(self, "Erro", "Título e Autores são campos obrigatórios.")
             return
-        
         filename, _ = QFileDialog.getSaveFileName(self, "Salvar Documento", "trabalho_abnt.docx", "Word Documents (*.docx)")
-        if not filename:
-            return
-            
+        if not filename: return
         try:
             gerador = GeradorDOCX(self.documento)
             gerador.gerar_documento(filename)
@@ -562,33 +547,26 @@ class ABNTHelperApp(QWidget):
 
     @QtCore.Slot()
     def _auto_salvar_recuperacao(self):
-        if not self.modificado:
-            return
+        if not self.modificado: return
         print(f"[{datetime.now():%H:%M:%S}] TIMER PERIÓDICO DISPARADO! Executando auto-save...")
         self.aba_conteudo.sincronizar_conteudo_pendente()
         self._sincronizar_modelo_com_ui()
         gerenciador_recuperacao.salvar_recuperacao(self.gerenciador_projeto, self.documento, self.caminho_projeto_atual)
 
-    # BUG CORRIGIDO AQUI: A limpeza do arquivo de recuperação foi movida para este método.
     def carregar_projeto_pelo_caminho(self, caminho, is_recovery=False):
         if not is_recovery and not self._verificar_alteracoes_nao_salvas():
             self.close()
             return
-            
         try:
             self.documento = self.gerenciador_projeto.carregar_projeto(caminho)
             self._popular_ui_com_documento()
-            
             if is_recovery:
-                self.caminho_projeto_atual = None # Força o "Salvar Como"
+                self.caminho_projeto_atual = None
                 self.modificado = True
                 self.setWindowTitle(f'ABNT Helper Final - ARQUIVO RECUPERADO*')
                 QMessageBox.information(self, "Arquivo Recuperado", "O arquivo foi recuperado com sucesso.\nUse 'Salvar Como...' para salvá-lo em um local permanente.")
-                
-                # ADICIONADO AQUI: Limpa o arquivo de recuperação APÓS o carregamento bem-sucedido.
                 gerenciador_recuperacao.limpar_recuperacao_pelo_caminho_direto(caminho)
-                
-                self._marcar_modificado() # Inicia o timer de auto-save para o arquivo recuperado
+                self._marcar_modificado()
             else:
                 self.caminho_projeto_atual = caminho
                 self.modificado = False
@@ -600,31 +578,25 @@ class ABNTHelperApp(QWidget):
             self.gerenciador_projeto.fechar_projeto()
 
     def iniciar_novo_projeto_com_modelo(self, nome_modelo):
-        if not self._verificar_alteracoes_nao_salvas():
-            return
-            
+        if not self._verificar_alteracoes_nao_salvas(): return
         gerenciador_recuperacao.limpar_recuperacao(self.caminho_projeto_atual)
-        if self.autosave_timer.isActive():
-            self.autosave_timer.stop()
-            
+        if self.autosave_timer.isActive(): self.autosave_timer.stop()
         self.documento = DocumentoABNT()
         estrutura = get_estrutura_por_nome(nome_modelo)
         for titulo in estrutura:
             self.documento.estrutura_textual.adicionar_filho(Capitulo(titulo=titulo, is_template_item=True))
-            
         self.caminho_projeto_atual = None
         self.gerenciador_projeto.fechar_projeto()
-        
         if hasattr(self, 'cfg_tipo'):
             self._popular_ui_com_documento()
             self._populando_ui = True
             self.cfg_tipo.setCurrentText(nome_modelo)
             self.documento.configuracoes.tipo_trabalho = nome_modelo
             self._populando_ui = False
-            
         self.modificado = False
         self.setWindowTitle(f'ABNT Helper Final - Novo Projeto ({nome_modelo})')
         self._disparar_atualizacao_automatica()
+
 
 if __name__ == '__main__':
     try:
@@ -635,70 +607,84 @@ if __name__ == '__main__':
         sys.exit(1)
 
     app = QApplication(sys.argv)
-
-    gerenciador_recuperacao.setup_diretorios()
-    arquivos_recuperaveis = gerenciador_recuperacao.verificar_arquivos_recuperaveis()
     
-    acao_inicial = None
-    dados_iniciais = None
+    # Loop principal para permitir voltar à tela inicial
+    while True:
+        gerenciador_recuperacao.setup_diretorios()
+        
+        acao_inicial = None
+        dados_iniciais = None
 
-    if arquivos_recuperaveis:
-        dialog = DialogoRecuperacao(arquivos_recuperaveis)
-        if dialog.exec():
-            # Lidar com os arquivos a serem descartados
-            for arq_info in dialog.arquivos_para_descartar:
-                gerenciador_recuperacao.limpar_recuperacao_pelo_caminho_direto(arq_info['recovery_file_path'])
-
-            # Lidar com os arquivos a serem recuperados
-            if dialog.arquivos_para_recuperar:
-                primeiro_para_abrir = dialog.arquivos_para_recuperar.pop(0)
-                acao_inicial = 'recuperar'
-                dados_iniciais = primeiro_para_abrir['recovery_file_path']
+        # Verificação automática de recuperação PRIMEIRO.
+        arquivos_recuperaveis = gerenciador_recuperacao.verificar_arquivos_recuperaveis()
+        if arquivos_recuperaveis:
+            dialog = DialogoRecuperacao(arquivos_recuperaveis)
+            if dialog.exec():
+                if dialog.arquivos_para_recuperar:
+                    acao_inicial = 'recuperar'
+                    dados_iniciais = dialog.arquivos_para_recuperar
                 
-                # REMOVIDO: A limpeza do primeiro arquivo foi movida para dentro de carregar_projeto_pelo_caminho
+                for arq_info in dialog.arquivos_para_descartar:
+                    gerenciador_recuperacao.limpar_recuperacao_pelo_caminho_direto(arq_info['recovery_file_path'])
 
-                # Os restantes são salvos em um local seguro (Área de Trabalho)
-                outros_recuperados = []
+        # Se nenhuma recuperação automática foi iniciada, mostra a tela inicial.
+        if not acao_inicial:
+            tela_inicial = TelaInicial()
+            if tela_inicial.exec():
+                acao_inicial, dados_iniciais = tela_inicial.get_resultado()
+
+        # Se nenhuma ação foi escolhida (usuário fechou a tela inicial), sai do loop.
+        if not acao_inicial:
+            break
+
+        # Bloco de processamento da ação
+        if acao_inicial == 'recuperar':
+            arquivos_para_recuperar = dados_iniciais
+            primeiro_para_abrir = arquivos_para_recuperar.pop(0)
+            caminho_primeiro = primeiro_para_abrir['recovery_file_path']
+            
+            outros_recuperados = []
+            if arquivos_para_recuperar:
                 desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-                for arq_info in dialog.arquivos_para_recuperar:
+                for arq_info in arquivos_para_recuperar:
                     nome_original = arq_info.get('original_name', 'arquivo_recuperado').replace('.abnf', '')
                     caminho_seguro = os.path.join(desktop, f"[RECUPERADO] {nome_original}.abnf")
-                    
                     contador = 1
                     while os.path.exists(caminho_seguro):
                         caminho_seguro = os.path.join(desktop, f"[RECUPERADO] {nome_original}_{contador}.abnf")
                         contador += 1
-                        
                     try:
                         shutil.copy2(arq_info['recovery_file_path'], caminho_seguro)
                         outros_recuperados.append(os.path.basename(caminho_seguro))
                     except Exception as e:
                         print(f"Erro ao salvar arquivo recuperado na área de trabalho: {e}")
-                    
                     gerenciador_recuperacao.limpar_recuperacao_pelo_caminho_direto(arq_info['recovery_file_path'])
-                
-                if outros_recuperados:
-                    msg = (f"O projeto '{primeiro_para_abrir.get('original_name')}' foi aberto para edição.\n\n"
-                           "Os seguintes projetos recuperados foram salvos na sua Área de Trabalho:\n- " +
-                           "\n- ".join(outros_recuperados))
-                    QMessageBox.information(None, "Projetos Recuperados", msg)
-    
-    if not acao_inicial:
-        tela_inicial = TelaInicial()
-        if tela_inicial.exec():
-            acao_inicial, dados_iniciais = tela_inicial.get_resultado()
+            
+            acao_inicial = 'abrir_recuperado'
+            dados_iniciais = caminho_primeiro
+            
+            if outros_recuperados:
+                msg = (f"O projeto '{primeiro_para_abrir.get('original_name')}' foi aberto para edição.\n\n"
+                       "Os seguintes projetos recuperados foram salvos na sua Área de Trabalho:\n- " +
+                       "\n- ".join(outros_recuperados))
+                QMessageBox.information(None, "Projetos Recuperados", msg)
 
-    if acao_inicial:
+        # Inicia a janela principal
         win = ABNTHelperApp()
 
         if acao_inicial == 'novo':
             win.iniciar_novo_projeto_com_modelo(dados_iniciais)
         elif acao_inicial == 'abrir':
             win.carregar_projeto_pelo_caminho(dados_iniciais)
-        elif acao_inicial == 'recuperar':
+        elif acao_inicial == 'abrir_recuperado':
             win.carregar_projeto_pelo_caminho(dados_iniciais, is_recovery=True)
 
-        win.show()
-        sys.exit(app.exec())
+        # Mostra a janela principal maximizada
+        win.showMaximized()
+        app.exec()
 
+        # Verifica se o loop deve continuar (voltar à tela inicial) ou terminar
+        if not win.wants_to_restart:
+            break
+            
     sys.exit(0)

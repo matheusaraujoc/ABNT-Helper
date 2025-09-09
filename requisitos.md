@@ -73,3 +73,5 @@ a mensagem de erro deve aparecer e a caixa de edição da tabela deve continuar 
 para evitar que o usuário perca o conteúdo que estava trabalhando. -- Corrigido
 
 O distanciamento do inicio de paragrafo não está sendo respeitado, conforme as normas ABNT exigem. -- Corrigido
+
+A formatação do arquivo em docx

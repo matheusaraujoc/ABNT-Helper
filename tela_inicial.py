@@ -6,9 +6,11 @@ import os
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import (QDialog, QWidget, QLabel, QPushButton, QVBoxLayout,
                                QHBoxLayout, QListWidget, QListWidgetItem,
-                               QFileDialog, QMessageBox, QScrollArea, QSizePolicy) # Adicionado QSizePolicy
+                               QFileDialog, QMessageBox, QScrollArea, QSizePolicy)
 
 import gerenciador_config
+import gerenciador_recuperacao
+from dialogs import DialogoRecuperacao
 from modelos_trabalho import get_nomes_modelos
 
 class ProjetoRecenteItem(QWidget):
@@ -21,7 +23,7 @@ class ProjetoRecenteItem(QWidget):
         nome_label = QLabel(f"<b>{nome}</b>")
         caminho_label = QLabel(caminho)
         caminho_label.setStyleSheet("color: gray;")
-        caminho_label.setWordWrap(True) # Permite que o caminho quebre a linha se for muito longo
+        caminho_label.setWordWrap(True)
         
         layout.addWidget(nome_label)
         layout.addWidget(caminho_label)
@@ -31,10 +33,8 @@ class TelaInicial(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Bem-vindo ao ABNT Helper")
-        # CORREÇÃO 1: Aumentar a largura mínima da janela para dar mais espaço
         self.setMinimumSize(950, 550)
         
-        # CORREÇÃO 2: Adicionar a propriedade 'white-space' para permitir quebra de linha nos botões
         self.setStyleSheet("""
             QDialog { background-color: #f0f0f0; }
             QPushButton { 
@@ -42,13 +42,12 @@ class TelaInicial(QDialog):
                 padding: 10px; border-radius: 5px; font-size: 14px;
             }
             QPushButton:hover { background-color: #005a9e; }
-            #BtnAbrir { 
+            #BtnAbrir, #BtnRecuperar { 
                 background-color: #e0e0e0; color: black;
-                text-align: left; /* Alinha o texto à esquerda para melhor leitura */
-                padding-left: 15px;
-                white-space: normal; /* ESSA É A PROPRIEDADE MÁGICA */
+                text-align: left; padding-left: 15px;
+                white-space: normal;
             }
-            #BtnAbrir:hover { background-color: #c8c8c8; }
+            #BtnAbrir:hover, #BtnRecuperar:hover { background-color: #c8c8c8; }
             QListWidget { border: 1px solid #ccc; background-color: white; }
         """)
 
@@ -73,10 +72,18 @@ class TelaInicial(QDialog):
         btn_abrir.setIcon(self.style().standardIcon(QtWidgets.QStyle.StandardPixmap.SP_DirOpenIcon))
         btn_abrir.clicked.connect(self.on_abrir_projeto)
 
+        # Botão de Gerenciamento de Recuperação
+        btn_recuperacao = QPushButton("Gerenciar Recuperação")
+        btn_recuperacao.setObjectName("BtnRecuperar")
+        btn_recuperacao.setIcon(self.style().standardIcon(QtWidgets.QStyle.StandardPixmap.SP_BrowserReload))
+        btn_recuperacao.clicked.connect(self.on_gerenciar_recuperacao)
+
         left_layout.addWidget(titulo_label)
         left_layout.addSpacing(20)
         left_layout.addWidget(btn_novo)
         left_layout.addWidget(btn_abrir)
+        left_layout.addSpacing(20)
+        left_layout.addWidget(btn_recuperacao)
         left_layout.addStretch()
 
         # --- Painel Central (Projetos Recentes) ---
@@ -96,7 +103,6 @@ class TelaInicial(QDialog):
         # --- Painel Direito (Modelos) ---
         right_panel = QWidget()
         right_layout = QVBoxLayout(right_panel)
-        # CORREÇÃO 3: Aumentar a largura do painel de modelos
         right_panel.setFixedWidth(300) 
         
         modelos_label = QLabel("Iniciar com um Modelo")
@@ -111,7 +117,6 @@ class TelaInicial(QDialog):
         for nome_modelo in get_nomes_modelos():
             btn = QPushButton(nome_modelo)
             btn.setObjectName("BtnAbrir")
-            # Faz o botão crescer na altura conforme necessário
             btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             btn.clicked.connect(lambda checked=False, m=nome_modelo: self.on_novo_com_modelo(m))
             self.modelos_layout.addWidget(btn)
@@ -162,6 +167,27 @@ class TelaInicial(QDialog):
                 f"O arquivo do projeto não foi encontrado no caminho:\n\n{caminho}\n\nEle pode ter sido movido ou excluído.")
             gerenciador_config.remover_projeto_recente(caminho)
             self.popular_projetos_recentes()
+
+    def on_gerenciar_recuperacao(self):
+        arquivos = gerenciador_recuperacao.verificar_arquivos_recuperaveis()
+        if not arquivos:
+            QMessageBox.information(self, "Gerenciar Recuperação", "Nenhum arquivo de recuperação foi encontrado.")
+            return
+
+        dialog = DialogoRecuperacao(arquivos, self)
+        if dialog.exec():
+            # Se o usuário escolheu recuperar, passa a lista de arquivos para o main_app
+            if dialog.arquivos_para_recuperar:
+                self.resultado = ("recuperar", dialog.arquivos_para_recuperar)
+                # Descarta também os arquivos que o usuário marcou para descarte na mesma ação
+                for arq_info in dialog.arquivos_para_descartar:
+                    gerenciador_recuperacao.limpar_recuperacao_pelo_caminho_direto(arq_info['recovery_file_path'])
+                self.accept()
+            # Se ele só escolheu descartar
+            elif dialog.arquivos_para_descartar:
+                for arq_info in dialog.arquivos_para_descartar:
+                    gerenciador_recuperacao.limpar_recuperacao_pelo_caminho_direto(arq_info['recovery_file_path'])
+                QMessageBox.information(self, "Limpeza Concluída", "Os arquivos de recuperação selecionados foram descartados.")
 
     def get_resultado(self):
         return self.resultado
