@@ -953,6 +953,22 @@
         "documentation": {}
     },
     {
+        "label": "DocumentoABNT",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Capitulo",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "Figura",
         "importPath": "documento",
         "description": "documento",
@@ -1452,6 +1468,30 @@
         "documentation": {}
     },
     {
+        "label": "Document",
+        "importPath": "docx",
+        "description": "docx",
+        "isExtraImport": true,
+        "detail": "docx",
+        "documentation": {}
+    },
+    {
+        "label": "Cm",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
+        "label": "Pt",
+        "importPath": "docx.shared",
+        "description": "docx.shared",
+        "isExtraImport": true,
+        "detail": "docx.shared",
+        "documentation": {}
+    },
+    {
         "label": "Cm",
         "importPath": "docx.shared",
         "description": "docx.shared",
@@ -1516,6 +1556,30 @@
         "documentation": {}
     },
     {
+        "label": "WD_TAB_ALIGNMENT",
+        "importPath": "docx.enum.text",
+        "description": "docx.enum.text",
+        "isExtraImport": true,
+        "detail": "docx.enum.text",
+        "documentation": {}
+    },
+    {
+        "label": "WD_PARAGRAPH_ALIGNMENT",
+        "importPath": "docx.enum.text",
+        "description": "docx.enum.text",
+        "isExtraImport": true,
+        "detail": "docx.enum.text",
+        "documentation": {}
+    },
+    {
+        "label": "WD_SECTION",
+        "importPath": "docx.enum.section",
+        "description": "docx.enum.section",
+        "isExtraImport": true,
+        "detail": "docx.enum.section",
+        "documentation": {}
+    },
+    {
         "label": "WD_SECTION",
         "importPath": "docx.enum.section",
         "description": "docx.enum.section",
@@ -1540,6 +1604,14 @@
         "documentation": {}
     },
     {
+        "label": "qn",
+        "importPath": "docx.oxml.ns",
+        "description": "docx.oxml.ns",
+        "isExtraImport": true,
+        "detail": "docx.oxml.ns",
+        "documentation": {}
+    },
+    {
         "label": "OxmlElement",
         "importPath": "docx.oxml",
         "description": "docx.oxml",
@@ -1553,6 +1625,22 @@
         "description": "docx.oxml",
         "isExtraImport": true,
         "detail": "docx.oxml",
+        "documentation": {}
+    },
+    {
+        "label": "OxmlElement",
+        "importPath": "docx.oxml",
+        "description": "docx.oxml",
+        "isExtraImport": true,
+        "detail": "docx.oxml",
+        "documentation": {}
+    },
+    {
+        "label": "MotorNormasABNT",
+        "importPath": "normas_abnt",
+        "description": "normas_abnt",
+        "isExtraImport": true,
+        "detail": "normas_abnt",
         "documentation": {}
     },
     {
@@ -1867,6 +1955,15 @@
         "description": "formula",
         "peekOfCode": "class Formula:\n    legenda: str = \"\"\n    codigo_latex: str = r\"\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\"\n    # Caminho para o arquivo vetorial original (para preview)\n    caminho_svg: str = \"\"\n    # Caminho para a imagem rasterizada (para o DOCX)\n    caminho_processado_png: str = \"\"\n    numero: int = 0",
         "detail": "formula",
+        "documentation": {}
+    },
+    {
+        "label": "GeradorDOCX",
+        "kind": 6,
+        "importPath": "gerador_docx",
+        "description": "gerador_docx",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT(self.doc_abnt)\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n        self.contador_formulas = 0\n    # ... (cole aqui os métodos _atualizar_sumario_com_word, gerar_documento, etc.)",
+        "detail": "gerador_docx",
         "documentation": {}
     },
     {

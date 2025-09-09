@@ -65,7 +65,9 @@ obs: Deve ser criado um novo arquivo para essa funcionalidade
 
 23- Na tela inicial adicionar uma opção de criar projeto "guiado"(procurar um nome melhor), para o usuário fazer todas as configurações do projeto de forma muito intuitiva, para usuários leigos, o programa vai fazer perguntas referente ao projeto e o usuário vai responder. Exemplo: "Qual o nome do seu orientador?", "Qual instituição você estuda" e dê um exemplo de como responder. Semelhante a tela de configuração da cortana no windows, onde aparecem os textos com uma animação discreta e intuitiva que seja amigável para o usuário leigo.
 
-4- Opção de adicionar brasão da instituição e do estado, com personalização lado direito, esquerdo ou superior
+24- Opção de adicionar brasão da instituição e do estado, com personalização lado direito, esquerdo ou superior
+
+25- Em formulas com números com pontos, o programa deve cobrir isso. (ex: 1.1)
 
 Correções:
 
