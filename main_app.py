@@ -5,6 +5,9 @@
 
 import sys
 import os
+
+os.environ['QTWEBENGINE_REMOTE_DEBUGGING'] = '9222'
+
 import shutil
 from datetime import datetime
 from PySide6 import QtWidgets, QtCore

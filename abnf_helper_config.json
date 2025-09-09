@@ -8,7 +8,7 @@
     ],
     "recovery": {
         "autosave_enabled": true,
-        "autosave_periodic_interval_min": 10
+        "autosave_periodic_interval_min": 5
     },
     "backup": {
         "backup_on_save_enabled": true,

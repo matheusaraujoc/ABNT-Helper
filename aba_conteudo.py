@@ -1,5 +1,5 @@
 # aba_conteudo.py
-# Descrição: Versão completa com o filtro de bancos de dados funcionando em tempo real.
+# Descrição: Versão completa com a interface para o Banco de Fórmulas.
 
 import re
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -7,8 +7,9 @@ from PySide6.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, QListWid
                                QVBoxLayout, QHBoxLayout, QMessageBox, QTreeWidget,
                                QTreeWidgetItem, QInputDialog, QAbstractItemView, QLineEdit)
 
-from documento import Capitulo, Tabela, Figura
+from documento import Capitulo, Tabela, Figura, Formula
 from dialogs import TabelaDialog, DialogoFigura
+from DialogoFormula import DialogoFormula
 
 class ArvoreConteudo(QTreeWidget):
     estruturaAlterada = QtCore.Signal()
@@ -60,7 +61,9 @@ class AbaConteudo(QWidget):
         btn_add_topico = QPushButton("Novo Tópico")
         btn_add_sub = QPushButton("Novo Subtópico")
         btn_del = QPushButton("Remover")
-        btn_layout.addWidget(btn_add_topico); btn_layout.addWidget(btn_add_sub); btn_layout.addWidget(btn_del)
+        btn_layout.addWidget(btn_add_topico)
+        btn_layout.addWidget(btn_add_sub)
+        btn_layout.addWidget(btn_del)
         btn_add_topico.clicked.connect(self._adicionar_topico_principal)
         btn_add_sub.clicked.connect(self._adicionar_subtopico)
         btn_del.clicked.connect(self._remover_topico)
@@ -75,6 +78,7 @@ class AbaConteudo(QWidget):
         
         self.lista_tabelas = QListWidget()
         self.lista_figuras = QListWidget()
+        self.lista_formulas = QListWidget()
 
         elementos_layout = QHBoxLayout()
         tabelas_widget = QWidget()
@@ -85,12 +89,19 @@ class AbaConteudo(QWidget):
         tabelas_v_layout.addWidget(self.filtro_tabelas_check)
         tabelas_v_layout.addWidget(self.lista_tabelas)
         tabelas_btn_layout = QHBoxLayout()
-        btn_add_tabela = QPushButton("Criar"); btn_edit_tabela = QPushButton("Editar"); btn_del_tabela = QPushButton("Remover")
-        tabelas_btn_layout.addWidget(btn_add_tabela); tabelas_btn_layout.addWidget(btn_edit_tabela); tabelas_btn_layout.addWidget(btn_del_tabela)
+        btn_add_tabela = QPushButton("Criar")
+        btn_edit_tabela = QPushButton("Editar")
+        btn_del_tabela = QPushButton("Remover")
+        tabelas_btn_layout.addWidget(btn_add_tabela)
+        tabelas_btn_layout.addWidget(btn_edit_tabela)
+        tabelas_btn_layout.addWidget(btn_del_tabela)
         tabelas_v_layout.addLayout(tabelas_btn_layout)
-        btn_ins_tabela = QPushButton("Inserir no Texto"); tabelas_v_layout.addWidget(btn_ins_tabela)
+        btn_ins_tabela = QPushButton("Inserir no Texto")
+        tabelas_v_layout.addWidget(btn_ins_tabela)
         
-        btn_add_tabela.clicked.connect(self._adicionar_tabela); btn_edit_tabela.clicked.connect(self._editar_tabela); btn_del_tabela.clicked.connect(self._remover_tabela)
+        btn_add_tabela.clicked.connect(self._adicionar_tabela)
+        btn_edit_tabela.clicked.connect(self._editar_tabela)
+        btn_del_tabela.clicked.connect(self._remover_tabela)
         btn_ins_tabela.clicked.connect(self._inserir_marcador_tabela)
         
         figuras_widget = QWidget()
@@ -101,15 +112,47 @@ class AbaConteudo(QWidget):
         figuras_v_layout.addWidget(self.filtro_figuras_check)
         figuras_v_layout.addWidget(self.lista_figuras)
         figuras_btn_layout = QHBoxLayout()
-        btn_add_figura = QPushButton("Criar"); btn_edit_figura = QPushButton("Editar"); btn_del_figura = QPushButton("Remover")
-        figuras_btn_layout.addWidget(btn_add_figura); figuras_btn_layout.addWidget(btn_edit_figura); figuras_btn_layout.addWidget(btn_del_figura)
+        btn_add_figura = QPushButton("Criar")
+        btn_edit_figura = QPushButton("Editar")
+        btn_del_figura = QPushButton("Remover")
+        figuras_btn_layout.addWidget(btn_add_figura)
+        figuras_btn_layout.addWidget(btn_edit_figura)
+        figuras_btn_layout.addWidget(btn_del_figura)
         figuras_v_layout.addLayout(figuras_btn_layout)
-        btn_ins_figura = QPushButton("Inserir no Texto"); figuras_v_layout.addWidget(btn_ins_figura)
+        btn_ins_figura = QPushButton("Inserir no Texto")
+        figuras_v_layout.addWidget(btn_ins_figura)
         
-        btn_add_figura.clicked.connect(self._adicionar_figura); btn_edit_figura.clicked.connect(self._editar_figura); btn_del_figura.clicked.connect(self._remover_figura)
+        btn_add_figura.clicked.connect(self._adicionar_figura)
+        btn_edit_figura.clicked.connect(self._editar_figura)
+        btn_del_figura.clicked.connect(self._remover_figura)
         btn_ins_figura.clicked.connect(self._inserir_marcador_figura)
+
+        formulas_widget = QWidget()
+        formulas_v_layout = QVBoxLayout(formulas_widget)
+        formulas_v_layout.addWidget(QLabel("Banco de Fórmulas do Projeto:"))
+        self.filtro_formulas_check = QCheckBox("Mostrar apenas do tópico atual")
+        self.filtro_formulas_check.stateChanged.connect(self.atualizar_bancos_visuais)
+        formulas_v_layout.addWidget(self.filtro_formulas_check)
+        formulas_v_layout.addWidget(self.lista_formulas)
+        formulas_btn_layout = QHBoxLayout()
+        btn_add_formula = QPushButton("Criar")
+        btn_edit_formula = QPushButton("Editar")
+        btn_del_formula = QPushButton("Remover")
+        formulas_btn_layout.addWidget(btn_add_formula)
+        formulas_btn_layout.addWidget(btn_edit_formula)
+        formulas_btn_layout.addWidget(btn_del_formula)
+        formulas_v_layout.addLayout(formulas_btn_layout)
+        btn_ins_formula = QPushButton("Inserir no Texto")
+        formulas_v_layout.addWidget(btn_ins_formula)
         
-        elementos_layout.addWidget(tabelas_widget); elementos_layout.addWidget(figuras_widget)
+        btn_add_formula.clicked.connect(self._adicionar_formula)
+        btn_edit_formula.clicked.connect(self._editar_formula)
+        btn_del_formula.clicked.connect(self._remover_formula)
+        btn_ins_formula.clicked.connect(self._inserir_marcador_formula)
+        
+        elementos_layout.addWidget(tabelas_widget)
+        elementos_layout.addWidget(figuras_widget)
+        elementos_layout.addWidget(formulas_widget)
 
         right_layout.addWidget(self.label_capitulo_atual)
         right_layout.addWidget(self.editor_capitulo, 2)
@@ -140,6 +183,16 @@ class AbaConteudo(QWidget):
                 if figura.titulo in titulos_usados: self.lista_figuras.addItem(figura.titulo)
         else:
             for figura in self.documento.banco_figuras: self.lista_figuras.addItem(figura.titulo)
+            
+        self.lista_formulas.clear()
+        if self.filtro_formulas_check.isChecked() and capitulo_selecionado:
+            legendas_usadas = set(re.findall(r"\{\{Formula:([^}]+)\}\}", conteudo_capitulo))
+            for formula in self.documento.banco_formulas:
+                if formula.legenda in legendas_usadas:
+                    self.lista_formulas.addItem(formula.legenda)
+        else:
+            for formula in self.documento.banco_formulas:
+                self.lista_formulas.addItem(formula.legenda)
     
     @QtCore.Slot()
     def _on_editor_text_changed(self):
@@ -191,7 +244,8 @@ class AbaConteudo(QWidget):
             if child.text() in ["Criar", "Editar", "Remover", "Inserir no Texto"]:
                 child.setEnabled(elementos_habilitados)
         if not capitulo:
-            self.editor_capitulo.clear(); self.editor_capitulo.setEnabled(False)
+            self.editor_capitulo.clear()
+            self.editor_capitulo.setEnabled(False)
             self.label_capitulo_atual.setText("Selecione um tópico")
             return
         
@@ -224,6 +278,17 @@ class AbaConteudo(QWidget):
                 self.atualizar_bancos_visuais()
 
     @QtCore.Slot()
+    def _adicionar_formula(self):
+        if not self._get_capitulo_selecionado():
+            QMessageBox.warning(self, "Atenção", "Selecione um tópico antes de criar uma fórmula.")
+            return
+        dialog = DialogoFormula(parent=self)
+        if dialog.exec():
+            nova_formula = dialog.get_dados_formula()
+            self.documento.banco_formulas.append(nova_formula)
+            self.atualizar_bancos_visuais()
+
+    @QtCore.Slot()
     def _inserir_marcador_tabela(self):
         item_selecionado = self.lista_tabelas.currentItem()
         if not item_selecionado:
@@ -239,6 +304,15 @@ class AbaConteudo(QWidget):
             QMessageBox.warning(self, "Atenção", "Selecione uma figura do banco para inserir.")
             return
         marcador = f"\n{{{{Figura:{item_selecionado.text()}}}}}\n"
+        self.editor_capitulo.insertPlainText(marcador)
+
+    @QtCore.Slot()
+    def _inserir_marcador_formula(self):
+        item_selecionado = self.lista_formulas.currentItem()
+        if not item_selecionado:
+            QMessageBox.warning(self, "Atenção", "Selecione uma fórmula do banco para inserir.")
+            return
+        marcador = f"\n{{{{Formula:{item_selecionado.text()}}}}}\n"
         self.editor_capitulo.insertPlainText(marcador)
 
     def _get_capitulo_selecionado(self) -> Capitulo | None:
@@ -286,6 +360,23 @@ class AbaConteudo(QWidget):
         if linha == -1: return
         if QMessageBox.question(self, "Confirmar", "Remover esta figura do banco de dados do projeto?") == QMessageBox.StandardButton.Yes:
             del self.documento.banco_figuras[linha]
+            self.atualizar_bancos_visuais()
+            
+    @QtCore.Slot()
+    def _editar_formula(self):
+        linha = self.lista_formulas.currentRow()
+        if linha == -1: return
+        dialog = DialogoFormula(formula=self.documento.banco_formulas[linha], parent=self)
+        if dialog.exec():
+            self.documento.banco_formulas[linha] = dialog.get_dados_formula()
+            self.atualizar_bancos_visuais()
+    
+    @QtCore.Slot()
+    def _remover_formula(self):
+        linha = self.lista_formulas.currentRow()
+        if linha == -1: return
+        if QMessageBox.question(self, "Confirmar", "Remover esta fórmula do banco de dados do projeto?") == QMessageBox.StandardButton.Yes:
+            del self.documento.banco_formulas[linha]
             self.atualizar_bancos_visuais()
     
     def _popular_arvore(self):

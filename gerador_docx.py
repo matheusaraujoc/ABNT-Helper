@@ -1,11 +1,11 @@
 # gerador_docx.py
-# Descrição: Versão corrigida com melhor distribuição de capa/folha de rosto e formatação de fonte.
+# Descrição: Versão final com suporte para renderização de Fórmulas LaTeX.
 
 import os
 import re
 from docx import Document
 from docx.shared import Cm, Pt
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT, WD_TAB_ALIGNMENT
 from docx.enum.section import WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
@@ -53,6 +53,7 @@ class GeradorDOCX:
         self.regras.configurar_pagina_e_estilos(self.doc)
         self.contador_tabelas = 0
         self.contador_figuras = 0
+        self.contador_formulas = 0
 
     def _atualizar_sumario_com_word(self, caminho_arquivo):
         if not WIN32_AVAILABLE:
@@ -116,7 +117,7 @@ class GeradorDOCX:
             self.regras.aplicar_estilo_titulo_secao(self.doc, numero_completo, no_filho.titulo, nivel=nivel_titulo)
             
             if no_filho.conteudo:
-                padrao = r"\{\{(Tabela|Figura):([^}]+)\}\}"
+                padrao = r"\{\{(Tabela|Figura|Formula):([^}]+)\}\}"
                 partes = re.split(padrao, no_filho.conteudo)
                 
                 for k, parte in enumerate(partes):
@@ -132,17 +133,23 @@ class GeradorDOCX:
                         tipo = parte
                         titulo = partes[k+1]
                         if tipo == "Tabela":
-                            tabela_obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
-                            if tabela_obj:
+                            obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
+                            if obj:
                                 self.contador_tabelas += 1
-                                tabela_obj.numero = self.contador_tabelas
-                                self._renderizar_tabela(tabela_obj)
+                                obj.numero = self.contador_tabelas
+                                self._renderizar_tabela(obj)
                         elif tipo == "Figura":
-                            figura_obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
-                            if figura_obj:
+                            obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
+                            if obj:
                                 self.contador_figuras += 1
-                                figura_obj.numero = self.contador_figuras
-                                self._renderizar_figura(figura_obj)
+                                obj.numero = self.contador_figuras
+                                self._renderizar_figura(obj)
+                        elif tipo == "Formula":
+                            obj = next((f for f in self.doc_abnt.banco_formulas if f.legenda == titulo), None)
+                            if obj:
+                                self.contador_formulas += 1
+                                obj.numero = self.contador_formulas
+                                self._renderizar_formula(obj)
             
             self._renderizar_secoes_recursivamente(no_filho, prefixo_numeracao=f"{numero_completo}.")
 
@@ -205,6 +212,42 @@ class GeradorDOCX:
         else:
             p_imagem.paragraph_format.keep_with_next = False
 
+    def _renderizar_formula(self, formula_obj):
+        # Parágrafo para alinhar a fórmula e o número
+        p_formula = self.doc.add_paragraph()
+        
+        # Insere a imagem SVG. O Word (via win32com) lida bem com isso.
+        # python-docx sozinho não consegue, mas a imagem fica como um placeholder
+        # que o Word pode preencher.
+        try:
+            # Adiciona a imagem SVG como um placeholder.
+            # O tamanho aqui é menos crítico, pois o Word vai usar o tamanho do SVG.
+            p_formula.add_run().add_picture(formula_obj.caminho_imagem, height=Cm(1.5))
+        except Exception as e:
+            # Fallback se add_picture falhar com SVG (improvável, mas seguro)
+            # Ou se o arquivo não for encontrado.
+            erro_msg = f"[ERRO: Imagem da fórmula '{formula_obj.legenda}' não encontrada ou formato inválido: {e}]"
+            run_erro = p_formula.add_run(erro_msg)
+            run_erro.italic = True
+            self.regras._aplicar_formatacao_run(run_erro)
+            
+        # Adiciona a tabulação para o número da equação
+        p_formula.add_run().add_tab()
+        run_numero = p_formula.add_run(f"({formula_obj.numero})")
+        self.regras._aplicar_formatacao_run(run_numero)
+
+        # Configura a posição da tabulação para alinhar o número à direita
+        tab_stops = p_formula.paragraph_format.tab_stops
+        # Ajuste o valor em Cm conforme a largura da sua página (16cm é um bom padrão)
+        tab_stops.add_tab_stop(Cm(16), alignment=WD_TAB_ALIGNMENT.RIGHT)
+
+        # Adiciona a legenda abaixo da fórmula
+        p_legenda = self.doc.add_paragraph()
+        p_legenda.add_run(f"Equação {formula_obj.numero} – {formula_obj.legenda}")
+        self.regras.aplicar_estilo_legenda(p_legenda, is_titulo=True)
+        p_legenda.paragraph_format.space_before = Pt(6)
+        p_legenda.paragraph_format.space_after = Pt(12)
+
     def _set_page_numbering(self, section):
         section.header.is_linked_to_previous = False
         header_p = section.header.paragraphs[0]
@@ -228,21 +271,21 @@ class GeradorDOCX:
         run.bold = True
         
         p_autores = self.doc.add_paragraph()
-        p_autores.paragraph_format.space_before = Pt(72) # Espaço
+        p_autores.paragraph_format.space_before = Pt(72)
         p_autores.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         nomes_autores = '\n'.join([a.nome_completo.upper() for a in self.doc_abnt.autores])
         run = p_autores.add_run(nomes_autores)
         run.bold = True
         
         p_titulo = self.doc.add_paragraph()
-        p_titulo.paragraph_format.space_before = Pt(120) # Espaço
+        p_titulo.paragraph_format.space_before = Pt(120)
         p_titulo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = p_titulo.add_run(self.doc_abnt.titulo.upper())
         run.bold = True
         run.font.size = self.regras.TAMANHO_FONTE_CAPA
         
         p_final = self.doc.add_paragraph()
-        p_final.paragraph_format.space_before = Pt(250) # CORRIGIDO: Valor ajustado para melhor posicionamento
+        p_final.paragraph_format.space_before = Pt(250)
         p_final.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         p_final.add_run(f"{self.doc_abnt.configuracoes.cidade.upper()}\n{self.doc_abnt.configuracoes.ano}")
         
@@ -257,24 +300,24 @@ class GeradorDOCX:
         p_autores.add_run(nomes_autores).bold = True
 
         p_titulo = self.doc.add_paragraph()
-        p_titulo.paragraph_format.space_before = Pt(120) # Espaço
+        p_titulo.paragraph_format.space_before = Pt(120)
         p_titulo.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = p_titulo.add_run(self.doc_abnt.titulo.upper())
         run.bold = True
         run.font.size = self.regras.TAMANHO_FONTE_CAPA
         
         p_natureza = self.doc.add_paragraph()
-        p_natureza.paragraph_format.space_before = Pt(90) # Espaço
+        p_natureza.paragraph_format.space_before = Pt(90)
         texto_natureza = (f"{cfg.tipo_trabalho} apresentado ao curso de {cfg.modalidade_curso} em {cfg.curso} da {cfg.instituicao}, "
                           f"como requisito parcial para a obtenção do título de {cfg.titulo_pretendido}.")
         self.regras.aplicar_estilo_natureza_trabalho(p_natureza, texto_natureza)
         
         p_orientador = self.doc.add_paragraph()
-        p_orientador.paragraph_format.space_before = Pt(12) # Espaço
+        p_orientador.paragraph_format.space_before = Pt(12)
         self.regras.aplicar_estilo_natureza_trabalho(p_orientador, f"Orientador(a): {self.doc_abnt.orientador}")
         
         p_final = self.doc.add_paragraph()
-        p_final.paragraph_format.space_before = Pt(150) # CORRIGIDO: Valor ajustado
+        p_final.paragraph_format.space_before = Pt(150)
         p_final.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         p_final.add_run(f"{cfg.cidade.upper()}\n{cfg.ano}")
         

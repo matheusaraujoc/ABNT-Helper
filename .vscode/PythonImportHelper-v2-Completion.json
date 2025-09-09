@@ -113,6 +113,22 @@
         "documentation": {}
     },
     {
+        "label": "QtWidgets",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
+        "label": "QtCore",
+        "importPath": "PySide6",
+        "description": "PySide6",
+        "isExtraImport": true,
+        "detail": "PySide6",
+        "documentation": {}
+    },
+    {
         "label": "QtGui",
         "importPath": "PySide6",
         "description": "PySide6",
@@ -226,6 +242,62 @@
     },
     {
         "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLineEdit",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QDialogButtonBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
         "isExtraImport": true,
@@ -793,6 +865,14 @@
         "documentation": {}
     },
     {
+        "label": "Formula",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
         "label": "Figura",
         "importPath": "documento",
         "description": "documento",
@@ -874,6 +954,14 @@
     },
     {
         "label": "Figura",
+        "importPath": "documento",
+        "description": "documento",
+        "isExtraImport": true,
+        "detail": "documento",
+        "documentation": {}
+    },
+    {
+        "label": "Formula",
         "importPath": "documento",
         "description": "documento",
         "isExtraImport": true,
@@ -1009,12 +1097,85 @@
         "documentation": {}
     },
     {
+        "label": "DialogoFormula",
+        "importPath": "DialogoFormula",
+        "description": "DialogoFormula",
+        "isExtraImport": true,
+        "detail": "DialogoFormula",
+        "documentation": {}
+    },
+    {
         "label": "os",
         "kind": 6,
         "isExtraImport": true,
         "importPath": "os",
         "description": "os",
         "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "tempfile",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "tempfile",
+        "description": "tempfile",
+        "detail": "tempfile",
+        "documentation": {}
+    },
+    {
+        "label": "QWebEngineSettings",
+        "importPath": "PySide6.QtWebEngineCore",
+        "description": "PySide6.QtWebEngineCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWebEngineCore",
+        "documentation": {}
+    },
+    {
+        "label": "QWebEngineDownloadRequest",
+        "importPath": "PySide6.QtWebEngineCore",
+        "description": "PySide6.QtWebEngineCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWebEngineCore",
+        "documentation": {}
+    },
+    {
+        "label": "QWebEnginePage",
+        "importPath": "PySide6.QtWebEngineCore",
+        "description": "PySide6.QtWebEngineCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWebEngineCore",
+        "documentation": {}
+    },
+    {
+        "label": "QWebEngineView",
+        "importPath": "PySide6.QtWebEngineWidgets",
+        "description": "PySide6.QtWebEngineWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWebEngineWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWebEngineView",
+        "importPath": "PySide6.QtWebEngineWidgets",
+        "description": "PySide6.QtWebEngineWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWebEngineWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "Formula",
+        "importPath": "formula",
+        "description": "formula",
+        "isExtraImport": true,
+        "detail": "formula",
+        "documentation": {}
+    },
+    {
+        "label": "Formula",
+        "importPath": "formula",
+        "description": "formula",
+        "isExtraImport": true,
+        "detail": "formula",
         "documentation": {}
     },
     {
@@ -1219,6 +1380,14 @@
         "documentation": {}
     },
     {
+        "label": "dataclass",
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "isExtraImport": true,
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
         "label": "List",
         "importPath": "typing",
         "description": "typing",
@@ -1284,6 +1453,14 @@
     },
     {
         "label": "WD_PARAGRAPH_ALIGNMENT",
+        "importPath": "docx.enum.text",
+        "description": "docx.enum.text",
+        "isExtraImport": true,
+        "detail": "docx.enum.text",
+        "documentation": {}
+    },
+    {
+        "label": "WD_TAB_ALIGNMENT",
         "importPath": "docx.enum.text",
         "description": "docx.enum.text",
         "isExtraImport": true,
@@ -1374,15 +1551,6 @@
         "documentation": {}
     },
     {
-        "label": "tempfile",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "tempfile",
-        "description": "tempfile",
-        "detail": "tempfile",
-        "documentation": {}
-    },
-    {
         "label": "copy",
         "kind": 6,
         "isExtraImport": true,
@@ -1424,22 +1592,6 @@
         "importPath": "sys",
         "description": "sys",
         "detail": "sys",
-        "documentation": {}
-    },
-    {
-        "label": "QWebEnginePage",
-        "importPath": "PySide6.QtWebEngineCore",
-        "description": "PySide6.QtWebEngineCore",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWebEngineCore",
-        "documentation": {}
-    },
-    {
-        "label": "QWebEngineView",
-        "importPath": "PySide6.QtWebEngineWidgets",
-        "description": "PySide6.QtWebEngineWidgets",
-        "isExtraImport": true,
-        "detail": "PySide6.QtWebEngineWidgets",
         "documentation": {}
     },
     {
@@ -1531,6 +1683,15 @@
         "description": "aba_conteudo",
         "peekOfCode": "class AbaConteudo(QWidget):\n    def __init__(self, documento, parent=None):\n        super().__init__(parent)\n        self.documento = documento\n        self._carregando_capitulo = False\n        self._build_ui()\n    def _build_ui(self):\n        layout = QHBoxLayout(self)\n        left_panel = QWidget()\n        left_layout = QVBoxLayout(left_panel)",
         "detail": "aba_conteudo",
+        "documentation": {}
+    },
+    {
+        "label": "DialogoFormula",
+        "kind": 6,
+        "importPath": "DialogoFormula",
+        "description": "DialogoFormula",
+        "peekOfCode": "class DialogoFormula(QDialog):\n    def __init__(self, formula: Formula = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Fórmulas LaTeX\")\n        self.setMinimumSize(800, 600)\n        self.formula = formula if formula else Formula()\n        self.svg_gerado_path = None\n        layout = QVBoxLayout(self)\n        form_layout = QtWidgets.QFormLayout()\n        self.legenda_input = QLineEdit(self.formula.legenda)",
+        "detail": "DialogoFormula",
         "documentation": {}
     },
     {
@@ -1660,11 +1821,20 @@
         "documentation": {}
     },
     {
+        "label": "Formula",
+        "kind": 6,
+        "importPath": "formula",
+        "description": "formula",
+        "peekOfCode": "class Formula:\n    legenda: str = \"\"\n    codigo_latex: str = r\"\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\"\n    caminho_imagem: str = \"\"  # ATENÇÃO: Este caminho agora será para um arquivo .svg\n    numero: int = 0",
+        "detail": "formula",
+        "documentation": {}
+    },
+    {
         "label": "GeradorDOCX",
         "kind": 6,
         "importPath": "gerador_docx",
         "description": "gerador_docx",
-        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT(self.doc_abnt)\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):\n        if not WIN32_AVAILABLE:",
+        "peekOfCode": "class GeradorDOCX:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.doc = Document()\n        self.regras = MotorNormasABNT(self.doc_abnt)\n        self.regras.configurar_pagina_e_estilos(self.doc)\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n        self.contador_formulas = 0\n    def _atualizar_sumario_com_word(self, caminho_arquivo):",
         "detail": "gerador_docx",
         "documentation": {}
     },
@@ -1682,7 +1852,7 @@
         "kind": 6,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "class GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n        self.classe_pagina_atual = 'pagina'",
+        "peekOfCode": "class GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0\n        self.contador_formulas = 0",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1691,7 +1861,7 @@
         "kind": 5,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "ALTURA_CONTEUDO_PAGINA = 24.7\nALTURA_LINHA_TEXTO = 0.6\nALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nCARACTERES_POR_LINHA = 80 # Estimativa\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []",
+        "peekOfCode": "ALTURA_CONTEUDO_PAGINA = 24.7\nALTURA_LINHA_TEXTO = 0.6\nALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nALTURA_FORMULA_ESTIMADA = 4.0 # Estimativa de altura para uma fórmula\nCARACTERES_POR_LINHA = 80\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1700,7 +1870,7 @@
         "kind": 5,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "ALTURA_LINHA_TEXTO = 0.6\nALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nCARACTERES_POR_LINHA = 80 # Estimativa\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []",
+        "peekOfCode": "ALTURA_LINHA_TEXTO = 0.6\nALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nALTURA_FORMULA_ESTIMADA = 4.0 # Estimativa de altura para uma fórmula\nCARACTERES_POR_LINHA = 80\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1709,7 +1879,7 @@
         "kind": 5,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "ALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nCARACTERES_POR_LINHA = 80 # Estimativa\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []",
+        "peekOfCode": "ALTURA_TITULO_SECAO = 1.5\nALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nALTURA_FORMULA_ESTIMADA = 4.0 # Estimativa de altura para uma fórmula\nCARACTERES_POR_LINHA = 80\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1718,7 +1888,7 @@
         "kind": 5,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "ALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nCARACTERES_POR_LINHA = 80 # Estimativa\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA",
+        "peekOfCode": "ALTURA_LEGENDA = 1.2\nALTURA_LINHA_TABELA = 0.8\nALTURA_FORMULA_ESTIMADA = 4.0 # Estimativa de altura para uma fórmula\nCARACTERES_POR_LINHA = 80\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1727,7 +1897,16 @@
         "kind": 5,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "ALTURA_LINHA_TABELA = 0.8\nCARACTERES_POR_LINHA = 80 # Estimativa\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0",
+        "peekOfCode": "ALTURA_LINHA_TABELA = 0.8\nALTURA_FORMULA_ESTIMADA = 4.0 # Estimativa de altura para uma fórmula\nCARACTERES_POR_LINHA = 80\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA",
+        "detail": "gerador_preview",
+        "documentation": {}
+    },
+    {
+        "label": "ALTURA_FORMULA_ESTIMADA",
+        "kind": 5,
+        "importPath": "gerador_preview",
+        "description": "gerador_preview",
+        "peekOfCode": "ALTURA_FORMULA_ESTIMADA = 4.0 # Estimativa de altura para uma fórmula\nCARACTERES_POR_LINHA = 80\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1736,7 +1915,7 @@
         "kind": 5,
         "importPath": "gerador_preview",
         "description": "gerador_preview",
-        "peekOfCode": "CARACTERES_POR_LINHA = 80 # Estimativa\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0",
+        "peekOfCode": "CARACTERES_POR_LINHA = 80\nclass GeradorHTMLPreview:\n    def __init__(self, doc_abnt: DocumentoABNT):\n        self.doc_abnt = doc_abnt\n        self.entradas_sumario = []\n        self.paginas_html = []\n        self.conteudo_pagina_atual = []\n        self.altura_restante = ALTURA_CONTEUDO_PAGINA\n        self.contador_tabelas = 0\n        self.contador_figuras = 0",
         "detail": "gerador_preview",
         "documentation": {}
     },
@@ -1817,7 +1996,7 @@
         "kind": 6,
         "importPath": "gerenciador_projeto",
         "description": "gerenciador_projeto",
-        "peekOfCode": "class GerenciadorProjetos:\n    def __init__(self):\n        self.diretorio_temporario_atual = None\n    def _limpar_diretorio_temporario(self):\n        if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):\n            try:\n                shutil.rmtree(self.diretorio_temporario_atual)\n            except OSError as e:\n                print(f\"Erro ao limpar diretório temporário {self.diretorio_temporario_atual}: {e}\")\n        self.diretorio_temporario_atual = None",
+        "peekOfCode": "class GerenciadorProjetos:\n    def __init__(self):\n        self.diretorio_temporario_atual = None\n    def _limpar_diretorio_temporario(self):\n        \"\"\"Limpa o diretório temporário usado para carregar o projeto atual.\"\"\"\n        if self.diretorio_temporario_atual and os.path.exists(self.diretorio_temporario_atual):\n            try:\n                shutil.rmtree(self.diretorio_temporario_atual)\n            except OSError as e:\n                print(f\"Erro ao limpar diretório temporário {self.diretorio_temporario_atual}: {e}\")",
         "detail": "gerenciador_projeto",
         "documentation": {}
     },
@@ -1908,6 +2087,15 @@
         "importPath": "main_app",
         "description": "main_app",
         "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1400, 800)\n        self.config = gerenciador_config.carregar_config()\n        self.documento = DocumentoABNT()\n        self.gerenciador_projeto = GerenciadorProjetos()\n        self.caminho_projeto_atual = None\n        self.modificado = False",
+        "detail": "main_app",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ['QTWEBENGINE_REMOTE_DEBUGGING']",
+        "kind": 5,
+        "importPath": "main_app",
+        "description": "main_app",
+        "peekOfCode": "os.environ['QTWEBENGINE_REMOTE_DEBUGGING'] = '9222'\nimport shutil\nfrom datetime import datetime\nfrom PySide6 import QtWidgets, QtCore\nfrom PySide6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QTextEdit,\n                               QPushButton, QVBoxLayout, QHBoxLayout, QFileDialog,\n                               QMessageBox, QTabWidget, QComboBox,\n                               QFormLayout, QMenuBar, QCheckBox, QSplitter)\nfrom PySide6.QtGui import QAction, QKeySequence, QActionGroup\nfrom PySide6.QtWebEngineCore import QWebEnginePage",
         "detail": "main_app",
         "documentation": {}
     },

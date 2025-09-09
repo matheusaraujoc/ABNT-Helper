@@ -1,6 +1,5 @@
 # gerador_preview.py
-# Descrição: Versão corrigida que restaura a contagem de página correta e
-# adiciona a seção de Referências ao sumário.
+# Descrição: Versão final com suporte para renderização de Fórmulas LaTeX.
 
 import os
 import re
@@ -13,7 +12,8 @@ ALTURA_LINHA_TEXTO = 0.6
 ALTURA_TITULO_SECAO = 1.5
 ALTURA_LEGENDA = 1.2
 ALTURA_LINHA_TABELA = 0.8
-CARACTERES_POR_LINHA = 80 # Estimativa
+ALTURA_FORMULA_ESTIMADA = 4.0 # Estimativa de altura para uma fórmula
+CARACTERES_POR_LINHA = 80
 
 class GeradorHTMLPreview:
     def __init__(self, doc_abnt: DocumentoABNT):
@@ -24,14 +24,13 @@ class GeradorHTMLPreview:
         self.altura_restante = ALTURA_CONTEUDO_PAGINA
         self.contador_tabelas = 0
         self.contador_figuras = 0
+        self.contador_formulas = 0
         self.classe_pagina_atual = 'pagina'
         self.is_artigo = self.doc_abnt.configuracoes.tipo_trabalho == "Artigo Científico"
 
     def _estimar_paginacao_e_coletar_sumario(self):
         self.entradas_sumario = []
         altura_restante = ALTURA_CONTEUDO_PAGINA
-        # CORREÇÃO: Voltamos ao valor inicial 4, que representa o início do
-        # conteúdo textual após Capa(não conta), Folha de Rosto(1), Resumo(2), Sumário(3).
         pagina_atual = 4
         
         def simular_nova_pagina():
@@ -77,7 +76,7 @@ class GeradorHTMLPreview:
                 })
                 simular_adicao_bloco(ALTURA_TITULO_SECAO)
                 if no_filho.conteudo:
-                    padrao = r"\{\{(Tabela|Figura):([^}]+)\}\}"
+                    padrao = r"\{\{(Tabela|Figura|Formula):([^}]+)\}\}"
                     partes = re.split(padrao, no_filho.conteudo)
                     for k, parte in enumerate(partes):
                         if k % 3 == 0:
@@ -94,13 +93,12 @@ class GeradorHTMLPreview:
                             elif tipo == "Figura":
                                 obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
                                 if obj: simular_adicao_bloco((obj.largura_cm / 16 * 9) + (ALTURA_LEGENDA * 2))
+                            elif tipo == "Formula":
+                                simular_adicao_bloco(ALTURA_FORMULA_ESTIMADA + ALTURA_LEGENDA)
                 coletar_recursivo(no_filho, f"{numero_completo}.")
         
-        # 1. Simula o conteúdo textual
         coletar_recursivo(self.doc_abnt.estrutura_textual)
 
-        # 2. CORREÇÃO: Simula a quebra de página para as referências
-        # e adiciona ao sumário com o número de página correto.
         simular_nova_pagina()
         self.entradas_sumario.append({
             "numero": "", "titulo": "REFERÊNCIAS", "nivel": 1,
@@ -161,8 +159,10 @@ class GeradorHTMLPreview:
         self._adicionar_elemento_bloco(f'<br><p><strong>Palavras-chave:</strong> {self.doc_abnt.palavras_chave.replace(";", ".")}.</p>', ALTURA_LINHA_TEXTO * 2)
 
     def gerar_html(self) -> str:
-        self.paginas_html = []; self.conteudo_pagina_atual = []
-        self.altura_restante = ALTURA_CONTEUDO_PAGINA; self.classe_pagina_atual = 'pagina'
+        self.paginas_html = []
+        self.conteudo_pagina_atual = []
+        self.altura_restante = ALTURA_CONTEUDO_PAGINA
+        self.classe_pagina_atual = 'pagina'
         
         cfg = self.doc_abnt.configuracoes
         
@@ -176,7 +176,7 @@ class GeradorHTMLPreview:
                 box-shadow: 0 0 10px rgba(0,0,0,0.2); box-sizing: border-box;
                 position: relative; overflow: hidden; line-height: 1.5;
             }
-            .pagina:not(.capa) { counter-increment: page; }
+            .pagina:not(.pre-textual) { counter-increment: page; }
             .pagina:not(.pre-textual)::after {
                 content: counter(page); position: absolute;
                 top: 1.5cm; right: 2cm; font-size: 12pt;
@@ -194,6 +194,8 @@ class GeradorHTMLPreview:
             .referencia { text-align: justify; line-height: 1.0; margin-bottom: 12px; }
             .legenda { font-size: 10pt; text-align: center; text-indent: 0; margin-bottom: 0.5em; }
             .fonte { font-size: 10pt; text-align: left; text-indent: 0; margin-top: 2px; }
+            .formula-container { text-align: center; margin: 1em 0; }
+            .formula-legenda { font-size: 10pt; text-align: center; text-indent: 0; margin-top: 0.5em; }
             table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 10pt; }
             th, td { border: 1px solid black; padding: 4px; text-align: left; }
             table.abnt { border: none; } table.abnt th, table.abnt td { border: none; }
@@ -254,7 +256,7 @@ class GeradorHTMLPreview:
             self._adicionar_elemento_bloco(f"<h1 id='{id_ancora}'>{titulo_texto}</h1>", ALTURA_TITULO_SECAO)
 
             if no_filho.conteudo:
-                padrao = r"\{\{(Tabela|Figura):([^}]+)\}\}"
+                padrao = r"\{\{(Tabela|Figura|Formula):([^}]+)\}\}"
                 partes = re.split(padrao, no_filho.conteudo)
                 for k, parte in enumerate(partes):
                     if k % 3 == 0:
@@ -266,17 +268,22 @@ class GeradorHTMLPreview:
                     elif k % 3 == 1:
                         tipo, titulo = parte, partes[k+1]
                         if tipo == "Tabela":
-                            tabela_obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
-                            if tabela_obj:
-                                self.contador_tabelas += 1; tabela_obj.numero = self.contador_tabelas
-                                altura = (len(tabela_obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2) if tabela_obj.dados else (ALTURA_LEGENDA * 2)
-                                self._adicionar_elemento_bloco(self._renderizar_tabela_html(tabela_obj), altura)
+                            obj = next((t for t in self.doc_abnt.banco_tabelas if t.titulo == titulo), None)
+                            if obj:
+                                self.contador_tabelas += 1; obj.numero = self.contador_tabelas
+                                altura = (len(obj.dados) * ALTURA_LINHA_TABELA) + (ALTURA_LEGENDA * 2) if obj.dados else (ALTURA_LEGENDA * 2)
+                                self._adicionar_elemento_bloco(self._renderizar_tabela_html(obj), altura)
                         elif tipo == "Figura":
-                            figura_obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
-                            if figura_obj:
-                                self.contador_figuras += 1; figura_obj.numero = self.contador_figuras
-                                altura = (figura_obj.largura_cm / 16 * 9) + (ALTURA_LEGENDA * 2)
-                                self._adicionar_elemento_bloco(self._renderizar_figura_html(figura_obj), altura)
+                            obj = next((f for f in self.doc_abnt.banco_figuras if f.titulo == titulo), None)
+                            if obj:
+                                self.contador_figuras += 1; obj.numero = self.contador_figuras
+                                altura = (obj.largura_cm / 16 * 9) + (ALTURA_LEGENDA * 2)
+                                self._adicionar_elemento_bloco(self._renderizar_figura_html(obj), altura)
+                        elif tipo == "Formula":
+                            obj = next((f for f in self.doc_abnt.banco_formulas if f.legenda == titulo), None)
+                            if obj:
+                                self.contador_formulas += 1; obj.numero = self.contador_formulas
+                                self._adicionar_elemento_bloco(self._renderizar_formula_html(obj), ALTURA_FORMULA_ESTIMADA + ALTURA_LEGENDA)
             
             self._renderizar_secoes_recursivamente_html(no_filho, f"{numero_completo}.")
     
@@ -307,18 +314,15 @@ class GeradorHTMLPreview:
         html = f'<div><p class="legenda">Tabela {tabela.numero} – {tabela.titulo}</p><table class="{classe_css}" align="center">'
         if tabela.dados:
             html += '<thead><tr>'
-            for header in tabela.dados[0]:
-                html += f'<th>{header}</th>'
+            for header in tabela.dados[0]: html += f'<th>{header}</th>'
             html += '</tr></thead><tbody>'
             for row in tabela.dados[1:]:
                 html += '<tr>'
-                for cell in row:
-                    html += f'<td>{cell}</td>'
+                for cell in row: html += f'<td>{cell}</td>'
                 html += '</tr>'
             html += '</tbody>'
         html += '</table>'
-        if tabela.fonte:
-            html += f'<p class="fonte">Fonte: {tabela.fonte}</p>'
+        if tabela.fonte: html += f'<p class="fonte">Fonte: {tabela.fonte}</p>'
         html += '</div>'
         return html
 
@@ -327,7 +331,28 @@ class GeradorHTMLPreview:
         url_local = f"file:///{caminho_abs.replace(os.path.sep, '/')}"
         html = f'<div><p class="legenda">Figura {figura.numero} – {figura.titulo}</p>'
         html += f'<img src="{url_local}" style="width: {figura.largura_cm}cm;">'
-        if figura.fonte:
-            html += f'<p class="fonte">Fonte: {figura.fonte}</p>'
+        if figura.fonte: html += f'<p class="fonte">Fonte: {figura.fonte}</p>'
         html += '</div>'
+        return html
+
+    def _renderizar_formula_html(self, formula):
+        if not formula.caminho_imagem or not os.path.exists(formula.caminho_imagem):
+            return '<div class="formula-container"><p style="color: red;">[ERRO: Imagem da fórmula não encontrada]</p></div>'
+            
+        caminho_abs = os.path.abspath(formula.caminho_imagem)
+        url_local = f"file:///{caminho_abs.replace(os.path.sep, '/')}"
+        
+        html = f"""
+        <div class="formula-container">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="flex-grow: 1; text-align: center;">
+                    <img src="{url_local}" alt="{formula.legenda}" style="display: inline-block; max-width: 80%; vertical-align: middle; height: 1.5cm;">
+                </div>
+                <div style="min-width: 4em; text-align: right;">
+                    ({formula.numero})
+                </div>
+            </div>
+            <p class="formula-legenda">Equação {formula.numero} – {formula.legenda}</p>
+        </div>
+        """
         return html

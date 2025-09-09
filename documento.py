@@ -1,10 +1,11 @@
 # documento.py
-# Descrição: Modelo de Dados com bancos de tabelas e figuras globais para o projeto.
+# Descrição: Modelo de Dados com bancos de tabelas, figuras e fórmulas globais para o projeto.
 
 from dataclasses import dataclass, field
 from typing import List, Optional
 from datetime import datetime
 from referencia import Referencia, Livro, Artigo, Site
+from formula import Formula
 
 @dataclass
 class Tabela:
@@ -84,6 +85,7 @@ class DocumentoABNT:
         
         self.banco_tabelas: List[Tabela] = []
         self.banco_figuras: List[Figura] = []
+        self.banco_formulas: List[Formula] = [] # NOVO
 
     def ordenar_referencias(self):
         self.referencias.sort(key=lambda ref: ref.get_chave_ordenacao())
@@ -105,7 +107,8 @@ class DocumentoABNT:
             "estrutura_textual": self.estrutura_textual.to_dict(),
             "referencias": refs_serializadas,
             "banco_tabelas": [t.__dict__ for t in self.banco_tabelas],
-            "banco_figuras": [f.__dict__ for f in self.banco_figuras]
+            "banco_figuras": [f.__dict__ for f in self.banco_figuras],
+            "banco_formulas": [f.__dict__ for f in self.banco_formulas] # NOVO
         }
 
     @classmethod
@@ -121,12 +124,11 @@ class DocumentoABNT:
         
         doc.banco_tabelas = [Tabela(**t) for t in data.get('banco_tabelas', [])]
         doc.banco_figuras = [Figura(**f) for f in data.get('banco_figuras', [])]
+        doc.banco_formulas = [Formula(**f) for f in data.get('banco_formulas', [])] # NOVO
 
         for ref_data in data.get('referencias', []):
             tipo = ref_data.pop('tipo_ref', None)
             
-            # CORREÇÃO: Remove a chave 'tipo' original do dicionário, pois ela não é
-            # esperada pelo construtor (__init__) da dataclass.
             ref_data.pop('tipo', None)
             
             if tipo == 'Livro':

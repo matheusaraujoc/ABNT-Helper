@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor LaTeX</title>
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        #editor {
+            flex: 1;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            resize: none;
+        }
+
+        #preview-container {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #preview {
+            font-size: 1.5em;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <textarea id="editor" placeholder="Digite seu código LaTeX aqui..."></textarea>
+        <div id="preview-container">
+            <div id="preview">Sua fórmula aparecerá aqui!</div>
+        </div>
+    </div>
+    <script>
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        let renderTimeout = null;
+
+        async function renderLatex() {
+            preview.innerHTML = `$$${editor.value}$$`;
+            try { await MathJax.typesetPromise([preview]); }
+            catch { preview.innerHTML = `<span style="color:red;">Erro na fórmula!</span>`; }
+        }
+
+        editor.addEventListener('input', () => { clearTimeout(renderTimeout); renderTimeout = setTimeout(renderLatex, 300); });
+
+        // Funções para o Python carregar dados
+        window.getEditorContent = () => editor.value;
+        window.setEditorContent = (content) => { editor.value = content || ''; renderLatex(); };
+
+        // Função que o botão "OK" do Python vai chamar
+        window.prepareAndTriggerDownload = async function () {
+            await renderLatex(); // Garante que a última versão está renderizada
+            await new Promise(r => setTimeout(r, 50));
+
+            const svg = preview.querySelector('mjx-container svg');
+            if (!svg) {
+                console.error("Não foi possível encontrar o elemento SVG para iniciar o download.");
+                return; // Falha silenciosa no lado do JS
+            }
+
+            svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+
+            // Cria um link invisível e o clica para disparar o sinal 'downloadRequested' no Qt
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "formula.svg"; // O nome do arquivo não importa, será sobrescrito pelo Python
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        renderLatex();
+    </script>
+</body>
+
+</html>

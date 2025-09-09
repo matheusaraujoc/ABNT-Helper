@@ -167,3 +167,9 @@ class MotorNormasABNT:
             run.font.color.rgb = self.COR_FONTE_PADRAO # CORRIGIDO
             if i % 2 == 1:
                 run.bold = True
+
+    def _aplicar_formatacao_run(self, run):
+        """Método auxiliar para aplicar formatação padrão a um 'run' de texto."""
+        run.font.name = self.FONTE_PADRAO
+        run.font.size = self.TAMANHO_FONTE_PADRAO
+        run.font.color.rgb = self.COR_FONTE_PADRAO
