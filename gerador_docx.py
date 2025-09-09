@@ -213,35 +213,30 @@ class GeradorDOCX:
             p_imagem.paragraph_format.keep_with_next = False
 
     def _renderizar_formula(self, formula_obj):
-        # Parágrafo para alinhar a fórmula e o número
         p_formula = self.doc.add_paragraph()
         
-        # Insere a imagem SVG. O Word (via win32com) lida bem com isso.
-        # python-docx sozinho não consegue, mas a imagem fica como um placeholder
-        # que o Word pode preencher.
         try:
-            # Adiciona a imagem SVG como um placeholder.
-            # O tamanho aqui é menos crítico, pois o Word vai usar o tamanho do SVG.
-            p_formula.add_run().add_picture(formula_obj.caminho_imagem, height=Cm(1.5))
+            # ALTERAÇÃO CRÍTICA: Use o caminho do PNG, não o do SVG.
+            caminho_imagem_valido = formula_obj.caminho_processado_png
+            
+            if not caminho_imagem_valido or not os.path.exists(caminho_imagem_valido):
+                 raise FileNotFoundError(f"Arquivo de imagem da fórmula não encontrado em '{caminho_imagem_valido}'")
+
+            # Adiciona a imagem PNG.
+            p_formula.add_run().add_picture(caminho_imagem_valido, height=Cm(1.5))
         except Exception as e:
-            # Fallback se add_picture falhar com SVG (improvável, mas seguro)
-            # Ou se o arquivo não for encontrado.
             erro_msg = f"[ERRO: Imagem da fórmula '{formula_obj.legenda}' não encontrada ou formato inválido: {e}]"
             run_erro = p_formula.add_run(erro_msg)
             run_erro.italic = True
             self.regras._aplicar_formatacao_run(run_erro)
             
-        # Adiciona a tabulação para o número da equação
         p_formula.add_run().add_tab()
         run_numero = p_formula.add_run(f"({formula_obj.numero})")
         self.regras._aplicar_formatacao_run(run_numero)
 
-        # Configura a posição da tabulação para alinhar o número à direita
         tab_stops = p_formula.paragraph_format.tab_stops
-        # Ajuste o valor em Cm conforme a largura da sua página (16cm é um bom padrão)
         tab_stops.add_tab_stop(Cm(16), alignment=WD_TAB_ALIGNMENT.RIGHT)
 
-        # Adiciona a legenda abaixo da fórmula
         p_legenda = self.doc.add_paragraph()
         p_legenda.add_run(f"Equação {formula_obj.numero} – {formula_obj.legenda}")
         self.regras.aplicar_estilo_legenda(p_legenda, is_titulo=True)

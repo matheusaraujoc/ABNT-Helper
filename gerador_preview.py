@@ -336,10 +336,13 @@ class GeradorHTMLPreview:
         return html
 
     def _renderizar_formula_html(self, formula):
-        if not formula.caminho_imagem or not os.path.exists(formula.caminho_imagem):
+        # ALTERAÇÃO: Priorize o SVG para a pré-visualização.
+        caminho_para_renderizar = formula.caminho_svg or formula.caminho_processado_png
+
+        if not caminho_para_renderizar or not os.path.exists(caminho_para_renderizar):
             return '<div class="formula-container"><p style="color: red;">[ERRO: Imagem da fórmula não encontrada]</p></div>'
             
-        caminho_abs = os.path.abspath(formula.caminho_imagem)
+        caminho_abs = os.path.abspath(caminho_para_renderizar)
         url_local = f"file:///{caminho_abs.replace(os.path.sep, '/')}"
         
         html = f"""

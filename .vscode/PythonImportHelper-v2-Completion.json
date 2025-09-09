@@ -985,31 +985,7 @@
         "documentation": {}
     },
     {
-        "label": "Referencia",
-        "importPath": "documento",
-        "description": "documento",
-        "isExtraImport": true,
-        "detail": "documento",
-        "documentation": {}
-    },
-    {
-        "label": "Livro",
-        "importPath": "documento",
-        "description": "documento",
-        "isExtraImport": true,
-        "detail": "documento",
-        "documentation": {}
-    },
-    {
-        "label": "Artigo",
-        "importPath": "documento",
-        "description": "documento",
-        "isExtraImport": true,
-        "detail": "documento",
-        "documentation": {}
-    },
-    {
-        "label": "Site",
+        "label": "Tabela",
         "importPath": "documento",
         "description": "documento",
         "isExtraImport": true,
@@ -1123,6 +1099,70 @@
         "documentation": {}
     },
     {
+        "label": "QImage",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QPainter",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QColor",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QPixmap",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QAction",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QKeySequence",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QActionGroup",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "QSvgRenderer",
+        "importPath": "PySide6.QtSvg",
+        "description": "PySide6.QtSvg",
+        "isExtraImport": true,
+        "detail": "PySide6.QtSvg",
+        "documentation": {}
+    },
+    {
         "label": "QWebEngineSettings",
         "importPath": "PySide6.QtWebEngineCore",
         "description": "PySide6.QtWebEngineCore",
@@ -1204,38 +1244,6 @@
         "documentation": {}
     },
     {
-        "label": "QPixmap",
-        "importPath": "PySide6.QtGui",
-        "description": "PySide6.QtGui",
-        "isExtraImport": true,
-        "detail": "PySide6.QtGui",
-        "documentation": {}
-    },
-    {
-        "label": "QAction",
-        "importPath": "PySide6.QtGui",
-        "description": "PySide6.QtGui",
-        "isExtraImport": true,
-        "detail": "PySide6.QtGui",
-        "documentation": {}
-    },
-    {
-        "label": "QKeySequence",
-        "importPath": "PySide6.QtGui",
-        "description": "PySide6.QtGui",
-        "isExtraImport": true,
-        "detail": "PySide6.QtGui",
-        "documentation": {}
-    },
-    {
-        "label": "QActionGroup",
-        "importPath": "PySide6.QtGui",
-        "description": "PySide6.QtGui",
-        "isExtraImport": true,
-        "detail": "PySide6.QtGui",
-        "documentation": {}
-    },
-    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -1273,6 +1281,38 @@
         "description": "datetime",
         "isExtraImport": true,
         "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "Livro",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Artigo",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Site",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
+        "documentation": {}
+    },
+    {
+        "label": "Referencia",
+        "importPath": "referencia",
+        "description": "referencia",
+        "isExtraImport": true,
+        "detail": "referencia",
         "documentation": {}
     },
     {
@@ -1690,7 +1730,7 @@
         "kind": 6,
         "importPath": "DialogoFormula",
         "description": "DialogoFormula",
-        "peekOfCode": "class DialogoFormula(QDialog):\n    def __init__(self, formula: Formula = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Fórmulas LaTeX\")\n        self.setMinimumSize(800, 600)\n        self.formula = formula if formula else Formula()\n        self.svg_gerado_path = None\n        layout = QVBoxLayout(self)\n        form_layout = QtWidgets.QFormLayout()\n        self.legenda_input = QLineEdit(self.formula.legenda)",
+        "peekOfCode": "class DialogoFormula(QDialog):\n    def __init__(self, formula: Formula = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Fórmulas LaTeX\")\n        self.setMinimumSize(800, 600)\n        self.formula = formula if formula else Formula()\n        self._temp_svg_path = None\n        layout = QVBoxLayout(self)\n        form_layout = QtWidgets.QFormLayout()\n        self.legenda_input = QLineEdit(self.formula.legenda)",
         "detail": "DialogoFormula",
         "documentation": {}
     },
@@ -1825,7 +1865,7 @@
         "kind": 6,
         "importPath": "formula",
         "description": "formula",
-        "peekOfCode": "class Formula:\n    legenda: str = \"\"\n    codigo_latex: str = r\"\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\"\n    caminho_imagem: str = \"\"  # ATENÇÃO: Este caminho agora será para um arquivo .svg\n    numero: int = 0",
+        "peekOfCode": "class Formula:\n    legenda: str = \"\"\n    codigo_latex: str = r\"\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}\"\n    # Caminho para o arquivo vetorial original (para preview)\n    caminho_svg: str = \"\"\n    # Caminho para a imagem rasterizada (para o DOCX)\n    caminho_processado_png: str = \"\"\n    numero: int = 0",
         "detail": "formula",
         "documentation": {}
     },

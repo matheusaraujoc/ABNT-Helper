@@ -1,6 +1,6 @@
 # gerenciador_projeto.py
 # Descrição: Lida com a criação, salvamento e carregamento de projetos no formato .abnf,
-# agora com suporte integrado para salvar e carregar as imagens SVG das fórmulas.
+# agora com suporte integrado para salvar e carregar os arquivos SVG e PNG das fórmulas.
 
 import os
 import json
@@ -8,7 +8,12 @@ import zipfile
 import tempfile
 import shutil
 import copy
-from documento import DocumentoABNT, Capitulo, Figura, Formula, Configuracoes, Autor, Referencia, Livro, Artigo, Site
+
+# É importante garantir que todas as classes necessárias sejam importadas para a desserialização.
+# O from_dict pode precisar instanciar essas classes.
+from documento import (DocumentoABNT, Capitulo, Figura, Formula, Configuracoes,
+                     Autor, Tabela) # Adicionei Tabela para garantir
+from referencia import Referencia, Livro, Artigo, Site
 import gerenciador_config
 
 class GerenciadorProjetos:
@@ -26,7 +31,7 @@ class GerenciadorProjetos:
 
     def salvar_projeto(self, documento: DocumentoABNT, caminho_arquivo: str, add_to_recents: bool = True):
         """
-        Salva o estado atual do documento, suas figuras (imagens) e fórmulas (svg)
+        Salva o estado atual do documento, suas figuras (imagens) e fórmulas (svg e png)
         em um único arquivo .abnf (que é um zip).
         """
         with tempfile.TemporaryDirectory(prefix="abnf_save_") as temp_dir:
@@ -34,11 +39,15 @@ class GerenciadorProjetos:
             imagens_dir = os.path.join(temp_dir, 'imagens')
             os.makedirs(imagens_dir)
             
-            # NOVO: Diretório para as fórmulas
-            formulas_dir = os.path.join(temp_dir, 'formulas')
-            os.makedirs(formulas_dir)
+            # Diretório para os SVGs das fórmulas
+            formulas_svg_dir = os.path.join(temp_dir, 'formulas_svg')
+            os.makedirs(formulas_svg_dir)
+            
+            # Diretório para os PNGs das fórmulas
+            formulas_png_dir = os.path.join(temp_dir, 'formulas_png')
+            os.makedirs(formulas_png_dir)
 
-            # Faz uma cópia profunda para não modificar o documento em memória
+            # Faz uma cópia profunda para não modificar o documento em memória durante o processo
             doc_para_salvar = copy.deepcopy(documento)
 
             # Processa as figuras
@@ -50,14 +59,21 @@ class GerenciadorProjetos:
                     # O caminho salvo no JSON é relativo à raiz do zip
                     figura.caminho_processado = os.path.join('imagens', nome_arquivo).replace('\\', '/')
             
-            # NOVO: Processa as fórmulas
+            # Processa as fórmulas (SVG e PNG)
             for formula in doc_para_salvar.banco_formulas:
-                if formula.caminho_imagem and os.path.exists(formula.caminho_imagem):
-                    nome_arquivo = os.path.basename(formula.caminho_imagem)
-                    caminho_destino = os.path.join(formulas_dir, nome_arquivo)
-                    shutil.copy2(formula.caminho_imagem, caminho_destino)
-                    # O caminho salvo no JSON também é relativo
-                    formula.caminho_imagem = os.path.join('formulas', nome_arquivo).replace('\\', '/')
+                # Salva o SVG
+                if formula.caminho_svg and os.path.exists(formula.caminho_svg):
+                    nome_arquivo_svg = os.path.basename(formula.caminho_svg)
+                    caminho_destino_svg = os.path.join(formulas_svg_dir, nome_arquivo_svg)
+                    shutil.copy2(formula.caminho_svg, caminho_destino_svg)
+                    formula.caminho_svg = os.path.join('formulas_svg', nome_arquivo_svg).replace('\\', '/')
+                
+                # Salva o PNG
+                if formula.caminho_processado_png and os.path.exists(formula.caminho_processado_png):
+                    nome_arquivo_png = os.path.basename(formula.caminho_processado_png)
+                    caminho_destino_png = os.path.join(formulas_png_dir, nome_arquivo_png)
+                    shutil.copy2(formula.caminho_processado_png, caminho_destino_png)
+                    formula.caminho_processado_png = os.path.join('formulas_png', nome_arquivo_png).replace('\\', '/')
             
             # Serializa o objeto Documento para JSON
             dados_dict = doc_para_salvar.to_dict()
@@ -97,14 +113,18 @@ class GerenciadorProjetos:
         # Atualiza os caminhos das figuras para apontar para a pasta temporária
         for figura in documento_carregado.banco_figuras:
             if figura.caminho_processado:
-                caminho_absoluto = os.path.join(self.diretorio_temporario_atual, figura.caminho_processado)
+                caminho_absoluto = os.path.join(self.diretorio_temporario_atual, figura.caminho_processado.replace('/', os.path.sep))
                 figura.caminho_processado = caminho_absoluto
 
-        # NOVO: Atualiza os caminhos das fórmulas para apontar para a pasta temporária
+        # Atualiza os caminhos das fórmulas (SVG e PNG) para apontar para a pasta temporária
         for formula in documento_carregado.banco_formulas:
-            if formula.caminho_imagem:
-                caminho_absoluto = os.path.join(self.diretorio_temporario_atual, formula.caminho_imagem)
-                formula.caminho_imagem = caminho_absoluto
+            if formula.caminho_svg:
+                caminho_abs_svg = os.path.join(self.diretorio_temporario_atual, formula.caminho_svg.replace('/', os.path.sep))
+                formula.caminho_svg = caminho_abs_svg
+            
+            if formula.caminho_processado_png:
+                caminho_abs_png = os.path.join(self.diretorio_temporario_atual, formula.caminho_processado_png.replace('/', os.path.sep))
+                formula.caminho_processado_png = caminho_abs_png
 
         return documento_carregado
 
