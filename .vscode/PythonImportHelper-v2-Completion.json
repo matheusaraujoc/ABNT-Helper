@@ -993,6 +993,14 @@
         "documentation": {}
     },
     {
+        "label": "DialogoRecuperacao",
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "isExtraImport": true,
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
         "label": "os",
         "kind": 6,
         "isExtraImport": true,
@@ -1056,6 +1064,46 @@
         "description": "PySide6.QtGui",
         "isExtraImport": true,
         "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
         "documentation": {}
     },
     {
@@ -1184,30 +1232,6 @@
         "description": "typing",
         "isExtraImport": true,
         "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
         "documentation": {}
     },
     {
@@ -1369,6 +1393,23 @@
         "documentation": {}
     },
     {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
         "label": "sys",
         "kind": 6,
         "isExtraImport": true,
@@ -1458,6 +1499,15 @@
         "documentation": {}
     },
     {
+        "label": "gerenciador_recuperacao",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
         "label": "ArvoreConteudo",
         "kind": 6,
         "importPath": "aba_conteudo",
@@ -1526,6 +1576,15 @@
         "importPath": "dialogs",
         "description": "dialogs",
         "peekOfCode": "class ReferenciaDialog(QDialog):\n    def __init__(self, ref=None, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Adicionar/Editar Referência\")\n        self.layout = QVBoxLayout(self); self.form_layout = QFormLayout()\n        self.tipo_combo = QComboBox(); self.tipo_combo.addItems([\"Livro\", \"Artigo\", \"Site\"])\n        self.autores_input = QLineEdit(); self.autores_input.setPlaceholderText(\"Autor 1; Autor 2\")\n        self.titulo_input = QLineEdit(); self.ano_input = QLineEdit()\n        self.campos_livro = { \"Local\": QLineEdit(), \"Editora\": QLineEdit() }\n        self.campos_artigo = { \"Revista\": QLineEdit(), \"Volume\": QLineEdit(), \"Pág. Inicial\": QLineEdit(), \"Pág. Final\": QLineEdit() }",
+        "detail": "dialogs",
+        "documentation": {}
+    },
+    {
+        "label": "DialogoRecuperacao",
+        "kind": 6,
+        "importPath": "dialogs",
+        "description": "dialogs",
+        "peekOfCode": "class DialogoRecuperacao(QDialog):\n    def __init__(self, arquivos: list[dict], parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Recuperação de Arquivos\")\n        self.setMinimumWidth(550)\n        self.arquivos_para_recuperar = []\n        self.arquivos_para_descartar = []\n        self.acao = None # 'recuperar', 'descartar', ou None se fechar\n        layout = QVBoxLayout(self)\n        label = QLabel(\"O programa foi encerrado inesperadamente.\\n\"",
         "detail": "dialogs",
         "documentation": {}
     },
@@ -1674,11 +1733,20 @@
         "documentation": {}
     },
     {
+        "label": "get_default_config",
+        "kind": 2,
+        "importPath": "gerenciador_config",
+        "description": "gerenciador_config",
+        "peekOfCode": "def get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI FICA O TIMER DEFINIDO EM MINUTOS DO SISTEMA DE RECUPERAÇÃO DE ARQUIVOS POR FALHAS ABRUPTAS DO SISTEMA\n            # MUDANÇA: Agora é um intervalo periódico, não de inatividade. 10 minutos é um padrão seguro.\n            \"autosave_periodic_interval_min\": 1\n        },",
+        "detail": "gerenciador_config",
+        "documentation": {}
+    },
+    {
         "label": "carregar_config",
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def carregar_config():\n    \"\"\"Carrega o arquivo de configuração JSON.\"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return {\"recent_projects\": []}\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:\n            return json.load(f)\n    except (json.JSONDecodeError, IOError):\n        # Em caso de arquivo corrompido ou erro de leitura, retorna um padrão seguro.\n        return {\"recent_projects\": []}",
+        "peekOfCode": "def carregar_config():\n    \"\"\"\n    Carrega o arquivo de configuração JSON. Se o arquivo não existir ou estiver\n    corrompido, retorna uma configuração padrão. Garante que configurações\n    antigas sejam atualizadas com as novas chaves sem perder dados.\n    \"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return get_default_config()\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1687,7 +1755,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def salvar_config(data):\n    \"\"\"Salva os dados no arquivo de configuração JSON.\"\"\"\n    try:\n        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:\n            json.dump(data, f, indent=4)\n    except IOError as e:\n        print(f\"Erro ao salvar configuração: {e}\")\ndef get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()",
+        "peekOfCode": "def salvar_config(data):\n    \"\"\"Salva os dados no arquivo de configuração JSON.\"\"\"\n    try:\n        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:\n            json.dump(data, f, indent=4, ensure_ascii=False)\n    except IOError as e:\n        print(f\"Erro ao salvar configuração: {e}\")\ndef get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1696,7 +1764,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    # Ordena para que os mais recentes apareçam primeiro\n    projetos.sort(key=lambda p: p.get(\"timestamp\", 0), reverse=True)\n    return projetos\ndef add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:",
+        "peekOfCode": "def get_projetos_recentes():\n    \"\"\"Retorna a lista de projetos recentes, ordenada pela data da última modificação.\"\"\"\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    projetos.sort(key=lambda p: p.get(\"timestamp\", 0), reverse=True)\n    return projetos\ndef add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:\n        return",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1705,7 +1773,7 @@
         "kind": 2,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "def add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:\n        return\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    caminho_abs = os.path.abspath(caminho_arquivo)\n    # Remove qualquer entrada existente com o mesmo caminho para evitar duplicatas\n    projetos = [p for p in projetos if p.get(\"path\") != caminho_abs]\n    # Adiciona a nova entrada no início da lista",
+        "peekOfCode": "def add_projeto_recente(caminho_arquivo):\n    \"\"\"Adiciona ou atualiza um projeto na lista de recentes.\"\"\"\n    if not caminho_arquivo:\n        return\n    config = carregar_config()\n    projetos = config.get(\"recent_projects\", [])\n    caminho_abs = os.path.abspath(caminho_arquivo)\n    projetos = [p for p in projetos if p.get(\"path\") != caminho_abs]\n    novo_projeto = {\n        \"path\": caminho_abs,",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1723,7 +1791,7 @@
         "kind": 5,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "CONFIG_FILE = \"abnf_helper_config.json\"\nMAX_RECENT_PROJECTS = 10\ndef carregar_config():\n    \"\"\"Carrega o arquivo de configuração JSON.\"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return {\"recent_projects\": []}\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:\n            return json.load(f)\n    except (json.JSONDecodeError, IOError):",
+        "peekOfCode": "CONFIG_FILE = \"abnf_helper_config.json\"\nMAX_RECENT_PROJECTS = 10\ndef get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI FICA O TIMER DEFINIDO EM MINUTOS DO SISTEMA DE RECUPERAÇÃO DE ARQUIVOS POR FALHAS ABRUPTAS DO SISTEMA\n            # MUDANÇA: Agora é um intervalo periódico, não de inatividade. 10 minutos é um padrão seguro.",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1732,7 +1800,7 @@
         "kind": 5,
         "importPath": "gerenciador_config",
         "description": "gerenciador_config",
-        "peekOfCode": "MAX_RECENT_PROJECTS = 10\ndef carregar_config():\n    \"\"\"Carrega o arquivo de configuração JSON.\"\"\"\n    if not os.path.exists(CONFIG_FILE):\n        return {\"recent_projects\": []}\n    try:\n        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:\n            return json.load(f)\n    except (json.JSONDecodeError, IOError):\n        # Em caso de arquivo corrompido ou erro de leitura, retorna um padrão seguro.",
+        "peekOfCode": "MAX_RECENT_PROJECTS = 10\ndef get_default_config():\n    \"\"\"Retorna a estrutura de configuração padrão da aplicação.\"\"\"\n    return {\n        \"recent_projects\": [],\n        \"recovery\": {\n            \"autosave_enabled\": True,\n            #AQUI FICA O TIMER DEFINIDO EM MINUTOS DO SISTEMA DE RECUPERAÇÃO DE ARQUIVOS POR FALHAS ABRUPTAS DO SISTEMA\n            # MUDANÇA: Agora é um intervalo periódico, não de inatividade. 10 minutos é um padrão seguro.\n            \"autosave_periodic_interval_min\": 1",
         "detail": "gerenciador_config",
         "documentation": {}
     },
@@ -1746,11 +1814,92 @@
         "documentation": {}
     },
     {
+        "label": "setup_diretorios",
+        "kind": 2,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "def setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação e backup existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"\n    if caminho_projeto_original:\n        # Cria um nome de arquivo baseado no hash do caminho original para ser consistente.",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "get_caminho_recuperacao",
+        "kind": 2,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "def get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"\n    if caminho_projeto_original:\n        # Cria um nome de arquivo baseado no hash do caminho original para ser consistente.\n        nome_base = str(hash(os.path.abspath(caminho_projeto_original)))\n    else:\n        # Para projetos novos, não salvos, o nome é baseado no timestamp da criação do processo.\n        # Isso é intencionalmente difícil de recriar, por isso a limpeza direta é necessária.",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "salvar_recuperacao",
+        "kind": 2,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "def salvar_recuperacao(gerenciador_projeto, documento, caminho_projeto_original: str | None):\n    \"\"\"\n    Salva o estado atual do documento em um arquivo de recuperação.\n    Reutiliza a lógica de salvamento do GerenciadorProjetos.\n    \"\"\"\n    caminho_recuperacao = get_caminho_recuperacao(caminho_projeto_original)\n    metadata_path = caminho_recuperacao.with_suffix('.json')\n    metadata = {\n        'original_path': caminho_projeto_original,\n        'original_name': os.path.basename(caminho_projeto_original) if caminho_projeto_original else \"Novo Projeto\",",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "verificar_arquivos_recuperaveis",
+        "kind": 2,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "def verificar_arquivos_recuperaveis() -> list[dict]:\n    \"\"\"Verifica na inicialização se existem arquivos de recuperação válidos.\"\"\"\n    arquivos_encontrados = []\n    if not os.path.exists(RECOVERY_DIR):\n        return []\n    for item in os.listdir(RECOVERY_DIR):\n        if item.endswith(\".abnf.recovery\"):\n            caminho_recuperacao = RECOVERY_DIR / item\n            metadata_path = caminho_recuperacao.with_suffix('.json')\n            if os.path.exists(metadata_path):",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "criar_backup",
+        "kind": 2,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "def criar_backup(caminho_projeto: str, max_backups: int):\n    \"\"\"Cria uma cópia de backup do arquivo de projeto atual antes de salvá-lo.\"\"\"\n    if not caminho_projeto or not os.path.exists(caminho_projeto):\n        return\n    diretorio_pai = Path(caminho_projeto).parent\n    backup_dir = diretorio_pai / BACKUP_SUBDIR\n    os.makedirs(backup_dir, exist_ok=True)\n    timestamp = datetime.now().strftime(\"%Y-%m-%d_%H-%M-%S\")\n    nome_arquivo_original = Path(caminho_projeto).stem\n    caminho_backup = backup_dir / f\"{nome_arquivo_original}_{timestamp}.abnf.bak\"",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "limpar_recuperacao",
+        "kind": 2,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "def limpar_recuperacao(caminho_projeto_original: str | None):\n    \"\"\"\n    Remove o arquivo de recuperação tentando recriar seu nome.\n    Funciona bem para projetos já salvos, mas não é confiável para\n    projetos novos que nunca foram salvos e sofreram uma falha.\n    \"\"\"\n    if caminho_projeto_original is None:\n        return\n    caminho_recuperacao = get_caminho_recuperacao(caminho_projeto_original)\n    metadata_path = caminho_recuperacao.with_suffix('.json')",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "limpar_recuperacao_pelo_caminho_direto",
+        "kind": 2,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "def limpar_recuperacao_pelo_caminho_direto(caminho_arquivo_recuperacao: str):\n    \"\"\"\n    Remove um arquivo de recuperação específico usando seu caminho exato.\n    Esta é a forma 100% confiável de garantir a exclusão, especialmente\n    após o usuário descartar uma recuperação.\n    \"\"\"\n    if not caminho_arquivo_recuperacao or not isinstance(caminho_arquivo_recuperacao, str):\n        return\n    caminho_recuperacao = Path(caminho_arquivo_recuperacao)\n    metadata_path = caminho_recuperacao.with_suffix('.json')",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "RECOVERY_DIR",
+        "kind": 5,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "RECOVERY_DIR = Path(os.getenv('LOCALAPPDATA', Path.home())) / 'ABNTHelper' / 'recovery'\nBACKUP_SUBDIR = \".abnf_backups\"\ndef setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação e backup existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
+        "label": "BACKUP_SUBDIR",
+        "kind": 5,
+        "importPath": "gerenciador_recuperacao",
+        "description": "gerenciador_recuperacao",
+        "peekOfCode": "BACKUP_SUBDIR = \".abnf_backups\"\ndef setup_diretorios():\n    \"\"\"Garante que os diretórios de recuperação e backup existam.\"\"\"\n    os.makedirs(RECOVERY_DIR, exist_ok=True)\n# --- LÓGICA DE RECUPERAÇÃO DE FALHAS (AUTO-SAVE) ---\ndef get_caminho_recuperacao(caminho_projeto_original: str | None) -> Path:\n    \"\"\"\n    Gera um nome de arquivo único e consistente para o arquivo de recuperação.\n    \"\"\"\n    if caminho_projeto_original:",
+        "detail": "gerenciador_recuperacao",
+        "documentation": {}
+    },
+    {
         "label": "ABNTHelperApp",
         "kind": 6,
         "importPath": "main_app",
         "description": "main_app",
-        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1400, 800)\n        self.documento = DocumentoABNT()\n        self.gerenciador_projeto = GerenciadorProjetos()\n        self.caminho_projeto_atual = None\n        self.modificado = False\n        self._populando_ui = False",
+        "peekOfCode": "class ABNTHelperApp(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle('ABNT Helper Final')\n        self.setGeometry(100, 100, 1400, 800)\n        self.config = gerenciador_config.carregar_config()\n        self.documento = DocumentoABNT()\n        self.gerenciador_projeto = GerenciadorProjetos()\n        self.caminho_projeto_atual = None\n        self.modificado = False",
         "detail": "main_app",
         "documentation": {}
     },
