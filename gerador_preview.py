@@ -1,5 +1,5 @@
 # gerador_preview.py
-# Descrição: Versão final com suporte para renderização de Fórmulas LaTeX.
+# Descrição: Versão final com suporte para renderização de Fórmulas LaTeX de tamanho variável.
 
 import os
 import re
@@ -336,7 +336,7 @@ class GeradorHTMLPreview:
         return html
 
     def _renderizar_formula_html(self, formula):
-        # ALTERAÇÃO: Priorize o SVG para a pré-visualização.
+        # Prioriza o SVG de alta qualidade para a pré-visualização.
         caminho_para_renderizar = formula.caminho_svg or formula.caminho_processado_png
 
         if not caminho_para_renderizar or not os.path.exists(caminho_para_renderizar):
@@ -349,7 +349,7 @@ class GeradorHTMLPreview:
         <div class="formula-container">
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div style="flex-grow: 1; text-align: center;">
-                    <img src="{url_local}" alt="{formula.legenda}" style="display: inline-block; max-width: 80%; vertical-align: middle; height: 1.5cm;">
+                    <img src="{url_local}" alt="{formula.legenda}" style="display: inline-block; width: {formula.largura_cm}cm; max-width: 90%; height: auto; vertical-align: middle;">
                 </div>
                 <div style="min-width: 4em; text-align: right;">
                     ({formula.numero})

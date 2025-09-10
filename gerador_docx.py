@@ -1,92 +1,5 @@
 # gerador_docx.py
-# Descrição: Versão final com formatação de fórmula corrigida usando Tab Stops.
-
-import os
-import re
-from docx import Document
-from docx.shared import Cm, Pt
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT, WD_TAB_ALIGNMENT
-from docx.enum.section import WD_SECTION
-# A importação WD_ALIGN_VERTICAL não é mais necessária
-# from docx.enum.table import WD_ALIGN_VERTICAL 
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
-
-try:
-    import win32com.client as win32
-    WIN32_AVAILABLE = True
-except ImportError:
-    WIN32_AVAILABLE = False
-    print("AVISO: Biblioteca 'pywin32' não encontrada. A automação do sumário será desativada.")
-
-from documento import DocumentoABNT, Capitulo
-from normas_abnt import MotorNormasABNT
-
-# ... (A função adicionar_sumario e o início da classe permanecem os mesmos)
-# ... (Vou pular para a função corrigida)
-
-class GeradorDOCX:
-    def __init__(self, doc_abnt: DocumentoABNT):
-        self.doc_abnt = doc_abnt
-        self.doc = Document()
-        self.regras = MotorNormasABNT(self.doc_abnt)
-        self.regras.configurar_pagina_e_estilos(self.doc)
-        self.contador_tabelas = 0
-        self.contador_figuras = 0
-        self.contador_formulas = 0
-
-    # ... (cole aqui os métodos _atualizar_sumario_com_word, gerar_documento, etc.)
-
-    def _renderizar_formula(self, formula_obj):
-        # --- ABORDAGEM FINAL SEM TABELA, USANDO TAB STOPS ---
-
-        # 1. Cria um único parágrafo para a fórmula e o número.
-        p_formula = self.doc.add_paragraph()
-        
-        # 2. Define as paradas de tabulação para este parágrafo.
-        # A largura útil da página A4 com margens 3cm/2cm é 21cm - 5cm = 16cm.
-        tab_stops = p_formula.paragraph_format.tab_stops
-        # Parada 1: Centralizada no meio da página (8 cm)
-        tab_stops.add_tab_stop(Cm(8.0), WD_TAB_ALIGNMENT.CENTER)
-        # Parada 2: Alinhada à direita no final da página (16 cm)
-        tab_stops.add_tab_stop(Cm(16.0), WD_TAB_ALIGNMENT.RIGHT)
-
-        # 3. Adiciona o conteúdo ao parágrafo usando os tabs.
-        run = p_formula.add_run()
-        # Adiciona o primeiro tab para pular para a parada central.
-        run.add_tab()
-        
-        # Adiciona a imagem da fórmula.
-        try:
-            caminho_imagem_valido = formula_obj.caminho_processado_png
-            if not caminho_imagem_valido or not os.path.exists(caminho_imagem_valido):
-                 raise FileNotFoundError(f"Arquivo de imagem da fórmula não encontrado em '{caminho_imagem_valido}'")
-            
-            run.add_picture(caminho_imagem_valido, height=Cm(1.5))
-        except Exception as e:
-            erro_msg = f"[ERRO: Imagem da fórmula '{formula_obj.legenda}' não encontrada: {e}]"
-            run.add_text(erro_msg)
-            run.font.italic = True
-
-        # Adiciona o segundo tab para pular para a parada da direita.
-        run.add_tab()
-
-        # Adiciona o número da equação.
-        run_numero = p_formula.add_run(f"({formula_obj.numero})")
-        self.regras._aplicar_formatacao_run(run_numero)
-
-        # Adiciona a legenda ABAIXO do parágrafo da fórmula.
-        p_legenda = self.doc.add_paragraph()
-        p_legenda.add_run(f"Equação {formula_obj.numero} – {formula_obj.legenda}")
-        self.regras.aplicar_estilo_legenda(p_legenda, is_titulo=True)
-        p_legenda.paragraph_format.space_before = Pt(6)
-        p_legenda.paragraph_format.space_after = Pt(12)
-
-    # O RESTANTE DO SEU ARQUIVO DEVE SER COLADO AQUI, SEM ALTERAÇÕES
-    # ... (Todos os outros métodos como _renderizar_tabela, _renderizar_figura, etc.)
-
-# PARA SUA CONVENIÊNCIA, AQUI ESTÁ O ARQUIVO COMPLETO:
-# Copie e cole tudo abaixo para substituir seu gerador_docx.py
+# Descrição: Versão final com todas as correções para renderização de Fórmulas LaTeX.
 
 import os
 import re
@@ -324,7 +237,9 @@ class GeradorDOCX:
             if not caminho_imagem_valido or not os.path.exists(caminho_imagem_valido):
                  raise FileNotFoundError(f"Arquivo de imagem da fórmula não encontrado em '{caminho_imagem_valido}'")
             
-            run.add_picture(caminho_imagem_valido, height=Cm(1.5))
+            # Usa a LARGURA selecionada pelo usuário, não mais a altura fixa.
+            run.add_picture(caminho_imagem_valido, width=Cm(formula_obj.largura_cm))
+
         except Exception as e:
             erro_msg = f"[ERRO: Imagem da fórmula '{formula_obj.legenda}' não encontrada: {e}]"
             # Adiciona o erro como texto para não quebrar o fluxo

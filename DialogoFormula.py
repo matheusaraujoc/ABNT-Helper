@@ -1,12 +1,14 @@
 # DialogoFormula.py
 import os
 import tempfile
-# NENHUMA IMPORTAÇÃO EXTERNA PARA CONVERSÃO!
 
-from PySide6 import QtWidgets, QtCore
+# Módulos nativos do PySide6 para a conversão de SVG
 from PySide6.QtGui import QImage, QPainter, QColor
 from PySide6.QtSvg import QSvgRenderer
-from PySide6.QtWidgets import (QDialog, QWidget, QLabel, QLineEdit,
+
+# Módulos padrão da interface
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtWidgets import (QDialog, QWidget, QLabel, QLineEdit, QComboBox,
                                QVBoxLayout, QDialogButtonBox, QMessageBox)
 from PySide6.QtWebEngineCore import QWebEngineSettings, QWebEngineDownloadRequest
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -20,6 +22,7 @@ class DialogoFormula(QDialog):
         self.setMinimumSize(800, 600)
 
         self.formula = formula if formula else Formula()
+        # Armazena temporariamente o caminho do SVG antes da conversão
         self._temp_svg_path = None
 
         layout = QVBoxLayout(self)
@@ -27,6 +30,18 @@ class DialogoFormula(QDialog):
         form_layout = QtWidgets.QFormLayout()
         self.legenda_input = QLineEdit(self.formula.legenda)
         form_layout.addRow("Legenda (sem a palavra 'Equação X'):", self.legenda_input)
+
+        # Adiciona o seletor de largura para fórmulas grandes
+        self.largura_combo = QComboBox()
+        self.largura_combo.addItems(["Pequena (8 cm)", "Média (12 cm)", "Grande (Largura Máxima)"])
+        if self.formula.largura_cm == 8.0:
+            self.largura_combo.setCurrentIndex(0)
+        elif self.formula.largura_cm == 12.0:
+            self.largura_combo.setCurrentIndex(1)
+        else:
+            self.largura_combo.setCurrentIndex(2)
+        form_layout.addRow("Largura da Fórmula:", self.largura_combo)
+        
         layout.addLayout(form_layout)
         
         self.web_view = QWebEngineView()
@@ -88,12 +103,12 @@ class DialogoFormula(QDialog):
 
             # Cria uma imagem em branco (QImage) com o tamanho do SVG e fundo transparente
             image = QImage(renderer.defaultSize(), QImage.Format_ARGB32)
-            image.fill(QtCore.Qt.GlobalColor.transparent) # Define o fundo como transparente
+            image.fill(QtCore.Qt.GlobalColor.transparent)
 
             # Cria um "pintor" para desenhar o SVG na imagem em branco
             painter = QPainter(image)
             renderer.render(painter)
-            painter.end() # Finaliza a pintura
+            painter.end()
 
             # Salva a QImage resultante como um arquivo PNG
             if not image.save(caminho_png):
@@ -128,5 +143,15 @@ class DialogoFormula(QDialog):
         self.web_view.page().runJavaScript(js_code)
 
     def get_dados_formula(self) -> Formula:
+        # Atualiza a legenda e a largura antes de retornar o objeto
         self.formula.legenda = self.legenda_input.text()
+        
+        largura_str = self.largura_combo.currentText()
+        if "Pequena" in largura_str:
+            self.formula.largura_cm = 8.0
+        elif "Média" in largura_str:
+            self.formula.largura_cm = 12.0
+        else:
+            self.formula.largura_cm = 16.0
+
         return self.formula
