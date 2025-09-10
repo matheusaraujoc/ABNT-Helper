@@ -249,6 +249,14 @@
         "documentation": {}
     },
     {
+        "label": "QApplication",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
         "label": "QDialog",
         "importPath": "PySide6.QtWidgets",
         "description": "PySide6.QtWidgets",
@@ -1131,6 +1139,14 @@
         "documentation": {}
     },
     {
+        "label": "Qt",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
         "label": "QPixmap",
         "importPath": "PySide6.QtGui",
         "description": "PySide6.QtGui",
@@ -1738,7 +1754,7 @@
         "kind": 6,
         "importPath": "DialogoFormula",
         "description": "DialogoFormula",
-        "peekOfCode": "class DialogoFormula(QDialog):\n    def __init__(self, formula: Formula = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Fórmulas LaTeX\")\n        self.setMinimumSize(800, 600)\n        self.formula = formula if formula else Formula()\n        # Armazena temporariamente o caminho do SVG antes da conversão\n        self._temp_svg_path = None\n        layout = QVBoxLayout(self)\n        form_layout = QtWidgets.QFormLayout()",
+        "peekOfCode": "class DialogoFormula(QDialog):\n    def __init__(self, formula: Formula = None, parent: QWidget = None):\n        super().__init__(parent)\n        self.setWindowTitle(\"Editor de Fórmulas LaTeX\")\n        self.setMinimumSize(800, 600)\n        self.formula = formula if formula else Formula()\n        self._temp_svg_path = None\n        layout = QVBoxLayout(self)\n        form_layout = QtWidgets.QFormLayout()\n        self.legenda_input = QLineEdit(self.formula.legenda)",
         "detail": "DialogoFormula",
         "documentation": {}
     },
