@@ -1,11 +1,11 @@
 # aba_conteudo.py
-# Descrição: Versão completa com a interface para o Banco de Fórmulas.
+# Descrição: Versão completa com QTabWidget e proporções de layout ajustadas.
 
 import re
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import (QWidget, QLabel, QTextEdit, QPushButton, QListWidget, QCheckBox,
                                QVBoxLayout, QHBoxLayout, QMessageBox, QTreeWidget,
-                               QTreeWidgetItem, QInputDialog, QAbstractItemView, QLineEdit)
+                               QTreeWidgetItem, QInputDialog, QAbstractItemView, QLineEdit, QTabWidget)
 
 from documento import Capitulo, Tabela, Figura, Formula
 from dialogs import TabelaDialog, DialogoFigura
@@ -80,7 +80,10 @@ class AbaConteudo(QWidget):
         self.lista_figuras = QListWidget()
         self.lista_formulas = QListWidget()
 
-        elementos_layout = QHBoxLayout()
+        # Cria o QTabWidget que vai conter os bancos
+        self.bancos_tabs = QTabWidget()
+
+        # Cria o widget para a aba "Tabelas"
         tabelas_widget = QWidget()
         tabelas_v_layout = QVBoxLayout(tabelas_widget)
         tabelas_v_layout.addWidget(QLabel("Banco de Tabelas do Projeto:"))
@@ -104,6 +107,7 @@ class AbaConteudo(QWidget):
         btn_del_tabela.clicked.connect(self._remover_tabela)
         btn_ins_tabela.clicked.connect(self._inserir_marcador_tabela)
         
+        # Cria o widget para a aba "Figuras"
         figuras_widget = QWidget()
         figuras_v_layout = QVBoxLayout(figuras_widget)
         figuras_v_layout.addWidget(QLabel("Banco de Figuras do Projeto:"))
@@ -127,6 +131,7 @@ class AbaConteudo(QWidget):
         btn_del_figura.clicked.connect(self._remover_figura)
         btn_ins_figura.clicked.connect(self._inserir_marcador_figura)
 
+        # Cria o widget para a aba "Fórmulas"
         formulas_widget = QWidget()
         formulas_v_layout = QVBoxLayout(formulas_widget)
         formulas_v_layout.addWidget(QLabel("Banco de Fórmulas do Projeto:"))
@@ -150,13 +155,15 @@ class AbaConteudo(QWidget):
         btn_del_formula.clicked.connect(self._remover_formula)
         btn_ins_formula.clicked.connect(self._inserir_marcador_formula)
         
-        elementos_layout.addWidget(tabelas_widget)
-        elementos_layout.addWidget(figuras_widget)
-        elementos_layout.addWidget(formulas_widget)
+        # Adiciona os widgets criados como abas no QTabWidget
+        self.bancos_tabs.addTab(tabelas_widget, "Tabelas")
+        self.bancos_tabs.addTab(figuras_widget, "Figuras")
+        self.bancos_tabs.addTab(formulas_widget, "Fórmulas")
 
+        # Adiciona os widgets ao layout principal com as novas proporções
         right_layout.addWidget(self.label_capitulo_atual)
-        right_layout.addWidget(self.editor_capitulo, 2)
-        right_layout.addLayout(elementos_layout, 1)
+        right_layout.addWidget(self.editor_capitulo, 3) # Editor de texto com mais espaço (fator 3)
+        right_layout.addWidget(self.bancos_tabs, 2)     # Abas com espaço equilibrado (fator 2)
         layout.addWidget(right_panel)
         
         self._popular_arvore()
@@ -240,9 +247,8 @@ class AbaConteudo(QWidget):
     def _carregar_capitulo_no_editor(self, item_atual, item_anterior):
         capitulo = self._get_capitulo_selecionado()
         elementos_habilitados = True if capitulo else False
-        for child in self.findChildren(QPushButton):
-            if child.text() in ["Criar", "Editar", "Remover", "Inserir no Texto"]:
-                child.setEnabled(elementos_habilitados)
+        self.bancos_tabs.setEnabled(elementos_habilitados)
+        
         if not capitulo:
             self.editor_capitulo.clear()
             self.editor_capitulo.setEnabled(False)
@@ -257,9 +263,6 @@ class AbaConteudo(QWidget):
 
     @QtCore.Slot()
     def _adicionar_tabela(self):
-        if not self._get_capitulo_selecionado():
-            QMessageBox.warning(self, "Atenção", "Selecione um tópico antes de criar uma tabela.")
-            return
         dialog = TabelaDialog(parent=self)
         if dialog.exec():
             self.documento.banco_tabelas.append(dialog.get_dados_tabela())
@@ -267,9 +270,6 @@ class AbaConteudo(QWidget):
 
     @QtCore.Slot()
     def _adicionar_figura(self):
-        if not self._get_capitulo_selecionado():
-            QMessageBox.warning(self, "Atenção", "Selecione um tópico antes de criar uma figura.")
-            return
         dialog = DialogoFigura(parent=self)
         if dialog.exec():
             nova_figura = dialog.get_dados_figura()
@@ -279,9 +279,6 @@ class AbaConteudo(QWidget):
 
     @QtCore.Slot()
     def _adicionar_formula(self):
-        if not self._get_capitulo_selecionado():
-            QMessageBox.warning(self, "Atenção", "Selecione um tópico antes de criar uma fórmula.")
-            return
         dialog = DialogoFormula(parent=self)
         if dialog.exec():
             nova_formula = dialog.get_dados_formula()
@@ -328,55 +325,69 @@ class AbaConteudo(QWidget):
 
     @QtCore.Slot()
     def _editar_tabela(self):
-        linha = self.lista_tabelas.currentRow();
+        linha = self.lista_tabelas.currentRow()
         if linha == -1: return
-        dialog = TabelaDialog(tabela=self.documento.banco_tabelas[linha], parent=self)
+        titulo_tabela = self.lista_tabelas.item(linha).text()
+        tabela_original = next((t for t in self.documento.banco_tabelas if t.titulo == titulo_tabela), None)
+        if not tabela_original: return
+        
+        dialog = TabelaDialog(tabela=tabela_original, parent=self)
         if dialog.exec():
-            self.documento.banco_tabelas[linha] = dialog.get_dados_tabela()
+            tabela_original.__dict__.update(dialog.get_dados_tabela().__dict__)
             self.atualizar_bancos_visuais()
+
 
     @QtCore.Slot()
     def _remover_tabela(self):
-        linha = self.lista_tabelas.currentRow();
+        linha = self.lista_tabelas.currentRow()
         if linha == -1: return
-        if QMessageBox.question(self, "Confirmar", "Remover esta tabela do banco de dados do projeto?") == QMessageBox.StandardButton.Yes:
-            del self.documento.banco_tabelas[linha]
+        titulo_tabela = self.lista_tabelas.item(linha).text()
+        if QMessageBox.question(self, "Confirmar", f"Remover a tabela '{titulo_tabela}' do projeto?") == QMessageBox.StandardButton.Yes:
+            self.documento.banco_tabelas = [t for t in self.documento.banco_tabelas if t.titulo != titulo_tabela]
             self.atualizar_bancos_visuais()
             
     @QtCore.Slot()
     def _editar_figura(self):
-        linha = self.lista_figuras.currentRow();
+        linha = self.lista_figuras.currentRow()
         if linha == -1: return
-        dialog = DialogoFigura(figura=self.documento.banco_figuras[linha], parent=self)
+        titulo_figura = self.lista_figuras.item(linha).text()
+        figura_original = next((f for f in self.documento.banco_figuras if f.titulo == titulo_figura), None)
+        if not figura_original: return
+        
+        dialog = DialogoFigura(figura=figura_original, parent=self)
         if dialog.exec():
-            figura = dialog.get_dados_figura()
-            if figura and figura.caminho_processado:
-                self.documento.banco_figuras[linha] = figura
-                self.atualizar_bancos_visuais()
+            figura_original.__dict__.update(dialog.get_dados_figura().__dict__)
+            self.atualizar_bancos_visuais()
     
     @QtCore.Slot()
     def _remover_figura(self):
-        linha = self.lista_figuras.currentRow();
+        linha = self.lista_figuras.currentRow()
         if linha == -1: return
-        if QMessageBox.question(self, "Confirmar", "Remover esta figura do banco de dados do projeto?") == QMessageBox.StandardButton.Yes:
-            del self.documento.banco_figuras[linha]
+        titulo_figura = self.lista_figuras.item(linha).text()
+        if QMessageBox.question(self, "Confirmar", f"Remover a figura '{titulo_figura}' do projeto?") == QMessageBox.StandardButton.Yes:
+            self.documento.banco_figuras = [f for f in self.documento.banco_figuras if f.titulo != titulo_figura]
             self.atualizar_bancos_visuais()
             
     @QtCore.Slot()
     def _editar_formula(self):
         linha = self.lista_formulas.currentRow()
         if linha == -1: return
-        dialog = DialogoFormula(formula=self.documento.banco_formulas[linha], parent=self)
+        legenda_formula = self.lista_formulas.item(linha).text()
+        formula_original = next((f for f in self.documento.banco_formulas if f.legenda == legenda_formula), None)
+        if not formula_original: return
+        
+        dialog = DialogoFormula(formula=formula_original, parent=self)
         if dialog.exec():
-            self.documento.banco_formulas[linha] = dialog.get_dados_formula()
+            formula_original.__dict__.update(dialog.get_dados_formula().__dict__)
             self.atualizar_bancos_visuais()
     
     @QtCore.Slot()
     def _remover_formula(self):
         linha = self.lista_formulas.currentRow()
         if linha == -1: return
-        if QMessageBox.question(self, "Confirmar", "Remover esta fórmula do banco de dados do projeto?") == QMessageBox.StandardButton.Yes:
-            del self.documento.banco_formulas[linha]
+        legenda_formula = self.lista_formulas.item(linha).text()
+        if QMessageBox.question(self, "Confirmar", f"Remover a fórmula '{legenda_formula}' do projeto?") == QMessageBox.StandardButton.Yes:
+            self.documento.banco_formulas = [f for f in self.documento.banco_formulas if f.legenda != legenda_formula]
             self.atualizar_bancos_visuais()
     
     def _popular_arvore(self):

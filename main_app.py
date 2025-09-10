@@ -1,7 +1,5 @@
 # main_app.py
-# Descrição: Versão final da aplicação, com modos de visualização selecionáveis
-# e uma tela de boas-vindas para gerenciamento de projetos.
-# Integra o sistema de backup automático e recuperação de falhas com timer periódico.
+# Descrição: Versão com a proporção do QSplitter ajustada para um melhor equilíbrio.
 
 import sys
 import os
@@ -49,7 +47,6 @@ class ABNTHelperApp(QWidget):
         self.modificado = False
         self._populando_ui = False
         
-        # Flag para controlar o reinício para a tela inicial
         self.wants_to_restart = False
 
         self.modo_preview = "lado_a_lado"
@@ -167,7 +164,11 @@ class ABNTHelperApp(QWidget):
             splitter = QSplitter(QtCore.Qt.Orientation.Horizontal, self)
             splitter.addWidget(self.tabs)
             splitter.addWidget(self.preview_container)
-            splitter.setSizes([600, 800])
+            
+            # --- AQUI ESTÁ A CORREÇÃO ---
+            # Invertemos a proporção para dar mais espaço ao painel de edição
+            splitter.setSizes([800, 600]) 
+            
             self.main_content_widget = splitter
             self.preview_container.show()
         else:
@@ -180,6 +181,7 @@ class ABNTHelperApp(QWidget):
         self.main_layout.insertWidget(0, self.main_content_widget, 1)
 
     def _criar_aba_geral(self):
+        # ... (código existente sem alterações)
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.addWidget(QLabel("<h3>Configurações do Documento</h3>"))
@@ -220,6 +222,7 @@ class ABNTHelperApp(QWidget):
         return widget
 
     def _criar_aba_referencias(self):
+        # ... (código existente sem alterações)
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.addWidget(QLabel("<h3>Gerenciador de Referências</h3>"))
@@ -243,6 +246,7 @@ class ABNTHelperApp(QWidget):
         return widget
 
     def _criar_painel_preview(self):
+        # ... (código existente sem alterações)
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(0,0,0,0)
@@ -283,6 +287,9 @@ class ABNTHelperApp(QWidget):
         btn_fechar_busca.clicked.connect(self._alternar_barra_busca)
         
         return widget
+
+    # ... (O restante do arquivo, a partir daqui, não precisa de alterações)
+    # ... (Ele será idêntico ao que você já tem)
 
     @QtCore.Slot()
     def _alternar_barra_busca(self):
@@ -374,9 +381,9 @@ class ABNTHelperApp(QWidget):
         if self._populando_ui or not nome_modelo or nome_modelo == self.documento.configuracoes.tipo_trabalho:
             return
         resposta = QMessageBox.question(self, "Mudar Modelo de Trabalho",
-                                          f"Mudar o modelo para '{nome_modelo}' irá reorganizar sua estrutura de capítulos.\n"
-                                          "Capítulos existentes serão preservados...\nDeseja continuar?",
-                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                                        f"Mudar o modelo para '{nome_modelo}' irá reorganizar sua estrutura de capítulos.\n"
+                                        "Capítulos existentes serão preservados...\nDeseja continuar?",
+                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if resposta == QMessageBox.StandardButton.No:
             self._populando_ui = True
             self.cfg_tipo.setCurrentText(self.documento.configuracoes.tipo_trabalho)
@@ -459,8 +466,8 @@ class ABNTHelperApp(QWidget):
         if not self.modificado:
             return True
         resposta = QMessageBox.question(self, "Salvar Alterações?",
-                                          "Você tem alterações não salvas. Deseja salvá-las?",
-                                          QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
+                                        "Você tem alterações não salvas. Deseja salvá-las?",
+                                        QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
         if resposta == QMessageBox.StandardButton.Cancel:
             return False
         if resposta == QMessageBox.StandardButton.Save:
